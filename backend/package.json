@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "pnpm run build & node ./dist/server.js",
-    "dev": "tsx watch ./src/**.ts",
+    "dev": "tsx watch src/server.ts",
     "biome:check": "pnpm exec biome check",
     "biome:fix": "pnpm exec biome check --write"
   },
