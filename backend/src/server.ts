@@ -58,8 +58,16 @@ app.use(limiter);
   try {
     app.use("/api/v1", v1Routes);
 
-    app.listen(config.PORT, () => {
+    const server = app.listen(config.PORT, () => {
       console.log(`Server running at: http://localhost:${config.PORT}`);
+    });
+
+    process.on("SIGTERM", () => {
+      server.close(handleServerShutdown);
+    });
+
+    process.on("SIGINT", () => {
+      server.close(handleServerShutdown);
     });
   } catch (err) {
     console.log("Failed to start the server", err);
@@ -78,6 +86,3 @@ async function handleServerShutdown() {
     console.log("Failed to shutdown server", err);
   }
 }
-
-process.on("SIGTERM", handleServerShutdown);
-process.on("SIGINT", handleServerShutdown);
