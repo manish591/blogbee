@@ -7,7 +7,8 @@ import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 
 import { config } from './config';
-import v1Routes from "./routes/v1";
+import { connectToDatabase, disconnectFromDatabase } from './lib/db';
+import { v1Routes } from './routes/v1';
 
 const app = express();
 
@@ -34,9 +35,9 @@ const limiter = rateLimit({
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: {
-    error: "Too many requests. Please try again later."
-  }
-})
+    error: 'Too many requests. Please try again later.',
+  },
+});
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -56,33 +57,36 @@ app.use(limiter);
 
 (async () => {
   try {
-    app.use("/api/v1", v1Routes);
+    await connectToDatabase();
+
+    app.use('/api/v1', v1Routes);
 
     const server = app.listen(config.PORT, () => {
       console.log(`Server running at: http://localhost:${config.PORT}`);
     });
 
-    process.on("SIGTERM", () => {
+    process.on('SIGTERM', () => {
       server.close(handleServerShutdown);
     });
 
-    process.on("SIGINT", () => {
+    process.on('SIGINT', () => {
       server.close(handleServerShutdown);
     });
   } catch (err) {
-    console.log("Failed to start the server", err);
+    console.log('Failed to start the server', err);
 
-    if (config.NODE_ENV === "production") {
+    if (config.NODE_ENV === 'production') {
       process.exit(1);
     }
   }
-})()
+})();
 
 async function handleServerShutdown() {
   try {
-    console.log("Server Shutdown");
+    await disconnectFromDatabase();
+    console.log('Server Shutdown');
     process.exit(0);
   } catch (err) {
-    console.log("Failed to shutdown server", err);
+    console.log('Failed to shutdown server', err);
   }
 }
