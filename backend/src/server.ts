@@ -9,6 +9,7 @@ import helmet from 'helmet';
 import { config } from './config';
 import { connectToDatabase, disconnectFromDatabase } from './lib/db';
 import { v1Routes } from './routes/v1';
+import { logger } from './lib/winston';
 
 const app = express();
 
@@ -62,7 +63,7 @@ app.use(limiter);
     app.use('/api/v1', v1Routes);
 
     const server = app.listen(config.PORT, () => {
-      console.log(`Server running at: http://localhost:${config.PORT}`);
+      logger.info(`Server running at: http://localhost:${config.PORT}`);
     });
 
     process.on('SIGTERM', () => {
@@ -73,7 +74,7 @@ app.use(limiter);
       server.close(handleServerShutdown);
     });
   } catch (err) {
-    console.log('Failed to start the server', err);
+    logger.error('Failed to start the server', err);
 
     if (config.NODE_ENV === 'production') {
       process.exit(1);
@@ -84,9 +85,9 @@ app.use(limiter);
 async function handleServerShutdown() {
   try {
     await disconnectFromDatabase();
-    console.log('Server Shutdown');
+    logger.warn('Server Shutdown');
     process.exit(0);
   } catch (err) {
-    console.log('Failed to shutdown server', err);
+    logger.error('Failed to shutdown server', err);
   }
 }

@@ -1,6 +1,7 @@
 import type { ConnectOptions } from 'mongoose';
 import mongoose from 'mongoose';
 import { config } from '../config';
+import { logger } from './winston';
 
 const clientOptions: ConnectOptions = {
   dbName: 'writely-db',
@@ -20,9 +21,9 @@ export async function connectToDatabase() {
 
     await mongoose.connect(config.DATABASE_URL, clientOptions);
 
-    console.log('Successfully connected to the database');
+    logger.info('Successfully connected to the database');
   } catch (err) {
-    console.log('Failed to connect to the database', err);
+    logger.error('Failed to connect to the database', err);
     process.exit(1);
   }
 }
@@ -31,8 +32,8 @@ export async function disconnectFromDatabase() {
   try {
     await mongoose.disconnect();
 
-    console.log('Successfully disconnected from the database');
+    logger.warn('Successfully disconnected from the database');
   } catch (err) {
-    console.log('Failed to disconnect from the database', err);
+    logger.error('Failed to disconnect from the database', err);
   }
 }
