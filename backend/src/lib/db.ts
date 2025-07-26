@@ -1,25 +1,18 @@
-import type { ConnectOptions } from 'mongoose';
-import mongoose from 'mongoose';
+import { MongoClient, ServerApiVersion } from 'mongodb';
 import { config } from '../config';
 import { logger } from './winston';
 
-const clientOptions: ConnectOptions = {
-  dbName: 'writely-db',
-  appName: 'writely',
+export const client = new MongoClient(config.DATABASE_URL, {
   serverApi: {
-    version: '1',
+    version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  },
-};
+  }
+});
 
 export async function connectToDatabase() {
   try {
-    if (!config.DATABASE_URL) {
-      throw new Error('Database URI cannot be empty');
-    }
-
-    await mongoose.connect(config.DATABASE_URL, clientOptions);
+    await client.connect();
 
     logger.info('Successfully connected to the database');
   } catch (err) {
@@ -30,7 +23,7 @@ export async function connectToDatabase() {
 
 export async function disconnectFromDatabase() {
   try {
-    await mongoose.disconnect();
+    await client.close();
 
     logger.warn('Successfully disconnected from the database');
   } catch (err) {
