@@ -8,8 +8,8 @@ import helmet from 'helmet';
 
 import { config } from './config';
 import { connectToDatabase, disconnectFromDatabase } from './lib/db';
-import { v1Routes } from './routes/v1';
 import { logger } from './lib/winston';
+import { v1Routes } from './routes/v1';
 
 const app = express();
 

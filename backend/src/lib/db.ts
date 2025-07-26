@@ -7,7 +7,7 @@ export const client = new MongoClient(config.DATABASE_URL, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 });
 
 export async function connectToDatabase() {
