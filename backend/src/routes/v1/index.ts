@@ -2,14 +2,4 @@ import { Router } from 'express';
 
 const router = Router();
 
-router.get('/', (_req, res) => {
-  res.status(200).json({
-    message: 'success',
-    status: 'ok',
-    docs: '',
-    version: 'v1',
-    timestamp: new Date().toISOString(),
-  });
-});
-
-export { Router as v1Routes };
+export { router as v1Routes };
