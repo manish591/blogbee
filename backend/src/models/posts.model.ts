@@ -4,6 +4,11 @@ export enum PostStatus {
   ARCHIVED
 }
 
+export interface Tag {
+  _id?: string;
+  name: string;
+}
+
 export interface Posts {
   _id?: string;
   userId: string;
@@ -13,10 +18,7 @@ export interface Posts {
   content: string;
   slug: string;
   postStatus: PostStatus
-  category: {
-    _id?: string;
-    name: string;
-  };
+  tags: Tag[];
   createdAt: Date;
   updatedAt: Date;
 }
