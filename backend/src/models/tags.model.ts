@@ -1,4 +1,4 @@
-export interface Categories {
+export interface Tags {
   _id?: string;
   name: string;
   description?: string;
