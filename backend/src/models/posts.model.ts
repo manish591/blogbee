@@ -1,7 +1,7 @@
 export enum PostStatus {
   DRAFT,
   PUBLISHED,
-  ARCHIVED
+  ARCHIVED,
 }
 
 export interface Tag {
@@ -17,7 +17,7 @@ export interface Posts {
   subTitle?: string;
   content: string;
   slug: string;
-  postStatus: PostStatus
+  postStatus: PostStatus;
   tags: Tag[];
   createdAt: Date;
   updatedAt: Date;
