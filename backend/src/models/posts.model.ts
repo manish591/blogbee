@@ -9,9 +9,14 @@ export interface Posts {
   userId: string;
   blogId: string;
   title: string;
+  subTitle?: string;
   content: string;
   slug: string;
   postStatus: PostStatus
+  category: {
+    _id?: string;
+    name: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
