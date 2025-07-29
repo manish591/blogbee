@@ -9,7 +9,7 @@ import helmet from 'helmet';
 import { config } from './config';
 import { connectToDatabase, disconnectFromDatabase } from './lib/db';
 import { logger } from './lib/winston';
-import { v1Routes } from './routes/v1';
+import { v1Routes } from './routes';
 
 const app = express();
 
@@ -60,7 +60,7 @@ app.use(limiter);
   try {
     await connectToDatabase();
 
-    app.use('/api/v1', v1Routes);
+    app.use('/api', v1Routes);
 
     const server = app.listen(config.PORT, () => {
       logger.info(`Server running at: http://localhost:${config.PORT}`);
