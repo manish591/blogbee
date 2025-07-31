@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
-import { collections } from '../db';
-import type { Session } from '../db/schema';
+import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { getAuthSession } from '../api/users/users.services';
 import { logger } from '../utils/logger';
 
 export async function authenticate(
@@ -14,48 +14,51 @@ export async function authenticate(
 
     if (!sessionId) {
       logger.error('Invalid cookies found in the request');
-      res.status(401).json({
-        status: 401,
-        code: 'UNAUTHENTICATED',
-        message: 'You are not logged in.',
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusCodes.UNAUTHORIZED,
+        code: ReasonPhrases.UNAUTHORIZED,
+        message: 'You are not authorized.',
       });
+
+      return;
     }
 
-    const sessionData = (await collections.session?.findOne({
-      sessionId,
-    })) as Session | null;
+    const sessionData = await getAuthSession(sessionId);
 
     if (!sessionData) {
       logger.error('No session found.');
-      res.status(401).json({
-        status: 401,
-        code: 'UNAUTHENTICATED',
-        message: 'You are not logged in.',
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusCodes.UNAUTHORIZED,
+        code: ReasonPhrases.UNAUTHORIZED,
+        message: 'You are not authorized.',
       });
 
       return;
     }
 
     if (new Date() > sessionData.expiresIn) {
-      logger.error('session token expired');
-      res.status(401).json({
-        status: 401,
-        code: 'UNAUTHENTICATED',
-        message: 'You are not logged in.',
+      logger.error('Session token expired');
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusCodes.UNAUTHORIZED,
+        code: ReasonPhrases.UNAUTHORIZED,
+        message: 'You are not authorized.',
       });
+
+      return;
     }
 
     res.locals.user = {
+      sessionId,
       userId: sessionData.userId,
     };
 
     next();
   } catch (err) {
     logger.error('Internal server error', err);
-    res.status(500).json({
-      status: 500,
-      code: 'INTERNAL_SERVER_ERROR',
-      message: 'Error on the server side. Please try again later',
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured. Please try again later!',
     });
   }
 }
