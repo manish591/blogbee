@@ -1,6 +1,6 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { collections } from '../../db';
-import type { Users } from '../../db/schema';
+import type { Session, Users } from '../../db/schema';
 import { AppError } from '../../utils/app-error';
 import { generateRandomString } from '../../utils/generate-random-string';
 import { hashPassword } from '../../utils/hash-password';
@@ -93,6 +93,20 @@ export async function createAuthSession(userId: string) {
 export async function revokeAuthSession(sessionId: string) {
   try {
     await collections.session?.deleteOne({ sessionId });
+  } catch (err) {
+    logger.error('An internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'An internal server error occured. Try again later!',
+    });
+  }
+}
+
+export async function getAuthSession(sessionId: string) {
+  try {
+    const authSession = (await collections.session?.findOne({ sessionId })) as Session | null;
+    return authSession;
   } catch (err) {
     logger.error('An internal server error occured', err);
     throw new AppError({
