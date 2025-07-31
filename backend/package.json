@@ -6,9 +6,10 @@
   "scripts": {
     "build": "tsc",
     "start": "pnpm run build & node ./dist/server.js",
-    "dev": "tsx watch src/server.ts",
+    "dev": "nodemon",
     "biome:check": "pnpm exec biome check",
-    "biome:fix": "pnpm exec biome check --write"
+    "biome:fix": "pnpm exec biome check --write",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "manish591",
@@ -21,9 +22,12 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/node": "^24.1.0",
+    "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
-    "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
+    "supertest": "^7.1.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -34,6 +38,7 @@
     "express": "^5.1.0",
     "express-rate-limit": "^8.0.1",
     "helmet": "^8.1.0",
+    "http-status-codes": "^2.3.0",
     "mongodb": "^6.18.0",
     "winston": "^3.17.0",
     "zod": "^4.0.10"

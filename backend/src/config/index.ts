@@ -8,5 +8,5 @@ export const config = {
   NODE_ENV: process.env.NODE_ENV ?? 'development',
   ALLOWED_ORIGINS: ['http://localhost:3000'],
   DATABASE_URL: process.env.DATABASE_URL ?? '',
-  DATABASE_NAME: process.env.DB_NAME,
+  DATABASE_NAME: process.env.DATABASE_NAME,
 };
