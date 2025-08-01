@@ -1,3 +1,5 @@
+import type { Db } from "mongodb";
+
 declare global {
   namespace Express {
     interface Locals {
@@ -6,7 +8,11 @@ declare global {
         sessionId: string;
       };
     }
+
+    interface Request {
+      db: Db
+    }
   }
 }
 
-export {};
+export { };

@@ -1,13 +1,14 @@
 import { buildServer } from './app';
 import { config } from './config';
-import { connectToDatabase, disconnectFromDatabase } from './db';
+import { connectToDatabase, createDatabaseClient, disconnectFromDatabase } from './db';
 import { logger } from './utils/logger';
-
-const app = buildServer();
 
 (async () => {
   try {
-    await connectToDatabase();
+    const dbClient = createDatabaseClient(config.DATABASE_URL);
+    const db = await connectToDatabase(dbClient);
+
+    const app = buildServer({ db });
 
     const server = app.listen(config.PORT, () => {
       logger.info(`Server running at: http://localhost:${config.PORT}`);
@@ -15,7 +16,7 @@ const app = buildServer();
 
     process.on('SIGTERM', () => {
       server.close(async () => {
-        await disconnectFromDatabase();
+        await disconnectFromDatabase(dbClient);
         logger.warn('Server Shutdown');
         process.exit(0);
       });
@@ -23,7 +24,7 @@ const app = buildServer();
 
     process.on('SIGINT', () => {
       server.close(async () => {
-        await disconnectFromDatabase();
+        await disconnectFromDatabase(dbClient);
         logger.warn('Server Shutdown');
         process.exit(0);
       });

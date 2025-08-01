@@ -1,17 +1,17 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-import { collections } from '../../db';
+import type { Db } from 'mongodb';
 import type { Session, Users } from '../../db/schema';
 import { AppError } from '../../utils/app-error';
 import { generateRandomString } from '../../utils/generate-random-string';
 import { hashPassword } from '../../utils/hash-password';
 import { logger } from '../../utils/logger';
 
-export async function getUserWithEmail(email: string) {
-  try {
-    const userData = (await collections.users?.findOne({
-      email,
-    })) as Required<Users> | null;
+export const USERS_COLLECTION = "users";
+export const SESSION_COLLECTION = "session";
 
+export async function getUserWithEmail(email: string, db: Db) {
+  try {
+    const userData = await db.collection<Users>(USERS_COLLECTION).findOne({ email });
     return userData;
   } catch (err) {
     logger.error('An internal server error occured', err);
@@ -25,26 +25,18 @@ export async function getUserWithEmail(email: string) {
 
 export async function createNewUser(
   userData: Omit<Users, 'createdAt' | 'updatedAt'>,
+  db: Db
 ) {
   try {
     const hashedPassword = await hashPassword(userData.password);
 
-    const user = await collections.users?.insertOne({
+    const user = await db.collection<Users>(USERS_COLLECTION).insertOne({
       email: userData.email,
       name: userData.name,
       password: hashedPassword,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-
-    if (!user) {
-      logger.error('Failed to insert user');
-      throw new AppError({
-        status: StatusCodes.INTERNAL_SERVER_ERROR,
-        code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-        message: 'An internal server error occured. Try again later!',
-      });
-    }
 
     return user;
   } catch (err) {
@@ -57,27 +49,18 @@ export async function createNewUser(
   }
 }
 
-export async function createAuthSession(userId: string) {
+export async function createAuthSession(userId: string, db: Db) {
   try {
     const sessionId = generateRandomString();
     const sessionExpiresIn = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
 
-    const createdSession = await collections.session?.insertOne({
+    await db.collection<Session>(SESSION_COLLECTION).insertOne({
       userId,
       sessionId,
       expiresIn: sessionExpiresIn,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-
-    if (!createdSession) {
-      logger.error('Failed to insert user');
-      throw new AppError({
-        status: StatusCodes.INTERNAL_SERVER_ERROR,
-        code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-        message: 'An internal server error occured. Try again later!',
-      });
-    }
 
     return sessionId;
   } catch (err) {
@@ -90,9 +73,9 @@ export async function createAuthSession(userId: string) {
   }
 }
 
-export async function revokeAuthSession(sessionId: string) {
+export async function revokeAuthSession(sessionId: string, db: Db) {
   try {
-    await collections.session?.deleteOne({ sessionId });
+    await db.collection<Session>(SESSION_COLLECTION).deleteOne({ sessionId });
   } catch (err) {
     logger.error('An internal server error occured', err);
     throw new AppError({
@@ -103,9 +86,9 @@ export async function revokeAuthSession(sessionId: string) {
   }
 }
 
-export async function getAuthSession(sessionId: string) {
+export async function getAuthSession(sessionId: string, db: Db) {
   try {
-    const authSession = (await collections.session?.findOne({ sessionId })) as Session | null;
+    const authSession = await db.collection<Session>(SESSION_COLLECTION).findOne({ sessionId });
     return authSession;
   } catch (err) {
     logger.error('An internal server error occured', err);

@@ -33,7 +33,7 @@ export async function createUser(
   try {
     const { email } = req.body;
 
-    const isUserExists = await getUserWithEmail(email);
+    const isUserExists = await getUserWithEmail(email, req.db);
 
     if (isUserExists) {
       logger.error('User with email already exists');
@@ -46,8 +46,8 @@ export async function createUser(
       return;
     }
 
-    const userData = await createNewUser(req.body);
-    const sessionId = await createAuthSession(userData.insertedId);
+    const userData = await createNewUser(req.body, req.db);
+    const sessionId = await createAuthSession(userData.insertedId, req.db);
 
     res.cookie(SESSION_COOKIE_NAME, sessionId, cookieOptions);
     res.status(StatusCodes.CREATED).json({
@@ -75,7 +75,7 @@ export async function loginUser(
   try {
     const { email, password } = req.body;
 
-    const userData = await getUserWithEmail(email);
+    const userData = await getUserWithEmail(email, req.db);
 
     if (!userData) {
       logger.error('Unauthenticated user. Credentials are invalid.');
@@ -104,7 +104,7 @@ export async function loginUser(
       return;
     }
 
-    const sessionId = await createAuthSession(userData._id);
+    const sessionId = await createAuthSession(userData._id, req.db);
 
     res.cookie(SESSION_COOKIE_NAME, sessionId, cookieOptions);
     res.status(StatusCodes.OK).json({
@@ -121,7 +121,7 @@ export async function loginUser(
   }
 }
 
-export async function logoutUser(_req: Request, res: Response) {
+export async function logoutUser(req: Request, res: Response) {
   try {
     const userData = res.locals.user;
 
@@ -136,7 +136,7 @@ export async function logoutUser(_req: Request, res: Response) {
       return;
     }
 
-    await revokeAuthSession(userData.sessionId);
+    await revokeAuthSession(userData.sessionId, req.db);
 
     res.clearCookie(SESSION_COOKIE_NAME);
     res.status(StatusCodes.OK).json({

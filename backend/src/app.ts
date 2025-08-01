@@ -10,12 +10,13 @@ import express, {
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import type * as mongo from "mongodb";
 
 import { config } from './config';
 import { v1Routes } from './routes';
 import { AppError } from './utils/app-error';
 
-export function buildServer() {
+export function buildServer({ db }: { db: mongo.Db }) {
   const app = express();
 
   const corsOptions: CorsOptions = {
@@ -60,6 +61,11 @@ export function buildServer() {
     }),
   );
   app.use(limiter);
+
+  app.use((req, _res, next) => {
+    req.db = db;
+    next();
+  });
 
   app.use('/api/v1/healthcheck', (_req, res) => {
     res.status(200).json({
