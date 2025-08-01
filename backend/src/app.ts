@@ -10,7 +10,7 @@ import express, {
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-import type * as mongo from "mongodb";
+import type * as mongo from 'mongodb';
 
 import { config } from './config';
 import { v1Routes } from './routes';

@@ -1,4 +1,4 @@
-import type { Db } from "mongodb";
+import type { Db } from 'mongodb';
 
 declare global {
   namespace Express {
@@ -10,9 +10,7 @@ declare global {
     }
 
     interface Request {
-      db: Db
+      db: Db;
     }
   }
 }
-
-export { };

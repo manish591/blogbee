@@ -1,6 +1,10 @@
 import { buildServer } from './app';
 import { config } from './config';
-import { connectToDatabase, createDatabaseClient, disconnectFromDatabase } from './db';
+import {
+  connectToDatabase,
+  createDatabaseClient,
+  disconnectFromDatabase,
+} from './db';
 import { logger } from './utils/logger';
 
 (async () => {

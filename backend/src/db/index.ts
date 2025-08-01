@@ -8,7 +8,7 @@ export const dbClientOptions: mongoDB.MongoClientOptions = {
     strict: true,
     deprecationErrors: true,
   },
-}
+};
 
 export function createDatabaseClient(databaseUri: string) {
   return new mongoDB.MongoClient(databaseUri, dbClientOptions);

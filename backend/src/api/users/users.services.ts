@@ -6,12 +6,14 @@ import { generateRandomString } from '../../utils/generate-random-string';
 import { hashPassword } from '../../utils/hash-password';
 import { logger } from '../../utils/logger';
 
-export const USERS_COLLECTION = "users";
-export const SESSION_COLLECTION = "session";
+export const USERS_COLLECTION = 'users';
+export const SESSION_COLLECTION = 'session';
 
 export async function getUserWithEmail(email: string, db: Db) {
   try {
-    const userData = await db.collection<Users>(USERS_COLLECTION).findOne({ email });
+    const userData = await db
+      .collection<Users>(USERS_COLLECTION)
+      .findOne({ email });
     return userData;
   } catch (err) {
     logger.error('An internal server error occured', err);
@@ -25,7 +27,7 @@ export async function getUserWithEmail(email: string, db: Db) {
 
 export async function createNewUser(
   userData: Omit<Users, 'createdAt' | 'updatedAt'>,
-  db: Db
+  db: Db,
 ) {
   try {
     const hashedPassword = await hashPassword(userData.password);
@@ -88,7 +90,9 @@ export async function revokeAuthSession(sessionId: string, db: Db) {
 
 export async function getAuthSession(sessionId: string, db: Db) {
   try {
-    const authSession = await db.collection<Session>(SESSION_COLLECTION).findOne({ sessionId });
+    const authSession = await db
+      .collection<Session>(SESSION_COLLECTION)
+      .findOne({ sessionId });
     return authSession;
   } catch (err) {
     logger.error('An internal server error occured', err);
