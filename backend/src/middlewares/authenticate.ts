@@ -23,7 +23,7 @@ export async function authenticate(
       return;
     }
 
-    const sessionData = await getAuthSession(sessionId);
+    const sessionData = await getAuthSession(sessionId, req.db);
 
     if (!sessionData) {
       logger.error('No session found.');
