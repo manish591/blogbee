@@ -14,14 +14,13 @@ let db: mongo.Db;
 let dbClient: mongo.MongoClient;
 let container: StartedMongoDBContainer;
 
-const timeout = 30_000;
+const timeout = 60_000;
 
 beforeAll(async () => {
   // start the mongo container first and connect to the database
-  container = await new MongoDBContainer('mongo').start();
+  container = await new MongoDBContainer("mongo:8.0.12").start();
   const DATABASE_URI = container.getConnectionString();
   dbClient = createDatabaseClient(DATABASE_URI);
-
   db = await connectToDatabase(dbClient);
 }, timeout);
 

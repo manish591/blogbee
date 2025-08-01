@@ -16,6 +16,14 @@ import { config } from './config';
 import { v1Routes } from './routes';
 import { AppError } from './utils/app-error';
 
+declare global {
+  namespace Express {
+    interface Request {
+      db: mongo.Db;
+    }
+  }
+}
+
 export function buildServer({ db }: { db: mongo.Db }) {
   const app = express();
 
