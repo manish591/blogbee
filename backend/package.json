@@ -16,6 +16,7 @@
   "license": "ISC",
   "devDependencies": {
     "@biomejs/biome": "^2.1.2",
+    "@testcontainers/mongodb": "^11.4.0",
     "@types/bcrypt": "^6.0.0",
     "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.9",
