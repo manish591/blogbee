@@ -1,5 +1,15 @@
 {
-	"devDependencies": {
-		"@biomejs/biome": "2.1.2"
-	}
+  "name": "writely",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "biome:check": "pnpm exec biome check",
+    "biome:fix": "pnpm exec biome check --write"
+  },
+  "keywords": [],
+  "author": "manish591",
+  "license": "ISC",
+  "devDependencies": {
+    "@biomejs/biome": "2.1.2"
+  }
 }
