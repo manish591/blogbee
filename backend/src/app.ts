@@ -75,12 +75,6 @@ export function buildServer({ db }: { db: mongo.Db }) {
     next();
   });
 
-  app.use('/api/v1/healthcheck', (_req, res) => {
-    res.status(200).json({
-      message: 'success',
-    });
-  });
-
   app.use('/api/v1', v1Routes);
 
   app.use((_req, _res, next) => {
