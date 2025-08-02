@@ -10,7 +10,7 @@ import { logger } from './utils/logger';
 (async () => {
   try {
     const dbClient = createDatabaseClient(config.DATABASE_URL);
-    const db = await connectToDatabase(dbClient);
+    const db = await connectToDatabase(dbClient, config.DATABASE_NAME);
 
     const app = buildServer({ db });
 

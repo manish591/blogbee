@@ -1,5 +1,4 @@
 import * as mongoDB from 'mongodb';
-import { config } from '../config';
 import { logger } from '../utils/logger';
 
 export const dbClientOptions: mongoDB.MongoClientOptions = {
@@ -10,15 +9,21 @@ export const dbClientOptions: mongoDB.MongoClientOptions = {
   },
 };
 
-export function createDatabaseClient(databaseUri: string) {
-  return new mongoDB.MongoClient(databaseUri, dbClientOptions);
+export function createDatabaseClient(
+  databaseUri: string,
+  options: mongoDB.MongoClientOptions = dbClientOptions,
+) {
+  return new mongoDB.MongoClient(databaseUri, options);
 }
 
-export async function connectToDatabase(client: mongoDB.MongoClient) {
+export async function connectToDatabase(
+  client: mongoDB.MongoClient,
+  databaseName: string,
+) {
   try {
     await client.connect();
 
-    const db: mongoDB.Db = client.db(config.DATABASE_NAME);
+    const db: mongoDB.Db = client.db(databaseName);
 
     logger.info('Successfully Connected To The Database');
 

@@ -4,6 +4,7 @@ import {
 } from '@testcontainers/mongodb';
 import type * as mongo from 'mongodb';
 import { afterAll, beforeAll, beforeEach } from 'vitest';
+import { config } from '../src/config';
 import {
   connectToDatabase,
   createDatabaseClient,
@@ -12,16 +13,20 @@ import {
 
 let db: mongo.Db;
 let dbClient: mongo.MongoClient;
-let container: StartedMongoDBContainer;
+let mongodbContainer: StartedMongoDBContainer;
 
 const timeout = 60_000;
 
 beforeAll(async () => {
-  // start the mongo container first and connect to the database
-  container = await new MongoDBContainer("mongo:8.0.12").start();
-  const DATABASE_URI = container.getConnectionString();
-  dbClient = createDatabaseClient(DATABASE_URI);
-  db = await connectToDatabase(dbClient);
+  mongodbContainer = await new MongoDBContainer('mongo:8.0.12').start();
+  dbClient = createDatabaseClient(
+    `${mongodbContainer.getConnectionString()}/?directConnection=true`,
+    {
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+    },
+  );
+  db = await connectToDatabase(dbClient, config.TEST_DATABASE_NAME);
 }, timeout);
 
 beforeEach(async () => {
@@ -32,7 +37,7 @@ beforeEach(async () => {
 afterAll(async () => {
   // close the db connections
   await disconnectFromDatabase(dbClient);
-  await container?.stop();
+  await mongodbContainer?.stop();
 }, timeout);
 
 export { db };
