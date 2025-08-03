@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { blogsRoutes } from './api/blogs/blogs.routes';
-import { usersRoutes } from './api/users/users.routes';
 import { healthCheckRoutes } from './api/healthcheck/healthcheck.routes';
+import { usersRoutes } from './api/users/users.routes';
 
 const router = Router();
 

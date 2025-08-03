@@ -8,7 +8,7 @@
   "files": {
     "ignoreUnknown": false,
     "includes": [
-      ".backend/src/**/*.ts",
+      "./backend/src/**/*.ts",
       "./backend/test/**/*.ts",
       "./backend/src/**/*.test.ts"
     ]

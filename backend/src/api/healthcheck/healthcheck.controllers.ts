@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import type { Request, Response } from 'express';
 
-export async function healthCheck(req: Request, res: Response) {
+export async function healthCheck(_req: Request, res: Response) {
   res.status(200).json({
     uptime: new Date(),
     message: 'Success',

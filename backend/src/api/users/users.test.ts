@@ -162,4 +162,16 @@ describe('users', () => {
       expect(res.status).toBe(200);
     });
   });
+
+  describe('POST /users/picture', () => {
+    it('should return 401 unauthorized if authorization cookies not found', async () => {});
+
+    it('should return 400 bad request if image file not attached', async () => {});
+
+    it('should return 200 ok if file is successfully uploaded', async () => {});
+  });
+
+  describe('PATCH /users/me', () => {});
+
+  describe('GET /users/me', () => {});
 });

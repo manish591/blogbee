@@ -5,7 +5,7 @@ import { AppError } from '../../utils/app-error';
 import { generateRandomString } from '../../utils/generate-random-string';
 import { hashPassword } from '../../utils/hash-password';
 import { logger } from '../../utils/logger';
-import { TUpdateProfileSchema } from './users.schema';
+import type { TUpdateProfileSchema } from './users.schema';
 
 export const USERS_COLLECTION = 'users';
 export const SESSION_COLLECTION = 'session';
@@ -105,9 +105,15 @@ export async function getAuthSession(sessionId: string, db: Db) {
   }
 }
 
-export async function updateProfile(userId: string, updatedData: TUpdateProfileSchema, db: Db) {
+export async function updateProfile(
+  userId: string,
+  updatedData: TUpdateProfileSchema,
+  db: Db,
+) {
   try {
-    await db.collection<Users>(USERS_COLLECTION).updateOne({ _id: userId }, updatedData);
+    await db
+      .collection<Users>(USERS_COLLECTION)
+      .updateOne({ _id: userId }, updatedData);
   } catch (err) {
     logger.error('An internal server error occured', err);
     throw new AppError({
@@ -120,15 +126,18 @@ export async function updateProfile(userId: string, updatedData: TUpdateProfileS
 
 export async function getUserDetails(userId: string, db: Db) {
   try {
-    const userData = await db.collection<Users>(USERS_COLLECTION).findOne({ _id: userId }, {
-      projection: {
-        name: 1,
-        email: 1,
-        profileImg: 1,
-        createdAt: 1,
-        updatedAt: 1
-      }
-    });
+    const userData = await db.collection<Users>(USERS_COLLECTION).findOne(
+      { _id: userId },
+      {
+        projection: {
+          name: 1,
+          email: 1,
+          profileImg: 1,
+          createdAt: 1,
+          updatedAt: 1,
+        },
+      },
+    );
 
     return userData;
   } catch (err) {

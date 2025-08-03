@@ -2,6 +2,10 @@ import type { CookieOptions, Request, Response } from 'express';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { comparePassword } from '../../utils/compare-password';
 import { logger } from '../../utils/logger';
+import {
+  uploadFileToCloudinary,
+  uploadSingleFile,
+} from '../../utils/upload-files';
 import type {
   TCreateUserRequestBody,
   TLoginUserRequestBody,
@@ -15,7 +19,6 @@ import {
   revokeAuthSession,
   updateProfile,
 } from './users.services';
-import { uploadSingleFile } from '../../utils/upload-files';
 
 export const SESSION_COOKIE_NAME = 'sessionId';
 
@@ -165,20 +168,23 @@ export async function uploadProfileImageHandler(req: Request, res: Response) {
       res.status(StatusCodes.BAD_REQUEST).json({
         status: StatusCodes.BAD_REQUEST,
         code: ReasonPhrases.BAD_REQUEST,
-        message: "File not found"
+        message: 'File not found',
       });
 
       return;
     }
 
-    const profileImageUrl = await uploadSingleFile(uploadedFile);
+    const profileImageUrl = await uploadSingleFile(
+      uploadedFile,
+      uploadFileToCloudinary,
+    );
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
-      message: "File uploaded successfully",
+      message: 'File uploaded successfully',
       data: {
-        url: profileImageUrl
-      }
+        url: profileImageUrl,
+      },
     });
   } catch (err) {
     logger.error('Internal server error', err);
@@ -190,11 +196,14 @@ export async function uploadProfileImageHandler(req: Request, res: Response) {
   }
 }
 
-export async function updateProfileHandler(req: Request<
-  Record<string, unknown>,
-  Record<string, unknown>,
-  TUpdateProfileSchema
->, res: Response) {
+export async function updateProfileHandler(
+  req: Request<
+    Record<string, unknown>,
+    Record<string, unknown>,
+    TUpdateProfileSchema
+  >,
+  res: Response,
+) {
   try {
     const userData = res.locals.user;
 
@@ -215,7 +224,7 @@ export async function updateProfileHandler(req: Request<
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
-      message: "Profile data updated successfully"
+      message: 'Profile data updated successfully',
     });
   } catch (err) {
     logger.error('Internal server error', err);
@@ -247,10 +256,10 @@ export async function getUserDetailsHandler(req: Request, res: Response) {
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
-      message: "Successfully fetched user details",
+      message: 'Successfully fetched user details',
       data: {
-        user: userDetails
-      }
+        user: userDetails,
+      },
     });
   } catch (err) {
     logger.error('Internal server error', err);
