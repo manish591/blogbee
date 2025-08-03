@@ -279,7 +279,63 @@ describe('users', () => {
     });
   });
 
-  // describe('PATCH /users/me', () => { });
+  describe('PATCH /users/me', () => {
+    let cookie: string;
+
+    const invalidProfileData = {
+      name: 'manish',
+      profileImg: 'https://picsum.photos/536/354',
+      otherData: 'other data not required',
+    };
+
+    const validProfileData = {
+      name: 'manish',
+      profileImg: 'https://picsum.photos/536/354',
+    };
+
+    beforeEach(async () => {
+      await createNewUser({ ...user1 }, db);
+
+      const app = buildServer({ db });
+      const res = await request(app)
+        .post('/api/v1/users/login')
+        .send({ email: user1.email, password: user1.password })
+        .set('Accept', 'application/json');
+
+      cookie = res.headers['set-cookie'][0];
+    });
+
+    it('should return 400 bad request if invalid profile data is provided', async () => {
+      const app = buildServer({ db });
+      const res = await request(app)
+        .patch('/api/v1/users/me')
+        .send(invalidProfileData)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        status: 400,
+        code: 'Bad Request',
+        message: 'Request body is invalid.',
+      });
+    });
+
+    it('should return 200 ok for successfully updating the profile data', async () => {
+      const app = buildServer({ db });
+      const res = await request(app)
+        .patch('/api/v1/users/me')
+        .send(validProfileData)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        status: 200,
+        message: 'Profile data updated successfully',
+      });
+    });
+  });
 
   // describe('GET /users/me', () => { });
 });

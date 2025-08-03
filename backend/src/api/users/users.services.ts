@@ -112,9 +112,12 @@ export async function updateProfile(
   db: Db,
 ) {
   try {
-    await db
-      .collection<Users>(USERS_COLLECTION)
-      .updateOne({ _id: userId }, updatedData);
+    await db.collection<Users>(USERS_COLLECTION).updateOne(
+      { _id: userId },
+      {
+        $set: updatedData,
+      },
+    );
   } catch (err) {
     logger.error('An internal server error occured', err);
     throw new AppError({

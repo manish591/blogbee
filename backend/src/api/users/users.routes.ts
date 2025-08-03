@@ -10,7 +10,11 @@ import {
   uploadProfileImageHandler,
 } from './users.controllers';
 import { validateRequestBody } from './users.middleware';
-import { createUserSchema, loginUserSchema } from './users.schema';
+import {
+  createUserSchema,
+  loginUserSchema,
+  updateProfileSchema,
+} from './users.schema';
 
 const router = Router();
 
@@ -23,7 +27,12 @@ router.post(
   upload.single('profileImg'),
   uploadProfileImageHandler,
 );
-router.patch('/me', authenticate, updateProfileHandler);
+router.patch(
+  '/me',
+  validateRequestBody(updateProfileSchema),
+  authenticate,
+  updateProfileHandler,
+);
 router.get('/me', authenticate, getUserDetailsHandler);
 
 export { router as usersRoutes };
