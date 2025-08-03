@@ -1,7 +1,8 @@
 import request from 'supertest';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '../../../test/setup';
 import { buildServer } from '../../app';
+import * as uploadUtils from '../../utils/upload-files';
 import { createNewUser } from './users.services';
 
 describe('users', () => {
@@ -12,8 +13,8 @@ describe('users', () => {
   };
 
   const user2 = {
-    name: 'anjali',
-    email: 'anjali@gmail.com',
+    name: 'prachi',
+    email: 'prachi@gmail.com',
     password: '4574114',
   };
 
@@ -28,6 +29,11 @@ describe('users', () => {
         .set('Accept', 'application/json');
 
       expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        status: 400,
+        code: 'Bad Request',
+        message: 'Request body is invalid.',
+      });
     });
 
     it('should return 400 bad request if password length is lower than 6 characters', async () => {
@@ -44,6 +50,11 @@ describe('users', () => {
         .set('Accept', 'application/json');
 
       expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        status: 400,
+        code: 'Bad Request',
+        message: 'Request body is invalid.',
+      });
     });
 
     it('should return 409 confict if user with email already exists', async () => {
@@ -57,6 +68,11 @@ describe('users', () => {
         .set('Accept', 'application/json');
 
       expect(res.status).toBe(409);
+      expect(res.body).toMatchObject({
+        status: 409,
+        code: 'Conflict',
+        message: 'A user with the email already exists!',
+      });
     });
 
     it('should return 201 created for successfully creating user account', async () => {
@@ -69,6 +85,10 @@ describe('users', () => {
         .set('Accept', 'application/json');
 
       expect(res.status).toBe(201);
+      expect(res.body).toMatchObject({
+        status: 201,
+        message: 'User created successfully',
+      });
     });
   });
 
@@ -87,6 +107,11 @@ describe('users', () => {
         .set('Accept', 'application/json');
 
       expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        status: 400,
+        code: 'Bad Request',
+        message: 'Request body is invalid.',
+      });
     });
 
     it('should return 401 unauthorized if user with email does not exists', async () => {
@@ -99,6 +124,11 @@ describe('users', () => {
         .set('Accept', 'application/json');
 
       expect(res.status).toBe(401);
+      expect(res.body).toMatchObject({
+        status: 401,
+        code: 'Unauthorized',
+        message: 'The credentials you have provided are incorrect!',
+      });
     });
 
     it('should return return 401 unauthorized if password is not correct', async () => {
@@ -111,6 +141,11 @@ describe('users', () => {
         .set('Accept', 'application/json');
 
       expect(res.status).toBe(401);
+      expect(res.body).toMatchObject({
+        status: 401,
+        code: 'Unauthorized',
+        message: 'The credentials you have provided are incorrect!',
+      });
     });
 
     it('should return 200 ok if credentials are correct', async () => {
@@ -123,6 +158,10 @@ describe('users', () => {
         .set('Accept', 'application/json');
 
       expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        status: 200,
+        message: 'Logged in successfully',
+      });
     });
   });
 
@@ -149,6 +188,29 @@ describe('users', () => {
         .set('Cookie', []);
 
       expect(res.status).toBe(401);
+      expect(res.body).toMatchObject({
+        status: 401,
+        code: 'Unauthorized',
+        message: 'You are not authorized.',
+      });
+    });
+
+    it('should return 401 if session has expired', async () => {
+      vi.setSystemTime(new Date(Date.now() + 1000 * 60 * 60 * 24 * 40)); // 40days
+      const app = buildServer({ db });
+      const res = await request(app)
+        .post('/api/v1/users/logout')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(401);
+      expect(res.body).toMatchObject({
+        status: 401,
+        code: 'Unauthorized',
+        message: 'You are not authorized.',
+      });
+
+      vi.useRealTimers();
     });
 
     it('should return 200 ok and logout user successfully', async () => {
@@ -164,14 +226,60 @@ describe('users', () => {
   });
 
   describe('POST /users/picture', () => {
-    it('should return 401 unauthorized if authorization cookies not found', async () => {});
+    let cookie: string;
 
-    it('should return 400 bad request if image file not attached', async () => {});
+    beforeEach(async () => {
+      await createNewUser({ ...user1 }, db);
 
-    it('should return 200 ok if file is successfully uploaded', async () => {});
+      const app = buildServer({ db });
+      const res = await request(app)
+        .post('/api/v1/users/login')
+        .send({ email: user1.email, password: user1.password })
+        .set('Accept', 'application/json');
+
+      cookie = res.headers['set-cookie'][0];
+    });
+
+    it('should return 400 bad request if image file not attached', async () => {
+      const app = buildServer({ db });
+      const res = await request(app)
+        .post('/api/v1/users/picture')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        status: 400,
+        code: 'Bad Request',
+        message: 'File not found',
+      });
+    });
+
+    it('should return 200 ok if file is successfully uploaded', async () => {
+      vi.spyOn(uploadUtils, 'uploadFileToCloudinary').mockImplementation(() => {
+        return Promise.resolve('https://img-url.png');
+      });
+      const app = buildServer({ db });
+      const res = await request(app)
+        .post('/api/v1/users/picture')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .attach('profileImg', Buffer.from('test-file'), {
+          filename: 'test.png',
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        status: 200,
+        message: 'File uploaded successfully',
+        data: {
+          url: 'https://img-url.png',
+        },
+      });
+    });
   });
 
-  describe('PATCH /users/me', () => {});
+  // describe('PATCH /users/me', () => { });
 
-  describe('GET /users/me', () => {});
+  // describe('GET /users/me', () => { });
 });

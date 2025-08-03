@@ -1,5 +1,6 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import type { Db } from 'mongodb';
+import { config } from '../../config';
 import type { Session, Users } from '../../db/schema';
 import { AppError } from '../../utils/app-error';
 import { generateRandomString } from '../../utils/generate-random-string';
@@ -55,7 +56,7 @@ export async function createNewUser(
 export async function createAuthSession(userId: string, db: Db) {
   try {
     const sessionId = generateRandomString();
-    const sessionExpiresIn = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30);
+    const sessionExpiresIn = config.SESSION_EXPIRES_IN;
 
     await db.collection<Session>(SESSION_COLLECTION).insertOne({
       userId,
@@ -93,7 +94,7 @@ export async function getAuthSession(sessionId: string, db: Db) {
   try {
     const authSession = await db
       .collection<Session>(SESSION_COLLECTION)
-      .findOne({ sessionId });
+      .findOne({ sessionId, expiresIn: { $gt: new Date() } });
     return authSession;
   } catch (err) {
     logger.error('An internal server error occured', err);
