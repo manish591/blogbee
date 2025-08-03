@@ -36,17 +36,6 @@ export async function authenticate(
       return;
     }
 
-    if (new Date() > sessionData.expiresIn) {
-      logger.error('Session token expired');
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        code: ReasonPhrases.UNAUTHORIZED,
-        message: 'You are not authorized.',
-      });
-
-      return;
-    }
-
     res.locals.user = {
       sessionId,
       userId: sessionData.userId,
