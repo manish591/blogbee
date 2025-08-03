@@ -18,3 +18,4 @@ build/
 .settings/
 Thumbs.db
 dist
+coverage
