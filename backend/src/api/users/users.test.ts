@@ -337,5 +337,29 @@ describe('users', () => {
     });
   });
 
-  // describe('GET /users/me', () => { });
+  describe('GET /users/me', () => {
+    let cookie: string;
+
+    beforeEach(async () => {
+      await createNewUser({ ...user1 }, db);
+
+      const app = buildServer({ db });
+      const res = await request(app)
+        .post('/api/v1/users/login')
+        .send({ email: user1.email, password: user1.password })
+        .set('Accept', 'application/json');
+
+      cookie = res.headers['set-cookie'][0];
+    });
+
+    it('should return 200 ok for successfully fetching the user data', async () => {
+      const app = buildServer({ db });
+      const res = await request(app)
+        .get('/api/v1/users/me')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(200);
+    });
+  });
 });
