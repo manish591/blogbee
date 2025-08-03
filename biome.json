@@ -7,7 +7,11 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": [".backend/src/**/*.ts", "./backend/tests/**/*.ts"]
+    "includes": [
+      ".backend/src/**/*.ts",
+      "./backend/test/**/*.ts",
+      "./backend/src/**/*.test.ts"
+    ]
   },
   "formatter": {
     "enabled": true,
