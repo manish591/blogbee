@@ -1,4 +1,8 @@
 import { Router } from 'express';
+import { authenticate } from '../../middlewares/authenticate';
+import { createNewBlogHandler } from './blogs.controllers';
+import { validateRequestBody } from './blogs.middlewares';
+import { createNewBlogSchema } from './blogs.schema';
 
 const router = Router();
 
@@ -19,5 +23,12 @@ const router = Router();
  * PATCH blogs/:blogId/tags/:tagId - Update a tag by ID
  * DELETE blogs/:blogId/tags/:tagId - Delete a tag by ID
  */
+
+router.post(
+  '/',
+  validateRequestBody(createNewBlogSchema),
+  authenticate,
+  createNewBlogHandler,
+);
 
 export { router as blogsRoutes };
