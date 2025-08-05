@@ -58,7 +58,7 @@ describe('blogs', () => {
       expect(res.body).toMatchObject({
         status: 400,
         code: 'Bad Request',
-        message: 'Request body is invalid.',
+        message: 'Request resources are invalid.',
       });
     });
 
@@ -75,7 +75,7 @@ describe('blogs', () => {
       expect(res.body).toMatchObject({
         status: 400,
         code: 'Bad Request',
-        message: 'Request body is invalid.',
+        message: 'Request resources are invalid.',
       });
     });
 
@@ -164,7 +164,7 @@ describe('blogs', () => {
       expect(res.body).toMatchObject({
         status: 400,
         code: 'Bad Request',
-        message: 'Request query params are invalid.',
+        message: 'Request resources are invalid.',
       });
     });
 
@@ -239,6 +239,57 @@ describe('blogs', () => {
         data: {
           url: 'https://img-url.png',
         },
+      });
+    });
+  });
+
+  describe('PATCH /blogs', () => {
+    const blogData = {
+      name: "update blog title",
+      slug: "update-blog-title",
+      about: "This is a content."
+    }
+
+    let blogId: string;
+
+    beforeEach(async () => {
+      blogId = await createNewBlog(userId, blogData, db);
+    });
+
+    it('should return 400 bad request if invalid request body is provided', async () => {
+      const app = buildServer({ db });
+      const data = { invalidData: "" };
+      const res = await request(app)
+        .patch(`/api/v1/blogs/${blogId}`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        status: 400,
+        code: 'Bad Request',
+        message: 'Request resources are invalid.',
+      });
+    });
+
+    it('should return 200 ok for successfully updating the blog content', async () => {
+      const app = buildServer({ db });
+      const data = {
+        name: 'updated blog',
+        about: 'about updated blog',
+        blogLogo: 'https://test.png',
+      };
+      const res = await request(app)
+        .patch(`/api/v1/blogs/${blogId}`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        status: 200,
+        message: 'Successfully updated the blog',
       });
     });
   });

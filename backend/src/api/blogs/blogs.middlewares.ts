@@ -4,48 +4,26 @@ import { ZodError, type ZodObject, z } from 'zod';
 import { AppError } from '../../utils/app-error';
 import { logger } from '../../utils/logger';
 
-export function validateRequestBody(schema: ZodObject) {
+export function validateRequest(schema: ZodObject) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      await schema.parseAsync(req.body);
-      next();
-    } catch (err) {
-      if (err instanceof ZodError) {
-        logger.error('ZodError: Request Body Is Invalid', err);
-        res.status(StatusCodes.BAD_REQUEST).json({
-          status: StatusCodes.BAD_REQUEST,
-          code: ReasonPhrases.BAD_REQUEST,
-          message: 'Request body is invalid.',
-        });
-      }
+      await schema.parseAsync({
+        body: req.body,
+        query: req.query,
+        params: req.params
+      });
 
-      logger.error('Internal Server Error', err);
-      next(
-        new AppError({
-          status: StatusCodes.INTERNAL_SERVER_ERROR,
-          code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-          message: 'An internal server error occured. Try again later!',
-        }),
-      );
-    }
-  };
-}
-
-export function validateQueryParams(schema: ZodObject) {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      await schema.parseAsync(req.query);
       next();
     } catch (err) {
       if (err instanceof ZodError) {
         logger.error(
-          'ZodError: Request query params are invalid',
+          'ZodError: Request resources are invalid',
           z.treeifyError(err),
         );
         res.status(StatusCodes.BAD_REQUEST).json({
           status: StatusCodes.BAD_REQUEST,
           code: ReasonPhrases.BAD_REQUEST,
-          message: 'Request query params are invalid.',
+          message: 'Request resources are invalid.',
         });
       }
 
@@ -58,5 +36,5 @@ export function validateQueryParams(schema: ZodObject) {
         }),
       );
     }
-  };
+  }
 }

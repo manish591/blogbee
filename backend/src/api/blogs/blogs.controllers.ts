@@ -5,8 +5,17 @@ import {
   uploadFileToCloudinary,
   uploadSingleFile,
 } from '../../utils/upload-files';
-import type { TCreateNewBlogRequestBody } from './blogs.schema';
-import { createNewBlog, getAllBlogs, isSlugTaken } from './blogs.services';
+import type {
+  TCreateNewBlogRequestBody,
+  TUpdateBlogParams,
+  TUpdateBlogRequestBody,
+} from './blogs.schema';
+import {
+  createNewBlog,
+  getAllBlogs,
+  isSlugTaken,
+  updateBlog,
+} from './blogs.services';
 
 export async function createNewBlogHandler(
   req: Request<
@@ -126,6 +135,46 @@ export async function uploadBlogLogoHandler(req: Request, res: Response) {
       data: {
         url: profileImageUrl,
       },
+    });
+  } catch (err) {
+    logger.error('Internal server error', err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured. Please try again later!',
+    });
+  }
+}
+
+export async function updateBlogHandler(
+  req: Request<
+    TUpdateBlogParams,
+    Record<string, unknown>,
+    TUpdateBlogRequestBody
+  >,
+  res: Response,
+) {
+  try {
+    const userData = res.locals.user;
+
+    if (!userData) {
+      logger.info('User not found');
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusCodes.UNAUTHORIZED,
+        code: ReasonPhrases.UNAUTHORIZED,
+        message: 'You are not logged in',
+      });
+
+      return;
+    }
+
+    const userId = userData.userId;
+    const blogId = req.params.blogId;
+    await updateBlog(userId, blogId, req.body, req.db);
+
+    res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      message: 'Successfully updated the blog',
     });
   } catch (err) {
     logger.error('Internal server error', err);

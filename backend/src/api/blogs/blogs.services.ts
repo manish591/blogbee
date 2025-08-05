@@ -3,7 +3,10 @@ import type { Db } from 'mongodb';
 import type { Blogs } from '../../db/schema';
 import { AppError } from '../../utils/app-error';
 import { logger } from '../../utils/logger';
-import type { TCreateNewBlogRequestBody } from './blogs.schema';
+import type {
+  TCreateNewBlogRequestBody,
+  TUpdateBlogRequestBody,
+} from './blogs.schema';
 
 export const BLOG_COLLECTION = 'blogs';
 
@@ -30,14 +33,17 @@ export async function createNewBlog(
   db: Db,
 ) {
   try {
-    await db.collection<Blogs>(BLOG_COLLECTION).insertOne({
+    const insertedBlogResult = await db.collection<Blogs>(BLOG_COLLECTION).insertOne({
       userId,
       name: blogData.name,
       slug: blogData.slug,
       about: blogData.about,
+      blogLogo: blogData.blogLogo,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+
+    return insertedBlogResult.insertedId;
   } catch (err) {
     logger.error('An internal server error occured', err);
     throw new AppError({
@@ -73,6 +79,32 @@ export async function getAllBlogs(
       )
       .toArray();
     return allBlogs;
+  } catch (err) {
+    logger.error('An internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'An internal server error occured. Try again later!',
+    });
+  }
+}
+
+export async function updateBlog(
+  userId: string,
+  blogId: string,
+  blogData: TUpdateBlogRequestBody,
+  db: Db,
+) {
+  try {
+    await db.collection<Blogs>(BLOG_COLLECTION).updateOne(
+      {
+        _id: blogId,
+        userId
+      },
+      {
+        $set: blogData,
+      },
+    );
   } catch (err) {
     logger.error('An internal server error occured', err);
     throw new AppError({

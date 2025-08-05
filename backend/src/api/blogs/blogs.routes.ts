@@ -4,10 +4,15 @@ import { upload } from '../../utils/upload-files';
 import {
   createNewBlogHandler,
   getAllBlogsHandler,
+  updateBlogHandler,
   uploadBlogLogoHandler,
 } from './blogs.controllers';
-import { validateQueryParams, validateRequestBody } from './blogs.middlewares';
-import { createNewBlogSchema, getAllBlogsSchema } from './blogs.schema';
+import { validateRequest } from './blogs.middlewares';
+import {
+  createNewBlogSchema,
+  getAllBlogsSchema,
+  updateBlogSchema,
+} from './blogs.schema';
 
 const router = Router();
 
@@ -28,14 +33,14 @@ const router = Router();
 
 router.post(
   '/',
-  validateRequestBody(createNewBlogSchema),
   authenticate,
+  validateRequest(createNewBlogSchema),
   createNewBlogHandler,
 );
 router.get(
   '/',
-  validateQueryParams(getAllBlogsSchema),
   authenticate,
+  validateRequest(getAllBlogsSchema),
   getAllBlogsHandler,
 );
 router.post(
@@ -43,6 +48,12 @@ router.post(
   authenticate,
   upload.single('blogLogo'),
   uploadBlogLogoHandler,
+);
+router.patch(
+  '/:blogId',
+  authenticate,
+  validateRequest(updateBlogSchema),
+  updateBlogHandler,
 );
 
 export { router as blogsRoutes };
