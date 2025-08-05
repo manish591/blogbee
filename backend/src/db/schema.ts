@@ -35,6 +35,7 @@ export interface Tags {
   _id?: string;
   name: string;
   blogId: string;
+  userId: string;
   createdAt: Date;
   updatedAt: Date;
 }
