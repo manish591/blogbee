@@ -51,7 +51,7 @@ export async function createNewBlog(
 export async function getAllBlogs(
   userId: string,
   db: Db,
-  query: string = "",
+  query: string = '',
   page: number = 0,
   limit: number = 10,
 ) {
@@ -63,8 +63,8 @@ export async function getAllBlogs(
           userId,
           slug: {
             $regex: query,
-            $options: "i"
-          }
+            $options: 'i',
+          },
         },
         {
           skip: page,

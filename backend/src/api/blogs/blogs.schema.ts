@@ -28,7 +28,7 @@ export const createNewBlogSchema = z
 
 export const getAllBlogsSchema = z
   .object({
-    query: z.string().optional().default(""),
+    query: z.string().optional().default(''),
     page: z.coerce.number().optional().default(0),
     limit: z.coerce.number().optional().default(10),
   })

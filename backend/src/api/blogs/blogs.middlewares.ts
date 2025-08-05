@@ -38,7 +38,10 @@ export function validateQueryParams(schema: ZodObject) {
       next();
     } catch (err) {
       if (err instanceof ZodError) {
-        logger.error('ZodError: Request query params are invalid', z.treeifyError(err));
+        logger.error(
+          'ZodError: Request query params are invalid',
+          z.treeifyError(err),
+        );
         res.status(StatusCodes.BAD_REQUEST).json({
           status: StatusCodes.BAD_REQUEST,
           code: ReasonPhrases.BAD_REQUEST,

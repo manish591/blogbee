@@ -1,9 +1,12 @@
 import type { Request, Response } from 'express';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { logger } from '../../utils/logger';
+import {
+  uploadFileToCloudinary,
+  uploadSingleFile,
+} from '../../utils/upload-files';
 import type { TCreateNewBlogRequestBody } from './blogs.schema';
 import { createNewBlog, getAllBlogs, isSlugTaken } from './blogs.services';
-import { uploadFileToCloudinary, uploadSingleFile } from '../../utils/upload-files';
 
 export async function createNewBlogHandler(
   req: Request<
@@ -75,12 +78,18 @@ export async function getAllBlogsHandler(req: Request, res: Response) {
     const query = req.query.query as string;
     const limit = req.query.limit as string;
     const page = req.query.page as string;
-    const allBlogs = await getAllBlogs(userData.userId, req.db, query, Number(page), Number(limit));
+    const allBlogs = await getAllBlogs(
+      userData.userId,
+      req.db,
+      query,
+      Number(page),
+      Number(limit),
+    );
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
-      message: "Blogs fetched successfully",
-      data: allBlogs
+      message: 'Blogs fetched successfully',
+      data: allBlogs,
     });
   } catch (err) {
     logger.error('Internal server error', err);

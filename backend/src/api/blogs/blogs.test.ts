@@ -1,7 +1,8 @@
 import request from 'supertest';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '../../../test/setup';
 import { buildServer } from '../../app';
+import * as uploadUtils from '../../utils/upload-files';
 import { createNewUser, getAuthSession } from '../users/users.services';
 import { createNewBlog } from './blogs.services';
 
@@ -120,72 +121,125 @@ describe('blogs', () => {
     });
   });
 
-  describe("GET /blogs", () => {
+  describe('GET /blogs', () => {
     const blogData1 = {
-      name: "first blog",
-      slug: "first-blog"
-    }
+      name: 'first blog',
+      slug: 'first-blog',
+    };
 
     const blogData2 = {
-      name: "Second blog",
-      slug: "second-blog",
-      about: "About second blog"
-    }
+      name: 'Second blog',
+      slug: 'second-blog',
+      about: 'About second blog',
+    };
 
     const blogData3 = {
-      name: "Third blog",
-      slug: "third-blog",
-      about: "About third blog"
-    }
+      name: 'Third blog',
+      slug: 'third-blog',
+      about: 'About third blog',
+    };
 
     const blogData4 = {
-      name: "Fourth blog",
-      slug: "fourth-blog",
-      about: "About fourth blog"
-    }
+      name: 'Fourth blog',
+      slug: 'fourth-blog',
+      about: 'About fourth blog',
+    };
 
     beforeEach(async () => {
       await createNewBlog(userId, blogData1, db);
       await createNewBlog(userId, blogData2, db);
       await createNewBlog(userId, blogData3, db);
       await createNewBlog(userId, blogData4, db);
-      await createNewBlog("anotherid", blogData2, db);
+      await createNewBlog('anotherid', blogData2, db);
     });
 
-    it("should return 400 bad request if invalid query params are passed", async () => {
+    it('should return 400 bad request if invalid query params are passed', async () => {
       const app = buildServer({ db });
-      const res = await request(app).get("/api/v1/blogs?data=jdjdj").set("Accept", "application/json").set("Cookie", [cookie]);
+      const res = await request(app)
+        .get('/api/v1/blogs?data=jdjdj')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
 
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         status: 400,
-        code: "Bad Request",
-        message: "Request query params are invalid."
+        code: 'Bad Request',
+        message: 'Request query params are invalid.',
       });
     });
 
-    it("should return 200 ok along with users blog", async () => {
+    it('should return 200 ok along with users blog', async () => {
       const app = buildServer({ db });
-      const res = await request(app).get("/api/v1/blogs").set("Accept", "application/json").set("Cookie", [cookie]);
+      const res = await request(app)
+        .get('/api/v1/blogs')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
       expect(res.body.data.length).toBe(4);
     });
 
-    it("should return 200 ok with limit 3 results shown", async () => {
+    it('should return 200 ok with limit 3 results shown', async () => {
       const app = buildServer({ db });
-      const res = await request(app).get("/api/v1/blogs?limit=3").set("Accept", "application/json").set("Cookie", [cookie]);
+      const res = await request(app)
+        .get('/api/v1/blogs?limit=3')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
       expect(res.body.data.length).toBe(3);
     });
 
-    it("should return 200 ok with search query result for fourth", async () => {
+    it('should return 200 ok with search query result for fourth', async () => {
       const app = buildServer({ db });
-      const res = await request(app).get("/api/v1/blogs?query=fourth").set("Accept", "application/json").set("Cookie", [cookie]);
+      const res = await request(app)
+        .get('/api/v1/blogs?query=fourth')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
       expect(res.body.data.length).toBe(1);
+    });
+  });
+
+  describe('POST /blogs/logo', () => {
+    it('should return 400 bad request if logo file is not attached', async () => {
+      const app = buildServer({ db });
+      const res = await request(app)
+        .post('/api/v1/blogs/logo')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        status: 400,
+        code: 'Bad Request',
+        message: 'File not found',
+      });
+    });
+
+    it('should return 200 ok if logo file is successfully uploaded', async () => {
+      vi.spyOn(uploadUtils, 'uploadFileToCloudinary').mockImplementation(() => {
+        return Promise.resolve('https://img-url.png');
+      });
+
+      const app = buildServer({ db });
+      const res = await request(app)
+        .post('/api/v1/blogs/logo')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .attach('blogLogo', Buffer.from('test-file'), {
+          filename: 'test.png',
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        status: 200,
+        message: 'Logo uploaded successfully',
+        data: {
+          url: 'https://img-url.png',
+        },
+      });
     });
   });
 });
