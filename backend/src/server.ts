@@ -2,14 +2,13 @@ import { buildServer } from './app';
 import { config } from './config';
 import {
   connectToDatabase,
-  createDatabaseClient,
+  dbClient,
   disconnectFromDatabase,
 } from './db';
 import { logger } from './utils/logger';
 
 (async () => {
   try {
-    const dbClient = createDatabaseClient(config.DATABASE_URL);
     const db = await connectToDatabase(dbClient, config.DATABASE_NAME);
 
     const app = buildServer({ db });
