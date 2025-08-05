@@ -1,4 +1,5 @@
 import * as mongoDB from 'mongodb';
+import { config } from '../config';
 import { logger } from '../utils/logger';
 
 export const dbClientOptions: mongoDB.MongoClientOptions = {
@@ -43,3 +44,5 @@ export async function disconnectFromDatabase(client: mongoDB.MongoClient) {
     logger.error('Failed To Disconnect From The Database', err);
   }
 }
+
+export const dbClient = createDatabaseClient(config.DATABASE_URL);

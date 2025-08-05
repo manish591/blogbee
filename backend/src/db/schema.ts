@@ -31,9 +31,12 @@ export enum PostStatus {
   ARCHIVED,
 }
 
-export interface Tag {
+export interface Tags {
   _id?: string;
   name: string;
+  blogId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Posts {
@@ -45,7 +48,7 @@ export interface Posts {
   content: string;
   slug: string;
   postStatus: PostStatus;
-  tags: Tag[];
+  tags: Tags[];
   createdAt: Date;
   updatedAt: Date;
 }
