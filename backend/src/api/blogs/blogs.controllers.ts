@@ -3,6 +3,7 @@ import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { logger } from '../../utils/logger';
 import type { TCreateNewBlogRequestBody } from './blogs.schema';
 import { createNewBlog, getAllBlogs, isSlugTaken } from './blogs.services';
+import { uploadFileToCloudinary, uploadSingleFile } from '../../utils/upload-files';
 
 export async function createNewBlogHandler(
   req: Request<
@@ -80,6 +81,42 @@ export async function getAllBlogsHandler(req: Request, res: Response) {
       status: StatusCodes.OK,
       message: "Blogs fetched successfully",
       data: allBlogs
+    });
+  } catch (err) {
+    logger.error('Internal server error', err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured. Please try again later!',
+    });
+  }
+}
+
+export async function uploadBlogLogoHandler(req: Request, res: Response) {
+  try {
+    const uploadedFile = req.file;
+
+    if (!uploadedFile) {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        status: StatusCodes.BAD_REQUEST,
+        code: ReasonPhrases.BAD_REQUEST,
+        message: 'File not found',
+      });
+
+      return;
+    }
+
+    const profileImageUrl = await uploadSingleFile(
+      uploadedFile,
+      uploadFileToCloudinary,
+    );
+
+    res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      message: 'Logo uploaded successfully',
+      data: {
+        url: profileImageUrl,
+      },
     });
   } catch (err) {
     logger.error('Internal server error', err);

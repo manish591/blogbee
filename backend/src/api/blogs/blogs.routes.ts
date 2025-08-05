@@ -1,16 +1,15 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate';
-import { createNewBlogHandler, getAllBlogsHandler } from './blogs.controllers';
+import { createNewBlogHandler, getAllBlogsHandler, uploadBlogLogoHandler } from './blogs.controllers';
 import { validateQueryParams, validateRequestBody } from './blogs.middlewares';
 import { createNewBlogSchema, getAllBlogsSchema } from './blogs.schema';
+import { upload } from '../../utils/upload-files';
 
 const router = Router();
 
 /**
- * POST /blogs - Create a new blog
- * GET /blogs - Get All blogs, Filter: pagination, search, sort
- * PATCH /blogs - update a blog by userid
  * POST /blogs/logo - Upload blog logo
+ * PATCH /blogs - update a blog by userid
  * DELETE /blogs/:blogId - Delete a blog by ID
  *
  * POST blogs/:blogId/posts - create a new post for a blog
@@ -36,5 +35,6 @@ router.get(
   authenticate,
   getAllBlogsHandler,
 );
+router.patch("/logo", authenticate, upload.single("blogLogo"), uploadBlogLogoHandler);
 
 export { router as blogsRoutes };
