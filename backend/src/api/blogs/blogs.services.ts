@@ -47,3 +47,38 @@ export async function createNewBlog(
     });
   }
 }
+
+export async function getAllBlogs(
+  userId: string,
+  db: Db,
+  query: string = "",
+  page: number = 0,
+  limit: number = 10,
+) {
+  try {
+    const allBlogs = db
+      .collection<Blogs>(BLOG_COLLECTION)
+      .find(
+        {
+          userId,
+          slug: {
+            $regex: query,
+            $options: "i"
+          }
+        },
+        {
+          skip: page,
+          limit,
+        },
+      )
+      .toArray();
+    return allBlogs;
+  } catch (err) {
+    logger.error('An internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'An internal server error occured. Try again later!',
+    });
+  }
+}

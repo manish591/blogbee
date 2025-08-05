@@ -26,4 +26,13 @@ export const createNewBlogSchema = z
   })
   .strict();
 
+export const getAllBlogsSchema = z
+  .object({
+    query: z.string().optional().default(""),
+    page: z.coerce.number().optional().default(0),
+    limit: z.coerce.number().optional().default(10),
+  })
+  .strict();
+
 export type TCreateNewBlogRequestBody = z.infer<typeof createNewBlogSchema>;
+export type TGetAllBlogsQueryParams = z.infer<typeof getAllBlogsSchema>;

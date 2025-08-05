@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate';
-import { createNewBlogHandler } from './blogs.controllers';
-import { validateRequestBody } from './blogs.middlewares';
-import { createNewBlogSchema } from './blogs.schema';
+import { createNewBlogHandler, getAllBlogsHandler } from './blogs.controllers';
+import { validateQueryParams, validateRequestBody } from './blogs.middlewares';
+import { createNewBlogSchema, getAllBlogsSchema } from './blogs.schema';
 
 const router = Router();
 
@@ -29,6 +29,12 @@ router.post(
   validateRequestBody(createNewBlogSchema),
   authenticate,
   createNewBlogHandler,
+);
+router.get(
+  '/',
+  validateQueryParams(getAllBlogsSchema),
+  authenticate,
+  getAllBlogsHandler,
 );
 
 export { router as blogsRoutes };

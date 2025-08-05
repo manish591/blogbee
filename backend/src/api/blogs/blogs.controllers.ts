@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { logger } from '../../utils/logger';
 import type { TCreateNewBlogRequestBody } from './blogs.schema';
-import { createNewBlog, isSlugTaken } from './blogs.services';
+import { createNewBlog, getAllBlogs, isSlugTaken } from './blogs.services';
 
 export async function createNewBlogHandler(
   req: Request<
@@ -45,6 +45,41 @@ export async function createNewBlogHandler(
       status: StatusCodes.OK,
       code: ReasonPhrases.OK,
       message: 'Successfully created the blog',
+    });
+  } catch (err) {
+    logger.error('Internal server error', err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured. Please try again later!',
+    });
+  }
+}
+
+export async function getAllBlogsHandler(req: Request, res: Response) {
+  try {
+    const userData = res.locals.user;
+
+    if (!userData) {
+      logger.info('User not found');
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusCodes.UNAUTHORIZED,
+        code: ReasonPhrases.UNAUTHORIZED,
+        message: 'You are not logged in',
+      });
+
+      return;
+    }
+
+    const query = req.query.query as string;
+    const limit = req.query.limit as string;
+    const page = req.query.page as string;
+    const allBlogs = await getAllBlogs(userData.userId, req.db, query, Number(page), Number(limit));
+
+    res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      message: "Blogs fetched successfully",
+      data: allBlogs
     });
   } catch (err) {
     logger.error('Internal server error', err);
