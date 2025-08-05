@@ -56,6 +56,7 @@ export interface Blogs {
   name: string;
   about?: string;
   slug: string;
+  blogLogo?: string;
   createdAt: Date;
   updatedAt: Date;
 }
