@@ -29,8 +29,8 @@ router.post(
 );
 router.patch(
   '/me',
-  validateRequestBody(updateProfileSchema),
   authenticate,
+  validateRequestBody(updateProfileSchema),
   updateProfileHandler,
 );
 router.get('/me', authenticate, getUserDetailsHandler);
