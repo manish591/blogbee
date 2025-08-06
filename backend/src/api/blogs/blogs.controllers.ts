@@ -188,7 +188,10 @@ export async function updateBlogHandler(
   }
 }
 
-export async function deleteBlogHandler(req: Request<TDeleteBlogParams>, res: Response) {
+export async function deleteBlogHandler(
+  req: Request<TDeleteBlogParams>,
+  res: Response,
+) {
   try {
     const userData = res.locals.user;
 
@@ -210,8 +213,8 @@ export async function deleteBlogHandler(req: Request<TDeleteBlogParams>, res: Re
 
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
-      message: "Successfully deleted the blog"
-    })
+      message: 'Successfully deleted the blog',
+    });
   } catch (err) {
     logger.error('Internal server error', err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

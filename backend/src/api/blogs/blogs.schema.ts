@@ -26,7 +26,7 @@ export const createNewBlogSchema = z.object({
         }),
       blogLogo: z.url({ message: 'Logo should be a valid url' }).optional(),
     })
-    .strict()
+    .strict(),
 });
 
 export const getAllBlogsSchema = z.object({
@@ -36,36 +36,48 @@ export const getAllBlogsSchema = z.object({
       page: z.coerce.number().optional().default(0),
       limit: z.coerce.number().optional().default(10),
     })
-    .strict()
-})
+    .strict(),
+});
 
 export const updateBlogSchema = z.object({
-  body: z.object({
-    name: z
-      .string()
-      .min(5, {
-        message: 'name should have atleast 5 characters',
-      })
-      .max(30, {
-        message: 'name should not exceed 30 characters',
-      })
-      .optional(),
-    about: z.string().optional(),
-    blogLogo: z.url({ message: 'Blog logo should be a valid url' }).optional(),
-  }).strict(),
-  params: z.object({
-    blogId: z.string()
-  }).strict()
+  body: z
+    .object({
+      name: z
+        .string()
+        .min(5, {
+          message: 'name should have atleast 5 characters',
+        })
+        .max(30, {
+          message: 'name should not exceed 30 characters',
+        })
+        .optional(),
+      about: z.string().optional(),
+      blogLogo: z
+        .url({ message: 'Blog logo should be a valid url' })
+        .optional(),
+    })
+    .strict(),
+  params: z
+    .object({
+      blogId: z.string(),
+    })
+    .strict(),
 });
 
 export const deleteBlogSchema = z.object({
-  params: z.object({
-    blogId: z.string()
-  }).strict()
-})
+  params: z
+    .object({
+      blogId: z.string(),
+    })
+    .strict(),
+});
 
-export type TCreateNewBlogRequestBody = z.infer<typeof createNewBlogSchema>["body"];
-export type TGetAllBlogsQueryParams = z.infer<typeof getAllBlogsSchema>["query"];
-export type TUpdateBlogRequestBody = z.infer<typeof updateBlogSchema>["body"];
-export type TUpdateBlogParams = z.infer<typeof updateBlogSchema>["params"];
-export type TDeleteBlogParams = z.infer<typeof deleteBlogSchema>["params"];
+export type TCreateNewBlogRequestBody = z.infer<
+  typeof createNewBlogSchema
+>['body'];
+export type TGetAllBlogsQueryParams = z.infer<
+  typeof getAllBlogsSchema
+>['query'];
+export type TUpdateBlogRequestBody = z.infer<typeof updateBlogSchema>['body'];
+export type TUpdateBlogParams = z.infer<typeof updateBlogSchema>['params'];
+export type TDeleteBlogParams = z.infer<typeof deleteBlogSchema>['params'];

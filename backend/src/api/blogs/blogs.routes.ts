@@ -54,6 +54,11 @@ router.patch(
   validateRequest(updateBlogSchema),
   updateBlogHandler,
 );
-router.delete("/:blogId", authenticate, validateRequest(deleteBlogSchema), deleteBlogHandler);
+router.delete(
+  '/:blogId',
+  authenticate,
+  validateRequest(deleteBlogSchema),
+  deleteBlogHandler,
+);
 
 export { router as blogsRoutes };

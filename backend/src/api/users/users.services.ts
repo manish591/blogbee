@@ -1,5 +1,5 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-import { ObjectId, type Db } from 'mongodb';
+import { type Db, ObjectId } from 'mongodb';
 import { config } from '../../config';
 import type { Session, Users } from '../../db/schema';
 import { AppError } from '../../utils/app-error';

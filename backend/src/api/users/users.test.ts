@@ -345,9 +345,9 @@ describe('users', () => {
   describe('GET /users/me', () => {
     let cookie: string;
     let createdUserData: {
-      _id?: string,
-      email: string,
-      name: string,
+      _id?: string;
+      email: string;
+      name: string;
       createdAt: string;
       updatedAt: string;
     };

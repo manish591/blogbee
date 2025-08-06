@@ -5,7 +5,6 @@ import { buildServer } from '../../app';
 import * as uploadUtils from '../../utils/upload-files';
 import { createNewUser, getAuthSession } from '../users/users.services';
 import { createNewBlog, getBlog } from './blogs.services';
-import { ObjectId } from 'mongodb';
 
 describe('blogs', () => {
   const user1 = {
@@ -152,7 +151,10 @@ describe('blogs', () => {
       await createNewBlog(userId, blogData3, db);
       await createNewBlog(userId, blogData4, db);
 
-      const newUserId = await createNewUser({ name: "new users", email: "ema@gmail.com", password: "new pass" }, db);
+      const newUserId = await createNewUser(
+        { name: 'new users', email: 'ema@gmail.com', password: 'new pass' },
+        db,
+      );
       await createNewBlog(newUserId.insertedId.toString(), blogData2, db);
     });
 
@@ -248,10 +250,10 @@ describe('blogs', () => {
 
   describe('PATCH /blogs/:blogId', () => {
     const blogData = {
-      name: "update blog title",
-      slug: "update-blog-title",
-      about: "This is a content."
-    }
+      name: 'update blog title',
+      slug: 'update-blog-title',
+      about: 'This is a content.',
+    };
 
     let blogId: string;
 
@@ -261,7 +263,7 @@ describe('blogs', () => {
 
     it('should return 400 bad request if invalid request body is provided', async () => {
       const app = buildServer({ db });
-      const data = { invalidData: "" };
+      const data = { invalidData: '' };
       const res = await request(app)
         .patch(`/api/v1/blogs/${blogId}`)
         .set('Accept', 'application/json')
@@ -297,12 +299,12 @@ describe('blogs', () => {
     });
   });
 
-  describe("DELETE /blogs/blogId", () => {
+  describe('DELETE /blogs/blogId', () => {
     const blogData = {
-      name: "update blog title",
-      slug: "update-blog-title",
-      about: "This is a content."
-    }
+      name: 'update blog title',
+      slug: 'update-blog-title',
+      about: 'This is a content.',
+    };
 
     let blogId: string;
 
@@ -310,16 +312,19 @@ describe('blogs', () => {
       blogId = (await createNewBlog(userId, blogData, db)).toString();
     });
 
-    it("should return 200 ok and delete the users blog resource", async () => {
+    it('should return 200 ok and delete the users blog resource', async () => {
       const app = buildServer({ db });
-      const res = await request(app).delete(`/api/v1/blogs/${blogId}`).set("Accept", "application/json").set("Cookie", [cookie]);
+      const res = await request(app)
+        .delete(`/api/v1/blogs/${blogId}`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
       const deletedBlog = await getBlog(userId, blogId, db);
 
       expect(res.status).toBe(200);
       expect(deletedBlog).toBe(null);
       expect(res.body).toMatchObject({
         status: 200,
-        message: "Successfully deleted the blog"
+        message: 'Successfully deleted the blog',
       });
     });
   });

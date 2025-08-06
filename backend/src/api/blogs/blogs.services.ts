@@ -1,5 +1,6 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-import { ObjectId, type Db } from 'mongodb';
+import { type Db, ObjectId } from 'mongodb';
+import { dbClient } from '../../db';
 import type { Blogs, Posts, Tags } from '../../db/schema';
 import { AppError } from '../../utils/app-error';
 import { logger } from '../../utils/logger';
@@ -7,11 +8,10 @@ import type {
   TCreateNewBlogRequestBody,
   TUpdateBlogRequestBody,
 } from './blogs.schema';
-import { dbClient } from '../../db';
 
 export const BLOG_COLLECTION = 'blogs';
-export const TAGS_COLLECTION = "tags";
-export const POSTS_COLLECTION = "posts";
+export const TAGS_COLLECTION = 'tags';
+export const POSTS_COLLECTION = 'posts';
 
 export async function isSlugTaken(slug: string, db: Db) {
   try {
@@ -36,15 +36,17 @@ export async function createNewBlog(
   db: Db,
 ) {
   try {
-    const insertedBlogResult = await db.collection<Blogs>(BLOG_COLLECTION).insertOne({
-      userId: new ObjectId(userId),
-      name: blogData.name,
-      slug: blogData.slug,
-      about: blogData.about,
-      blogLogo: blogData.blogLogo,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+    const insertedBlogResult = await db
+      .collection<Blogs>(BLOG_COLLECTION)
+      .insertOne({
+        userId: new ObjectId(userId),
+        name: blogData.name,
+        slug: blogData.slug,
+        about: blogData.about,
+        blogLogo: blogData.blogLogo,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
     return insertedBlogResult.insertedId;
   } catch (err) {
@@ -61,7 +63,7 @@ export async function getBlog(userId: string, blogId: string, db: Db) {
   try {
     const blogData = await db.collection<Blogs>(BLOG_COLLECTION).findOne({
       userId: new ObjectId(userId),
-      _id: new ObjectId(blogId)
+      _id: new ObjectId(blogId),
     });
 
     return blogData;
@@ -120,7 +122,7 @@ export async function updateBlog(
     await db.collection<Blogs>(BLOG_COLLECTION).updateOne(
       {
         _id: new ObjectId(blogId),
-        userId: new ObjectId(userId)
+        userId: new ObjectId(userId),
       },
       {
         $set: blogData,
@@ -144,19 +146,19 @@ export async function deleteBlog(userId: string, blogId: string, db: Db) {
 
     await db.collection<Blogs>(BLOG_COLLECTION).deleteOne({
       _id: new ObjectId(blogId),
-      userId: new ObjectId(userId)
+      userId: new ObjectId(userId),
     });
     await db.collection<Tags>(TAGS_COLLECTION).deleteMany({
       blogId: new ObjectId(blogId),
-      userId: new ObjectId(userId)
+      userId: new ObjectId(userId),
     });
     await db.collection<Posts>(POSTS_COLLECTION).deleteMany({
       blogId: new ObjectId(blogId),
-      userId: new ObjectId(userId)
+      userId: new ObjectId(userId),
     });
 
     await session.commitTransaction();
-    logger.info("Successfully deleted the blog data");
+    logger.info('Successfully deleted the blog data');
   } catch (err) {
     await session.abortTransaction();
     logger.error('An internal server error occured', err);
