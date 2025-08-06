@@ -188,6 +188,7 @@ export async function createNewTag(
       blogId: new ObjectId(blogId),
       name: tagsData.name,
       description: tagsData.description,
+      posts: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
