@@ -2,9 +2,10 @@ import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '../../../test/setup';
 import { buildServer } from '../../app';
+import type { Tags } from '../../db/schema';
 import * as uploadUtils from '../../utils/upload-files';
 import { createNewUser, getAuthSession } from '../users/users.services';
-import { createNewBlog, getBlog } from './blogs.services';
+import { createNewBlog, getBlog, TAGS_COLLECTION } from './blogs.services';
 
 describe('blogs', () => {
   const user1 = {
@@ -326,6 +327,63 @@ describe('blogs', () => {
         status: 200,
         message: 'Successfully deleted the blog',
       });
+    });
+  });
+
+  describe('POST /blogs/:blogId/tags', () => {
+    const blogData = {
+      name: 'update blog title',
+      slug: 'update-blog-title',
+      about: 'This is a content.',
+    };
+
+    let blogId: string;
+
+    beforeEach(async () => {
+      blogId = (await createNewBlog(userId, blogData, db)).toString();
+    });
+
+    it('should return 400 bad request if invalid request body is provided', async () => {
+      const app = buildServer({ db });
+      const data = {};
+      const res = await request(app)
+        .post(`/api/v1/blogs/${blogId}/tags`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        status: 400,
+        code: 'Bad Request',
+        message: 'Request resources are invalid.',
+      });
+    });
+
+    it('should return 200 ok for successfully creating a new tag', async () => {
+      const app = buildServer({ db });
+      const data = {
+        name: 'Javascript',
+        desciption: 'Contains all the blogs of the javascript category.',
+      };
+      const res = await request(app)
+        .post(`/api/v1/blogs/${blogId}/tags`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+      const newTagCreatedData = await db
+        .collection<Tags>(TAGS_COLLECTION)
+        .findOne({
+          name: 'Javascript',
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body).toMatchObject({
+        status: 201,
+        message: 'Successfully created a new tag',
+      });
+      expect(newTagCreatedData).toBeDefined();
+      expect(newTagCreatedData?.name).toBe('Javascript');
     });
   });
 });

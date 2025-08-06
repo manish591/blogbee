@@ -7,12 +7,12 @@ import {
 } from '../../utils/upload-files';
 import type {
   TCreateNewBlogRequestBody,
-  TDeleteBlogParams,
   TUpdateBlogParams,
   TUpdateBlogRequestBody,
 } from './blogs.schema';
 import {
   createNewBlog,
+  createNewTag,
   deleteBlog,
   getAllBlogs,
   isSlugTaken,
@@ -188,10 +188,7 @@ export async function updateBlogHandler(
   }
 }
 
-export async function deleteBlogHandler(
-  req: Request<TDeleteBlogParams>,
-  res: Response,
-) {
+export async function deleteBlogHandler(req: Request, res: Response) {
   try {
     const userData = res.locals.user;
 
@@ -214,6 +211,39 @@ export async function deleteBlogHandler(
     res.status(StatusCodes.OK).json({
       status: StatusCodes.OK,
       message: 'Successfully deleted the blog',
+    });
+  } catch (err) {
+    logger.error('Internal server error', err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured. Please try again later!',
+    });
+  }
+}
+
+export async function createNewTagHandler(req: Request, res: Response) {
+  try {
+    const userData = res.locals.user;
+
+    if (!userData) {
+      logger.info('User not found');
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusCodes.UNAUTHORIZED,
+        code: ReasonPhrases.UNAUTHORIZED,
+        message: 'You are not logged in',
+      });
+
+      return;
+    }
+
+    const userId = userData.userId;
+    const blogId = req.params.blogId;
+    await createNewTag(userId, blogId, req.body, req.db);
+
+    res.status(StatusCodes.CREATED).json({
+      status: StatusCodes.CREATED,
+      message: 'Successfully created a new tag',
     });
   } catch (err) {
     logger.error('Internal server error', err);

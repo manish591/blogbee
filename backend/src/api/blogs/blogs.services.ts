@@ -6,6 +6,7 @@ import { AppError } from '../../utils/app-error';
 import { logger } from '../../utils/logger';
 import type {
   TCreateNewBlogRequestBody,
+  TCreateNewTagRequestBody,
   TUpdateBlogRequestBody,
 } from './blogs.schema';
 
@@ -169,5 +170,32 @@ export async function deleteBlog(userId: string, blogId: string, db: Db) {
     });
   } finally {
     await session.endSession();
+  }
+}
+
+export async function createNewTag(
+  userId: string,
+  blogId: string,
+  tagsData: TCreateNewTagRequestBody,
+  db: Db,
+) {
+  try {
+    const blogData = await db.collection<Tags>(TAGS_COLLECTION).insertOne({
+      userId: new ObjectId(userId),
+      blogId: new ObjectId(blogId),
+      name: tagsData.name,
+      description: tagsData.description,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    return blogData.insertedId;
+  } catch (err) {
+    logger.error('An internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'An internal server error occured. Try again later!',
+    });
   }
 }
