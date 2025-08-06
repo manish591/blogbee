@@ -15,6 +15,7 @@ import {
   createNewBlog,
   createNewTag,
   deleteBlog,
+  deleteTags,
   editBlog,
   editTags,
   getAllBlogs,
@@ -371,6 +372,45 @@ export async function editTagsHandler(req: Request, res: Response) {
       .status(StatusCodes.OK)
       .json(
         new APIResponse('success', StatusCodes.OK, 'Edited tag successfully'),
+      );
+  } catch (err) {
+    logger.error('SERVER_ERRRO: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
+  }
+}
+
+export async function deleteTagsHandler(req: Request, res: Response) {
+  try {
+    const userData = res.locals.user;
+
+    if (!userData) {
+      logger.info('Unauthorized_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
+      return;
+    }
+
+    const userId = userData.userId;
+    const tagId = req.params.tagId;
+    const blogId = req.params.blogId;
+    await deleteTags(userId, blogId, tagId, req.db);
+    logger.info('DELETE_TAG_SUCCESS: Deleted tag successfully');
+
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new APIResponse('success', StatusCodes.OK, 'Deleted tag successfully'),
       );
   } catch (err) {
     logger.error('SERVER_ERRRO: Internal server error occured', err);

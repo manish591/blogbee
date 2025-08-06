@@ -258,15 +258,40 @@ export async function editTags(
   try {
     const data = await db.collection<Tags>(TAGS_COLLECTION).updateOne(
       {
+        _id: new ObjectId(tagId),
         userId: new ObjectId(userId),
         blogId: new ObjectId(blogId),
-        _id: new ObjectId(tagId),
       },
       {
         $set: tagData,
       },
     );
     return data;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
+  }
+}
+
+export async function deleteTags(
+  userId: string,
+  blogId: string,
+  tagId: string,
+  db: Db,
+) {
+  try {
+    const data = await db.collection<Tags>(TAGS_COLLECTION).deleteOne({
+      userId: new ObjectId(userId),
+      blogId: new ObjectId(blogId),
+      _id: new ObjectId(tagId),
+    });
+    return {
+      isSuccess: data.acknowledged,
+    };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({

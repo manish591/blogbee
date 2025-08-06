@@ -5,6 +5,7 @@ import {
   createNewBlogHandler,
   createNewTagHandler,
   deleteBlogHandler,
+  deleteTagsHandler,
   editBlogHandler,
   editTagsHandler,
   getAllBlogsHandler,
@@ -16,6 +17,7 @@ import {
   createNewBlogSchema,
   createNewTagSchema,
   deleteBlogSchema,
+  deleteTagsSchema,
   editBlogSchema,
   editTagsSchema,
   getAllBlogsSchema,
@@ -80,6 +82,12 @@ router.patch(
   authenticate,
   validateRequest(editTagsSchema),
   editTagsHandler,
+);
+router.delete(
+  '/:blogId/tags/:tagId',
+  authenticate,
+  validateRequest(deleteTagsSchema),
+  deleteTagsHandler,
 );
 
 export { router as blogsRoutes };

@@ -484,4 +484,44 @@ describe('blogs', () => {
       expect(editTagData?.name).toBe('typescript');
     });
   });
+
+  describe('DELETE /blogs/:blogId/tags/:tagId', () => {
+    const blogData = {
+      name: 'update blog title',
+      slug: 'update-blog-title',
+      about: 'This is a content.',
+    };
+
+    const tagData = {
+      name: 'javascript',
+      description: 'Contains all the blogs related to the javascript',
+    };
+
+    let blogId: string;
+    let tagId: string;
+
+    beforeEach(async () => {
+      blogId = (await createNewBlog(userId, blogData, db)).blogId.toString();
+      tagId = (
+        await createNewTag(userId, blogId, tagData, db)
+      ).tagId.toString();
+    });
+
+    it('should return 200 ok for successfully deleting the tag data', async () => {
+      const app = buildServer({ db });
+      const res = await request(app)
+        .delete(`/api/v1/blogs/${blogId}/tags/${tagId}`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+      const deletedTagData = await getTag(userId, blogId, tagId, db);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        code: 200,
+        status: 'success',
+        message: 'Deleted tag successfully',
+      });
+      expect(deletedTagData).toBe(null);
+    });
+  });
 });
