@@ -7,7 +7,7 @@ import { logger } from '../../utils/logger';
 import type {
   TCreateNewBlogRequestBody,
   TCreateNewTagRequestBody,
-  TUpdateBlogRequestBody,
+  TEditBlogRequestBody,
 } from './blogs.schema';
 
 export const BLOG_COLLECTION = 'blogs';
@@ -37,19 +37,20 @@ export async function createNewBlog(
   db: Db,
 ) {
   try {
-    const insertedBlogResult = await db
-      .collection<Blogs>(BLOG_COLLECTION)
-      .insertOne({
-        userId: new ObjectId(userId),
-        name: blogData.name,
-        slug: blogData.slug,
-        about: blogData.about,
-        blogLogo: blogData.blogLogo,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+    const data = await db.collection<Blogs>(BLOG_COLLECTION).insertOne({
+      userId: new ObjectId(userId),
+      name: blogData.name,
+      slug: blogData.slug,
+      about: blogData.about,
+      blogLogo: blogData.blogLogo,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
 
-    return insertedBlogResult.insertedId;
+    return {
+      isSuccess: data.acknowledged,
+      blogId: data.insertedId,
+    };
   } catch (err) {
     logger.error('An internal server error occured', err);
     throw new AppError({
@@ -113,10 +114,10 @@ export async function getAllBlogs(
   }
 }
 
-export async function updateBlog(
+export async function editBlog(
   userId: string,
   blogId: string,
-  blogData: TUpdateBlogRequestBody,
+  blogData: TEditBlogRequestBody,
   db: Db,
 ) {
   try {
@@ -190,6 +191,26 @@ export async function createNewTag(
     });
 
     return blogData.insertedId;
+  } catch (err) {
+    logger.error('An internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'An internal server error occured. Try again later!',
+    });
+  }
+}
+
+export async function getAllTags(userId: string, blogId: string, db: Db) {
+  try {
+    const allTagsData = db
+      .collection<Tags>(TAGS_COLLECTION)
+      .find({
+        userId: new ObjectId(userId),
+        blogId: new ObjectId(blogId),
+      })
+      .toArray();
+    return allTagsData;
   } catch (err) {
     logger.error('An internal server error occured', err);
     throw new AppError({

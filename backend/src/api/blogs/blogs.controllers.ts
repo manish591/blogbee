@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { StatusCodes } from 'http-status-codes';
+import { APIResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
 import {
   uploadFileToCloudinary,
@@ -7,16 +8,17 @@ import {
 } from '../../utils/upload-files';
 import type {
   TCreateNewBlogRequestBody,
-  TUpdateBlogParams,
-  TUpdateBlogRequestBody,
+  TEditBlogParams,
+  TEditBlogRequestBody,
 } from './blogs.schema';
 import {
   createNewBlog,
   createNewTag,
   deleteBlog,
+  editBlog,
   getAllBlogs,
+  getAllTags,
   isSlugTaken,
-  updateBlog,
 } from './blogs.services';
 
 export async function createNewBlogHandler(
@@ -31,13 +33,12 @@ export async function createNewBlogHandler(
     const userData = res.locals.user;
 
     if (!userData) {
-      logger.info('User not found');
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        code: ReasonPhrases.UNAUTHORIZED,
-        message: 'You are not logged in',
-      });
-
+      logger.info('Unauthorized_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
       return;
     }
 
@@ -45,29 +46,38 @@ export async function createNewBlogHandler(
     const isSlugAvailable = await isSlugTaken(slug, req.db);
 
     if (isSlugAvailable) {
-      logger.error('Slug is already taken. Try with another slug name');
-      res.status(StatusCodes.CONFLICT).json({
-        status: StatusCodes.CONFLICT,
-        code: ReasonPhrases.CONFLICT,
-        message: 'Slug is taken. Please user a different slug',
-      });
+      logger.error('SLUG_CONFLICT_ERROR: Slug not available');
+      res
+        .status(StatusCodes.CONFLICT)
+        .json(
+          new APIResponse('error', StatusCodes.CONFLICT, 'Slug not available'),
+        );
       return;
     }
 
     await createNewBlog(userData.userId, req.body, req.db);
+    logger.info('CREATE_BLOG_SUCCESS: Created the blog successfully');
 
-    res.status(StatusCodes.OK).json({
-      status: StatusCodes.OK,
-      code: ReasonPhrases.OK,
-      message: 'Successfully created the blog',
-    });
+    res
+      .status(StatusCodes.CREATED)
+      .json(
+        new APIResponse(
+          'success',
+          StatusCodes.CREATED,
+          'Created the blog successfully',
+        ),
+      );
   } catch (err) {
-    logger.error('Internal server error', err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured. Please try again later!',
-    });
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
   }
 }
 
@@ -76,39 +86,48 @@ export async function getAllBlogsHandler(req: Request, res: Response) {
     const userData = res.locals.user;
 
     if (!userData) {
-      logger.info('User not found');
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        code: ReasonPhrases.UNAUTHORIZED,
-        message: 'You are not logged in',
-      });
-
+      logger.info('Unauthorized_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
       return;
     }
 
     const query = req.query.query as string;
     const limit = req.query.limit as string;
     const page = req.query.page as string;
-    const allBlogs = await getAllBlogs(
+    const data = await getAllBlogs(
       userData.userId,
       req.db,
       query,
       Number(page),
       Number(limit),
     );
+    logger.info('FETCH_ALL_BLOG_SUCCESS: Blogs fetched successfully');
 
-    res.status(StatusCodes.OK).json({
-      status: StatusCodes.OK,
-      message: 'Blogs fetched successfully',
-      data: allBlogs,
-    });
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new APIResponse(
+          'success',
+          StatusCodes.OK,
+          'Blogs fetched successfully',
+          data,
+        ),
+      );
   } catch (err) {
     logger.error('Internal server error', err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured. Please try again later!',
-    });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
   }
 }
 
@@ -117,12 +136,10 @@ export async function uploadBlogLogoHandler(req: Request, res: Response) {
     const uploadedFile = req.file;
 
     if (!uploadedFile) {
-      res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusCodes.BAD_REQUEST,
-        code: ReasonPhrases.BAD_REQUEST,
-        message: 'File not found',
-      });
-
+      logger.error('UPLOAD_FILE_ERROR: File not found in req.file');
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(new APIResponse('error', StatusCodes.BAD_REQUEST, 'Bad request'));
       return;
     }
 
@@ -130,61 +147,74 @@ export async function uploadBlogLogoHandler(req: Request, res: Response) {
       uploadedFile,
       uploadFileToCloudinary,
     );
+    logger.info('BLOG_LOGO_UPLOAD_SUCCESS: Blog logo uploaded successfully');
 
-    res.status(StatusCodes.OK).json({
-      status: StatusCodes.OK,
-      message: 'Logo uploaded successfully',
-      data: {
-        url: profileImageUrl,
-      },
-    });
+    res.status(StatusCodes.OK).json(
+      new APIResponse(
+        'success',
+        StatusCodes.OK,
+        'Blog logo uploaded successfully',
+        {
+          url: profileImageUrl,
+        },
+      ),
+    );
   } catch (err) {
-    logger.error('Internal server error', err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured. Please try again later!',
-    });
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
   }
 }
 
-export async function updateBlogHandler(
-  req: Request<
-    TUpdateBlogParams,
-    Record<string, unknown>,
-    TUpdateBlogRequestBody
-  >,
+export async function editBlogHandler(
+  req: Request<TEditBlogParams, Record<string, unknown>, TEditBlogRequestBody>,
   res: Response,
 ) {
   try {
     const userData = res.locals.user;
 
     if (!userData) {
-      logger.info('User not found');
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        code: ReasonPhrases.UNAUTHORIZED,
-        message: 'You are not logged in',
-      });
-
+      logger.info('Unauthorized_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
       return;
     }
 
     const userId = userData.userId;
     const blogId = req.params.blogId;
-    await updateBlog(userId, blogId, req.body, req.db);
+    await editBlog(userId, blogId, req.body, req.db);
+    logger.info('EDIT_BLOG_SUCCESS: Edited the blog successfully');
 
-    res.status(StatusCodes.OK).json({
-      status: StatusCodes.OK,
-      message: 'Successfully updated the blog',
-    });
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new APIResponse(
+          'success',
+          StatusCodes.OK,
+          'Edited the blog successfully',
+        ),
+      );
   } catch (err) {
-    logger.error('Internal server error', err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured. Please try again later!',
-    });
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
   }
 }
 
@@ -193,13 +223,12 @@ export async function deleteBlogHandler(req: Request, res: Response) {
     const userData = res.locals.user;
 
     if (!userData) {
-      logger.info('User not found');
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        code: ReasonPhrases.UNAUTHORIZED,
-        message: 'You are not logged in',
-      });
-
+      logger.info('Unauthorized_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
       return;
     }
 
@@ -207,18 +236,28 @@ export async function deleteBlogHandler(req: Request, res: Response) {
     const blogId = req.params.blogId;
 
     await deleteBlog(userId, blogId, req.db);
+    logger.info('DELETE_BLOG_SUCCESS: Deleted the blog successfully');
 
-    res.status(StatusCodes.OK).json({
-      status: StatusCodes.OK,
-      message: 'Successfully deleted the blog',
-    });
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new APIResponse(
+          'success',
+          StatusCodes.OK,
+          'Deleted the blog successfully',
+        ),
+      );
   } catch (err) {
-    logger.error('Internal server error', err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured. Please try again later!',
-    });
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal Server error occured',
+        ),
+      );
   }
 }
 
@@ -227,30 +266,82 @@ export async function createNewTagHandler(req: Request, res: Response) {
     const userData = res.locals.user;
 
     if (!userData) {
-      logger.info('User not found');
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        code: ReasonPhrases.UNAUTHORIZED,
-        message: 'You are not logged in',
-      });
-
+      logger.info('Unauthorized_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
       return;
     }
 
     const userId = userData.userId;
     const blogId = req.params.blogId;
     await createNewTag(userId, blogId, req.body, req.db);
+    logger.info('CREATE_NEW_TAG_SUCCESS: Tags created successfully');
 
-    res.status(StatusCodes.CREATED).json({
-      status: StatusCodes.CREATED,
-      message: 'Successfully created a new tag',
-    });
+    res
+      .status(StatusCodes.CREATED)
+      .json(
+        new APIResponse(
+          'success',
+          StatusCodes.CREATED,
+          'Tags created successfully',
+        ),
+      );
   } catch (err) {
-    logger.error('Internal server error', err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured. Please try again later!',
-    });
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
+  }
+}
+
+export async function getAllTagsHandler(req: Request, res: Response) {
+  try {
+    const userData = res.locals.user;
+
+    if (!userData) {
+      logger.info('Unauthorized_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
+      return;
+    }
+
+    const userId = userData.userId;
+    const blogId = req.params.blogId;
+    const data = await getAllTags(userId, blogId, req.db);
+    logger.info('GET_ALL_TAGS_SUCCESS: Tags fetched successfully');
+
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new APIResponse(
+          'success',
+          StatusCodes.OK,
+          'Tags fetched successfuly',
+          data,
+        ),
+      );
+  } catch (err) {
+    logger.error('SERVER_ERRRO: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
   }
 }

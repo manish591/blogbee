@@ -5,7 +5,12 @@ import { buildServer } from '../../app';
 import type { Tags } from '../../db/schema';
 import * as uploadUtils from '../../utils/upload-files';
 import { createNewUser, getAuthSession } from '../users/users.services';
-import { createNewBlog, getBlog, TAGS_COLLECTION } from './blogs.services';
+import {
+  createNewBlog,
+  createNewTag,
+  getBlog,
+  TAGS_COLLECTION,
+} from './blogs.services';
 
 describe('blogs', () => {
   const user1 = {
@@ -57,9 +62,9 @@ describe('blogs', () => {
 
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
-        status: 400,
-        code: 'Bad Request',
-        message: 'Request resources are invalid.',
+        code: 400,
+        status: "error",
+        message: 'Bad request',
       });
     });
 
@@ -74,9 +79,9 @@ describe('blogs', () => {
 
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
-        status: 400,
-        code: 'Bad Request',
-        message: 'Request resources are invalid.',
+        status: "error",
+        code: 400,
+        message: 'Bad request',
       });
     });
 
@@ -95,9 +100,9 @@ describe('blogs', () => {
 
       expect(res.status).toBe(409);
       expect(res.body).toMatchObject({
-        status: 409,
-        code: 'Conflict',
-        message: 'Slug is taken. Please user a different slug',
+        status: "error",
+        code: 409,
+        message: 'Slug not available',
       });
     });
 
@@ -114,10 +119,11 @@ describe('blogs', () => {
         .set('Cookie', [cookie])
         .send(data);
 
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(201);
       expect(res.body).toMatchObject({
-        status: 200,
-        message: 'Successfully created the blog',
+        status: "success",
+        code: 201,
+        message: 'Created the blog successfully',
       });
     });
   });
@@ -168,9 +174,9 @@ describe('blogs', () => {
 
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
-        status: 400,
-        code: 'Bad Request',
-        message: 'Request resources are invalid.',
+        status: "error",
+        code: 400,
+        message: 'Bad request',
       });
     });
 
@@ -218,9 +224,9 @@ describe('blogs', () => {
 
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
-        status: 400,
-        code: 'Bad Request',
-        message: 'File not found',
+        code: 400,
+        status: "error",
+        message: 'Bad request',
       });
     });
 
@@ -240,8 +246,9 @@ describe('blogs', () => {
 
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
-        status: 200,
-        message: 'Logo uploaded successfully',
+        status: "success",
+        code: 200,
+        message: 'Blog logo uploaded successfully',
         data: {
           url: 'https://img-url.png',
         },
@@ -259,7 +266,7 @@ describe('blogs', () => {
     let blogId: string;
 
     beforeEach(async () => {
-      blogId = (await createNewBlog(userId, blogData, db)).toString();
+      blogId = (await createNewBlog(userId, blogData, db)).blogId.toString();
     });
 
     it('should return 400 bad request if invalid request body is provided', async () => {
@@ -273,17 +280,17 @@ describe('blogs', () => {
 
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
-        status: 400,
-        code: 'Bad Request',
-        message: 'Request resources are invalid.',
+        code: 400,
+        status: "error",
+        message: 'Bad request',
       });
     });
 
-    it('should return 200 ok for successfully updating the blog content', async () => {
+    it('should return 200 ok for successfully editing the blog content', async () => {
       const app = buildServer({ db });
       const data = {
-        name: 'updated blog',
-        about: 'about updated blog',
+        name: 'edit blog',
+        about: 'about edited blog',
         blogLogo: 'https://test.png',
       };
       const res = await request(app)
@@ -294,8 +301,9 @@ describe('blogs', () => {
 
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
-        status: 200,
-        message: 'Successfully updated the blog',
+        code: 200,
+        status: "success",
+        message: 'Edited the blog successfully',
       });
     });
   });
@@ -310,7 +318,7 @@ describe('blogs', () => {
     let blogId: string;
 
     beforeEach(async () => {
-      blogId = (await createNewBlog(userId, blogData, db)).toString();
+      blogId = (await createNewBlog(userId, blogData, db)).blogId.toString();
     });
 
     it('should return 200 ok and delete the users blog resource', async () => {
@@ -324,8 +332,9 @@ describe('blogs', () => {
       expect(res.status).toBe(200);
       expect(deletedBlog).toBe(null);
       expect(res.body).toMatchObject({
-        status: 200,
-        message: 'Successfully deleted the blog',
+        code: 200,
+        status: "success",
+        message: 'Deleted the blog successfully',
       });
     });
   });
@@ -340,7 +349,7 @@ describe('blogs', () => {
     let blogId: string;
 
     beforeEach(async () => {
-      blogId = (await createNewBlog(userId, blogData, db)).toString();
+      blogId = (await createNewBlog(userId, blogData, db)).blogId.toString();
     });
 
     it('should return 400 bad request if invalid request body is provided', async () => {
@@ -354,9 +363,9 @@ describe('blogs', () => {
 
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
-        status: 400,
-        code: 'Bad Request',
-        message: 'Request resources are invalid.',
+        code: 400,
+        status: 'error',
+        message: 'Bad request',
       });
     });
 
@@ -379,11 +388,39 @@ describe('blogs', () => {
 
       expect(res.status).toBe(201);
       expect(res.body).toMatchObject({
-        status: 201,
-        message: 'Successfully created a new tag',
+        code: 201,
+        status: "success",
+        message: 'Tags created successfully',
       });
       expect(newTagCreatedData).toBeDefined();
       expect(newTagCreatedData?.name).toBe('Javascript');
+    });
+  });
+
+  describe('GET /blogs/:blogId/tags', () => {
+    const blogData = {
+      name: 'update blog title',
+      slug: 'update-blog-title',
+      about: 'This is a content.',
+    };
+
+    let blogId: string;
+
+    beforeEach(async () => {
+      blogId = (await createNewBlog(userId, blogData, db)).blogId.toString();
+      await createNewTag(userId, blogId, { name: 'Typescript' }, db);
+      await createNewTag(userId, blogId, { name: 'Python' }, db);
+    });
+
+    it('should return 200 ok along with all the tags related to the blogId', async () => {
+      const app = buildServer({ db });
+      const res = await request(app)
+        .get(`/api/v1/blogs/${blogId}/tags`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.length).toBe(2);
     });
   });
 });

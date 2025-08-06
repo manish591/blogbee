@@ -5,8 +5,9 @@ import {
   createNewBlogHandler,
   createNewTagHandler,
   deleteBlogHandler,
+  editBlogHandler,
   getAllBlogsHandler,
-  updateBlogHandler,
+  getAllTagsHandler,
   uploadBlogLogoHandler,
 } from './blogs.controllers';
 import { validateRequest } from './blogs.middlewares';
@@ -14,8 +15,9 @@ import {
   createNewBlogSchema,
   createNewTagSchema,
   deleteBlogSchema,
+  editBlogSchema,
   getAllBlogsSchema,
-  updateBlogSchema,
+  getAllTagsSchema,
 } from './blogs.schema';
 
 const router = Router();
@@ -27,7 +29,6 @@ const router = Router();
  * DELETE blogs/posts/:postId - Delete a post by ID
  *
  * GET blogs/:blogId/tags - Get all tags for a blog
- * POST blogs/:blogId/tags - Create a new tag for a blog
  * PATCH blogs/:blogId/tags/:tagId - Update a tag by ID
  * DELETE blogs/:blogId/tags/:tagId - Delete a tag by ID
  */
@@ -52,8 +53,8 @@ router.post(
 router.patch(
   '/:blogId',
   authenticate,
-  validateRequest(updateBlogSchema),
-  updateBlogHandler,
+  validateRequest(editBlogSchema),
+  editBlogHandler,
 );
 router.delete(
   '/:blogId',
@@ -66,6 +67,12 @@ router.post(
   authenticate,
   validateRequest(createNewTagSchema),
   createNewTagHandler,
+);
+router.get(
+  '/:blogId/tags',
+  authenticate,
+  validateRequest(getAllTagsSchema),
+  getAllTagsHandler,
 );
 
 export { router as blogsRoutes };

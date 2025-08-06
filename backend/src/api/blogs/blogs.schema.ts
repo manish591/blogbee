@@ -39,7 +39,7 @@ export const getAllBlogsSchema = z.object({
     .strict(),
 });
 
-export const updateBlogSchema = z.object({
+export const editBlogSchema = z.object({
   body: z
     .object({
       name: z
@@ -82,16 +82,23 @@ export const createNewTagSchema = z.object({
   }),
 });
 
+export const getAllTagsSchema = z.object({
+  params: z.object({
+    blogId: z.string(),
+  }),
+});
+
 export type TCreateNewBlogRequestBody = z.infer<
   typeof createNewBlogSchema
 >['body'];
 export type TGetAllBlogsQueryParams = z.infer<
   typeof getAllBlogsSchema
 >['query'];
-export type TUpdateBlogRequestBody = z.infer<typeof updateBlogSchema>['body'];
-export type TUpdateBlogParams = z.infer<typeof updateBlogSchema>['params'];
+export type TEditBlogRequestBody = z.infer<typeof editBlogSchema>['body'];
+export type TEditBlogParams = z.infer<typeof editBlogSchema>['params'];
 export type TDeleteBlogParams = z.infer<typeof deleteBlogSchema>['params'];
 export type TCreateNewTagParams = z.infer<typeof createNewTagSchema>['params'];
 export type TCreateNewTagRequestBody = z.infer<
   typeof createNewTagSchema
 >['body'];
+export type TGetAllTagsParams = z.infer<typeof getAllTagsSchema>['params'];
