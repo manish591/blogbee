@@ -36,6 +36,7 @@ export interface Tags {
   description?: string;
   blogId: ObjectId;
   userId: ObjectId;
+  posts: ObjectId[],
   createdAt: Date;
   updatedAt: Date;
 }
@@ -46,10 +47,11 @@ export interface Posts {
   blogId: ObjectId;
   title: string;
   subTitle?: string;
-  content: string;
+  content?: string;
   slug: string;
+  coverImg?: string;
   postStatus: PostStatus;
-  tags: Tags[];
+  tags: ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
