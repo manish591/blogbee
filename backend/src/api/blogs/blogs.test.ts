@@ -2,14 +2,14 @@ import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '../../../test/setup';
 import { buildServer } from '../../app';
-import type { Tags } from '../../db/schema';
 import * as uploadUtils from '../../utils/upload-files';
 import { createNewUser, getAuthSession } from '../users/users.services';
 import {
   createNewBlog,
   createNewTag,
+  getAllTags,
   getBlog,
-  TAGS_COLLECTION,
+  getTag,
 } from './blogs.services';
 
 describe('blogs', () => {
@@ -63,7 +63,7 @@ describe('blogs', () => {
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 400,
-        status: "error",
+        status: 'error',
         message: 'Bad request',
       });
     });
@@ -79,7 +79,7 @@ describe('blogs', () => {
 
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
-        status: "error",
+        status: 'error',
         code: 400,
         message: 'Bad request',
       });
@@ -100,7 +100,7 @@ describe('blogs', () => {
 
       expect(res.status).toBe(409);
       expect(res.body).toMatchObject({
-        status: "error",
+        status: 'error',
         code: 409,
         message: 'Slug not available',
       });
@@ -121,7 +121,7 @@ describe('blogs', () => {
 
       expect(res.status).toBe(201);
       expect(res.body).toMatchObject({
-        status: "success",
+        status: 'success',
         code: 201,
         message: 'Created the blog successfully',
       });
@@ -174,7 +174,7 @@ describe('blogs', () => {
 
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
-        status: "error",
+        status: 'error',
         code: 400,
         message: 'Bad request',
       });
@@ -225,7 +225,7 @@ describe('blogs', () => {
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 400,
-        status: "error",
+        status: 'error',
         message: 'Bad request',
       });
     });
@@ -246,7 +246,7 @@ describe('blogs', () => {
 
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
-        status: "success",
+        status: 'success',
         code: 200,
         message: 'Blog logo uploaded successfully',
         data: {
@@ -281,7 +281,7 @@ describe('blogs', () => {
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 400,
-        status: "error",
+        status: 'error',
         message: 'Bad request',
       });
     });
@@ -302,13 +302,13 @@ describe('blogs', () => {
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
         code: 200,
-        status: "success",
+        status: 'success',
         message: 'Edited the blog successfully',
       });
     });
   });
 
-  describe('DELETE /blogs/blogId', () => {
+  describe('DELETE /blogs/:blogId', () => {
     const blogData = {
       name: 'update blog title',
       slug: 'update-blog-title',
@@ -333,7 +333,7 @@ describe('blogs', () => {
       expect(deletedBlog).toBe(null);
       expect(res.body).toMatchObject({
         code: 200,
-        status: "success",
+        status: 'success',
         message: 'Deleted the blog successfully',
       });
     });
@@ -373,27 +373,24 @@ describe('blogs', () => {
       const app = buildServer({ db });
       const data = {
         name: 'Javascript',
-        desciption: 'Contains all the blogs of the javascript category.',
+        description: 'Contains all the blogs of the javascript category.',
       };
       const res = await request(app)
         .post(`/api/v1/blogs/${blogId}/tags`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie])
         .send(data);
-      const newTagCreatedData = await db
-        .collection<Tags>(TAGS_COLLECTION)
-        .findOne({
-          name: 'Javascript',
-        });
+      const createdTagData = await getAllTags(userId, blogId, db);
 
       expect(res.status).toBe(201);
       expect(res.body).toMatchObject({
         code: 201,
-        status: "success",
+        status: 'success',
         message: 'Tags created successfully',
       });
-      expect(newTagCreatedData).toBeDefined();
-      expect(newTagCreatedData?.name).toBe('Javascript');
+      expect(createdTagData).toBeDefined();
+      expect(createdTagData.length).toBe(1);
+      expect(createdTagData[0].name).toBe('Javascript');
     });
   });
 
@@ -421,6 +418,70 @@ describe('blogs', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.data.length).toBe(2);
+    });
+  });
+
+  describe('PATCH /blogs/:blogId/tags/:tagId', () => {
+    const blogData = {
+      name: 'update blog title',
+      slug: 'update-blog-title',
+      about: 'This is a content.',
+    };
+
+    const tagData = {
+      name: 'javascript',
+      description: 'Contains all the blogs related to the javascript',
+    };
+
+    let blogId: string;
+    let tagId: string;
+
+    beforeEach(async () => {
+      blogId = (await createNewBlog(userId, blogData, db)).blogId.toString();
+      tagId = (
+        await createNewTag(userId, blogId, tagData, db)
+      ).tagId.toString();
+    });
+
+    it('should return 400 bad request if invalid request body is provided', async () => {
+      const app = buildServer({ db });
+      const data = {
+        invalidData: 'invalid',
+      };
+      const res = await request(app)
+        .patch(`/api/v1/blogs/${blogId}/tags/${tagId}`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        code: 400,
+        status: 'error',
+        message: 'Bad request',
+      });
+    });
+
+    it('should return 200 ok for successfully editing the tag', async () => {
+      const app = buildServer({ db });
+      const data = {
+        name: 'typescript',
+      };
+      const res = await request(app)
+        .patch(`/api/v1/blogs/${blogId}/tags/${tagId}`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+      const editTagData = await getTag(userId, blogId, tagId, db);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        code: 200,
+        status: 'success',
+        message: 'Edited tag successfully',
+      });
+      expect(editTagData).toBeDefined();
+      expect(editTagData?.name).toBe('typescript');
     });
   });
 });

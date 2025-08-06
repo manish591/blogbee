@@ -16,6 +16,7 @@ import {
   createNewTag,
   deleteBlog,
   editBlog,
+  editTags,
   getAllBlogs,
   getAllTags,
   isSlugTaken,
@@ -331,6 +332,45 @@ export async function getAllTagsHandler(req: Request, res: Response) {
           'Tags fetched successfuly',
           data,
         ),
+      );
+  } catch (err) {
+    logger.error('SERVER_ERRRO: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
+  }
+}
+
+export async function editTagsHandler(req: Request, res: Response) {
+  try {
+    const userData = res.locals.user;
+
+    if (!userData) {
+      logger.info('Unauthorized_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
+      return;
+    }
+
+    const userId = userData.userId;
+    const tagId = req.params.tagId;
+    const blogId = req.params.blogId;
+    await editTags(userId, blogId, tagId, req.body, req.db);
+    logger.info('EDIT_TAG_SUCCESS: Edited tag successfully');
+
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new APIResponse('success', StatusCodes.OK, 'Edited tag successfully'),
       );
   } catch (err) {
     logger.error('SERVER_ERRRO: Internal server error occured', err);
