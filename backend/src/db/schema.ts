@@ -33,7 +33,7 @@ export interface Blogs {
 export interface Tags {
   _id?: ObjectId;
   name: string;
-  description: string;
+  description?: string;
   blogId: ObjectId;
   userId: ObjectId;
   createdAt: Date;
