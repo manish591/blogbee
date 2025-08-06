@@ -54,7 +54,7 @@ export async function createUserHandler(
     }
 
     const userData = await createNewUser(req.body, req.db);
-    const sessionId = await createAuthSession(userData.insertedId, req.db);
+    const sessionId = await createAuthSession(userData.insertedId.toString(), req.db);
 
     res.cookie(SESSION_COOKIE_NAME, sessionId, cookieOptions);
     res.status(StatusCodes.CREATED).json({
@@ -111,7 +111,7 @@ export async function loginUserHandler(
       return;
     }
 
-    const sessionId = await createAuthSession(userData._id, req.db);
+    const sessionId = await createAuthSession(userData._id.toString(), req.db);
 
     res.cookie(SESSION_COOKIE_NAME, sessionId, cookieOptions);
     res.status(StatusCodes.OK).json({
