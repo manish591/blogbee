@@ -1,5 +1,5 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-import type { Db } from 'mongodb';
+import { ObjectId, type Db } from 'mongodb';
 import { config } from '../../config';
 import type { Session, Users } from '../../db/schema';
 import { AppError } from '../../utils/app-error';
@@ -59,7 +59,7 @@ export async function createAuthSession(userId: string, db: Db) {
     const sessionExpiresIn = config.SESSION_EXPIRES_IN;
 
     await db.collection<Session>(SESSION_COLLECTION).insertOne({
-      userId,
+      userId: new ObjectId(userId),
       sessionId,
       expiresIn: sessionExpiresIn,
       createdAt: new Date(),
@@ -113,7 +113,7 @@ export async function updateProfile(
 ) {
   try {
     await db.collection<Users>(USERS_COLLECTION).updateOne(
-      { _id: userId },
+      { _id: new ObjectId(userId) },
       {
         $set: updatedData,
       },
@@ -131,7 +131,7 @@ export async function updateProfile(
 export async function getUserDetails(userId: string, db: Db) {
   try {
     const userData = await db.collection<Users>(USERS_COLLECTION).findOne(
-      { _id: userId },
+      { _id: new ObjectId(userId) },
       {
         projection: {
           name: 1,

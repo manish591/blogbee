@@ -38,7 +38,7 @@ export async function authenticate(
 
     res.locals.user = {
       sessionId,
-      userId: sessionData.userId,
+      userId: sessionData.userId.toString(),
     };
 
     next();

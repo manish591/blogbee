@@ -7,11 +7,13 @@ import {
 } from '../../utils/upload-files';
 import type {
   TCreateNewBlogRequestBody,
+  TDeleteBlogParams,
   TUpdateBlogParams,
   TUpdateBlogRequestBody,
 } from './blogs.schema';
 import {
   createNewBlog,
+  deleteBlog,
   getAllBlogs,
   isSlugTaken,
   updateBlog,
@@ -176,6 +178,40 @@ export async function updateBlogHandler(
       status: StatusCodes.OK,
       message: 'Successfully updated the blog',
     });
+  } catch (err) {
+    logger.error('Internal server error', err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured. Please try again later!',
+    });
+  }
+}
+
+export async function deleteBlogHandler(req: Request<TDeleteBlogParams>, res: Response) {
+  try {
+    const userData = res.locals.user;
+
+    if (!userData) {
+      logger.info('User not found');
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        status: StatusCodes.UNAUTHORIZED,
+        code: ReasonPhrases.UNAUTHORIZED,
+        message: 'You are not logged in',
+      });
+
+      return;
+    }
+
+    const userId = userData.userId;
+    const blogId = req.params.blogId;
+
+    await deleteBlog(userId, blogId, req.db);
+
+    res.status(StatusCodes.OK).json({
+      status: StatusCodes.OK,
+      message: "Successfully deleted the blog"
+    })
   } catch (err) {
     logger.error('Internal server error', err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({

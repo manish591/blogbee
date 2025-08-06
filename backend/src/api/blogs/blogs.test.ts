@@ -4,7 +4,8 @@ import { db } from '../../../test/setup';
 import { buildServer } from '../../app';
 import * as uploadUtils from '../../utils/upload-files';
 import { createNewUser, getAuthSession } from '../users/users.services';
-import { createNewBlog } from './blogs.services';
+import { createNewBlog, getBlog } from './blogs.services';
+import { ObjectId } from 'mongodb';
 
 describe('blogs', () => {
   const user1 = {
@@ -31,7 +32,7 @@ describe('blogs', () => {
       .split(';')
       .find((c) => c.split('=')[0] === 'sessionId')
       ?.split('=')[1] as string;
-    userId = (await getAuthSession(sessionId, db))?.userId as string;
+    userId = (await getAuthSession(sessionId, db))?.userId.toString() as string;
   });
 
   describe('POST /blogs', () => {
@@ -150,7 +151,9 @@ describe('blogs', () => {
       await createNewBlog(userId, blogData2, db);
       await createNewBlog(userId, blogData3, db);
       await createNewBlog(userId, blogData4, db);
-      await createNewBlog('anotherid', blogData2, db);
+
+      const newUserId = await createNewUser({ name: "new users", email: "ema@gmail.com", password: "new pass" }, db);
+      await createNewBlog(newUserId.insertedId.toString(), blogData2, db);
     });
 
     it('should return 400 bad request if invalid query params are passed', async () => {
@@ -243,7 +246,7 @@ describe('blogs', () => {
     });
   });
 
-  describe('PATCH /blogs', () => {
+  describe('PATCH /blogs/:blogId', () => {
     const blogData = {
       name: "update blog title",
       slug: "update-blog-title",
@@ -253,7 +256,7 @@ describe('blogs', () => {
     let blogId: string;
 
     beforeEach(async () => {
-      blogId = await createNewBlog(userId, blogData, db);
+      blogId = (await createNewBlog(userId, blogData, db)).toString();
     });
 
     it('should return 400 bad request if invalid request body is provided', async () => {
@@ -290,6 +293,33 @@ describe('blogs', () => {
       expect(res.body).toMatchObject({
         status: 200,
         message: 'Successfully updated the blog',
+      });
+    });
+  });
+
+  describe("DELETE /blogs/blogId", () => {
+    const blogData = {
+      name: "update blog title",
+      slug: "update-blog-title",
+      about: "This is a content."
+    }
+
+    let blogId: string;
+
+    beforeEach(async () => {
+      blogId = (await createNewBlog(userId, blogData, db)).toString();
+    });
+
+    it("should return 200 ok and delete the users blog resource", async () => {
+      const app = buildServer({ db });
+      const res = await request(app).delete(`/api/v1/blogs/${blogId}`).set("Accept", "application/json").set("Cookie", [cookie]);
+      const deletedBlog = await getBlog(userId, blogId, db);
+
+      expect(res.status).toBe(200);
+      expect(deletedBlog).toBe(null);
+      expect(res.body).toMatchObject({
+        status: 200,
+        message: "Successfully deleted the blog"
       });
     });
   });

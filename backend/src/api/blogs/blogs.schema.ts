@@ -58,7 +58,14 @@ export const updateBlogSchema = z.object({
   }).strict()
 });
 
+export const deleteBlogSchema = z.object({
+  params: z.object({
+    blogId: z.string()
+  }).strict()
+})
+
 export type TCreateNewBlogRequestBody = z.infer<typeof createNewBlogSchema>["body"];
 export type TGetAllBlogsQueryParams = z.infer<typeof getAllBlogsSchema>["query"];
 export type TUpdateBlogRequestBody = z.infer<typeof updateBlogSchema>["body"];
 export type TUpdateBlogParams = z.infer<typeof updateBlogSchema>["params"];
+export type TDeleteBlogParams = z.infer<typeof deleteBlogSchema>["params"];

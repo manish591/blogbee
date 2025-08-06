@@ -2,8 +2,9 @@ import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '../../../test/setup';
 import { buildServer } from '../../app';
+import type { Users } from '../../db/schema';
 import * as uploadUtils from '../../utils/upload-files';
-import { createNewUser } from './users.services';
+import { createNewUser, getUserDetails } from './users.services';
 
 describe('users', () => {
   const user1 = {
@@ -222,6 +223,10 @@ describe('users', () => {
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        status: 200,
+        message: 'Logout successfully',
+      });
     });
   });
 
@@ -339,9 +344,28 @@ describe('users', () => {
 
   describe('GET /users/me', () => {
     let cookie: string;
+    let createdUserData: {
+      _id?: string,
+      email: string,
+      name: string,
+      createdAt: string;
+      updatedAt: string;
+    };
 
     beforeEach(async () => {
-      await createNewUser({ ...user1 }, db);
+      const insertedUser = await createNewUser({ ...user1 }, db);
+      const userData = (await getUserDetails(
+        insertedUser.insertedId.toString(),
+        db,
+      )) as Users;
+      createdUserData = {
+        _id: userData._id?.toString(),
+        name: userData.name,
+        email: userData.email,
+        createdAt: userData.createdAt.toISOString(),
+        updatedAt: userData.updatedAt.toISOString(),
+        ...(userData.profileImg && { profileImg: userData.profileImg }),
+      };
 
       const app = buildServer({ db });
       const res = await request(app)
@@ -360,6 +384,13 @@ describe('users', () => {
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        status: 200,
+        message: 'Successfully fetched user details',
+        data: {
+          user: createdUserData,
+        },
+      });
     });
   });
 });

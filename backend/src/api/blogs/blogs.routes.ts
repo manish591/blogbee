@@ -3,6 +3,7 @@ import { authenticate } from '../../middlewares/authenticate';
 import { upload } from '../../utils/upload-files';
 import {
   createNewBlogHandler,
+  deleteBlogHandler,
   getAllBlogsHandler,
   updateBlogHandler,
   uploadBlogLogoHandler,
@@ -10,6 +11,7 @@ import {
 import { validateRequest } from './blogs.middlewares';
 import {
   createNewBlogSchema,
+  deleteBlogSchema,
   getAllBlogsSchema,
   updateBlogSchema,
 } from './blogs.schema';
@@ -17,9 +19,6 @@ import {
 const router = Router();
 
 /**
- * PATCH /blogs - update a blog by userid
- * DELETE /blogs/:blogId - Delete a blog by ID
- *
  * POST blogs/:blogId/posts - create a new post for a blog
  * GET blogs/:blogId/posts - Get all posts for a blog, filter: pagination, search, sort, categories
  * PATCH blogs/posts/:postId - Update a post by ID
@@ -55,5 +54,6 @@ router.patch(
   validateRequest(updateBlogSchema),
   updateBlogHandler,
 );
+router.delete("/:blogId", authenticate, validateRequest(deleteBlogSchema), deleteBlogHandler);
 
 export { router as blogsRoutes };
