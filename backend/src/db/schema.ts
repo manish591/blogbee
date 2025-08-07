@@ -46,12 +46,12 @@ export interface Posts {
   userId: ObjectId;
   blogId: ObjectId;
   title: string;
-  subTitle?: string;
-  content?: string;
   slug: string;
-  coverImg?: string;
   postStatus: PostStatus;
   tags: ObjectId[];
+  subTitle?: string;
+  content?: string;
+  coverImg?: string;
   createdAt: Date;
   updatedAt: Date;
 }
