@@ -6,11 +6,14 @@ import {
   createNewTagHandler,
   createPostHandler,
   deleteBlogHandler,
+  deletePostHandler,
   deleteTagsHandler,
   editBlogHandler,
+  editPostHandler,
   editTagsHandler,
   getAllBlogsHandler,
   getAllTagsHandler,
+  getPostsHandler,
   uploadBlogLogoHandler,
 } from './blogs.controllers';
 import { validateRequest } from './blogs.middlewares';
@@ -19,11 +22,14 @@ import {
   createNewTagSchema,
   createPostsSchema,
   deleteBlogSchema,
+  deletePostsSchema,
   deleteTagsSchema,
   editBlogSchema,
+  editPostSchema,
   editTagsSchema,
   getAllBlogsSchema,
   getAllTagsSchema,
+  getPostsSchema,
 } from './blogs.schema';
 
 const router = Router();
@@ -90,6 +96,8 @@ router.delete(
   deleteTagsHandler,
 );
 router.post("/:blogId/posts", authenticate, validateRequest(createPostsSchema), createPostHandler);
-router.get("/:blogId/posts", authenticate);
+router.get("/:blogId/posts", authenticate, validateRequest(getPostsSchema), getPostsHandler);
+router.patch("/:blogId/posts/:postId", authenticate, validateRequest(editPostSchema), editPostHandler);
+router.delete("/:blogId/posts/:postId", authenticate, validateRequest(deletePostsSchema), deletePostHandler);
 
 export { router as blogsRoutes };
