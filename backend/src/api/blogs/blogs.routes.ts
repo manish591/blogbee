@@ -4,6 +4,7 @@ import { upload } from '../../utils/upload-files';
 import {
   createNewBlogHandler,
   createNewTagHandler,
+  createPostHandler,
   deleteBlogHandler,
   deleteTagsHandler,
   editBlogHandler,
@@ -16,6 +17,7 @@ import { validateRequest } from './blogs.middlewares';
 import {
   createNewBlogSchema,
   createNewTagSchema,
+  createPostsSchema,
   deleteBlogSchema,
   deleteTagsSchema,
   editBlogSchema,
@@ -32,8 +34,6 @@ const router = Router();
  * PATCH blogs/posts/:postId - Update a post by ID
  * DELETE blogs/posts/:postId - Delete a post by ID
  *
- * PATCH blogs/:blogId/tags/:tagId - Update a tag by ID
- * DELETE blogs/:blogId/tags/:tagId - Delete a tag by ID
  */
 router.post(
   '/',
@@ -89,5 +89,7 @@ router.delete(
   validateRequest(deleteTagsSchema),
   deleteTagsHandler,
 );
+router.post("/:blogId/posts", authenticate, validateRequest(createPostsSchema), createPostHandler);
+router.get("/:blogId/posts", authenticate);
 
 export { router as blogsRoutes };

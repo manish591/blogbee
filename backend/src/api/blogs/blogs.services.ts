@@ -1,7 +1,7 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { type Db, ObjectId } from 'mongodb';
 import { dbClient } from '../../db';
-import type { Blogs, Posts, Tags } from '../../db/schema';
+import { PostStatus, type Blogs, type Posts, type Tags } from '../../db/schema';
 import { AppError } from '../../utils/app-error';
 import { logger } from '../../utils/logger';
 import type {
@@ -10,6 +10,7 @@ import type {
   TEditBlogRequestBody,
   TEditTagsRequestBody,
 } from './blogs.schema';
+import { generateRandomString } from '../../utils/generate-random-string';
 
 export const BLOG_COLLECTION = 'blogs';
 export const TAGS_COLLECTION = 'tags';
@@ -86,7 +87,7 @@ export async function getAllBlogs(
   limit: number = 10,
 ) {
   try {
-    const allBlogs = db
+    const allBlogs = await db
       .collection<Blogs>(BLOG_COLLECTION)
       .find(
         {
@@ -100,8 +101,7 @@ export async function getAllBlogs(
           skip: page,
           limit,
         },
-      )
-      .toArray();
+      ).toArray();
     return allBlogs;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
@@ -231,13 +231,12 @@ export async function getTag(
 
 export async function getAllTags(userId: string, blogId: string, db: Db) {
   try {
-    const allTagsData = db
+    const allTagsData = await db
       .collection<Tags>(TAGS_COLLECTION)
       .find({
         userId: new ObjectId(userId),
         blogId: new ObjectId(blogId),
-      })
-      .toArray();
+      }).toArray()
     return allTagsData;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
@@ -284,15 +283,74 @@ export async function deleteTags(
   tagId: string,
   db: Db,
 ) {
+  const session = dbClient.startSession();
   try {
-    const data = await db.collection<Tags>(TAGS_COLLECTION).deleteOne({
+    session.startTransaction();
+
+    const tagData = await db.collection<Tags>(TAGS_COLLECTION).findOne({
+      _id: new ObjectId(tagId),
+      userId: new ObjectId(userId),
+      blogId: new ObjectId(blogId),
+    });
+
+    await db.collection<Posts>(POSTS_COLLECTION).updateMany({
+      _id: { $in: tagData?.posts }
+    }, {
+      $pull: { tags: tagData?._id }
+    });
+
+    await db.collection<Tags>(TAGS_COLLECTION).deleteOne({
       userId: new ObjectId(userId),
       blogId: new ObjectId(blogId),
       _id: new ObjectId(tagId),
     });
-    return {
-      isSuccess: data.acknowledged,
-    };
+
+    await session.commitTransaction();
+  } catch (err) {
+    await session.abortTransaction();
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
+  } finally {
+    await session.endSession();
+  }
+}
+
+export async function createPost(userId: string, blogId: string, db: Db) {
+  try {
+    const randomSlug = generateRandomString();
+
+    await db.collection<Posts>(POSTS_COLLECTION).insertOne({
+      userId: new ObjectId(userId),
+      blogId: new ObjectId(blogId),
+      title: "untitled",
+      slug: randomSlug,
+      postStatus: PostStatus.DRAFT,
+      tags: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
+  }
+}
+
+export async function getPost(userId: string, blogId: string, postId: string, db: Db) {
+  try {
+    const data = await db.collection<Posts>(POSTS_COLLECTION).findOne({
+      _id: new ObjectId(postId),
+      userId: new ObjectId(userId),
+      blogId: new ObjectId(blogId)
+    });
+    return data;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({

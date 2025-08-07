@@ -118,6 +118,16 @@ export const deleteTagsSchema = z.object({
     .strict(),
 });
 
+export const createPostsSchema = z.object({
+  params: z.object({
+    blogId: z.string(),
+  })
+});
+
+export const getPostsSchema = z.object({
+
+});
+
 export type TCreateNewBlogRequestBody = z.infer<
   typeof createNewBlogSchema
 >['body'];
@@ -135,3 +145,4 @@ export type TGetAllTagsParams = z.infer<typeof getAllTagsSchema>['params'];
 export type TEditTagsParams = z.infer<typeof editTagsSchema>['params'];
 export type TEditTagsRequestBody = z.infer<typeof editBlogSchema>['body'];
 export type TDeleteTagsParams = z.infer<typeof deleteTagsSchema>['params'];
+export type TCreatePostParams = z.infer<typeof createPostsSchema>['params'];
