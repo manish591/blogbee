@@ -25,7 +25,7 @@ export interface Blogs {
   name: string;
   about?: string;
   slug: string;
-  blogLogo?: string;
+  logo?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,7 +36,7 @@ export interface Tags {
   description?: string;
   blogId: ObjectId;
   userId: ObjectId;
-  posts: ObjectId[],
+  posts: ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }

@@ -3,52 +3,48 @@ import { type Db, ObjectId } from 'mongodb';
 import { config } from '../../config';
 import type { Session, Users } from '../../db/schema';
 import { AppError } from '../../utils/app-error';
+import { SESSION_COLLECTION, USERS_COLLECTION } from '../../utils/constants';
 import { generateRandomString } from '../../utils/generate-random-string';
 import { hashPassword } from '../../utils/hash-password';
 import { logger } from '../../utils/logger';
-import type { TUpdateProfileSchema } from './users.schema';
+import type { TEditUserProfileBody } from './users.schema';
 
-export const USERS_COLLECTION = 'users';
-export const SESSION_COLLECTION = 'session';
-
-export async function getUserWithEmail(email: string, db: Db) {
+export async function getUserByEmail(email: string, db: Db) {
   try {
     const userData = await db
       .collection<Users>(USERS_COLLECTION)
       .findOne({ email });
     return userData;
   } catch (err) {
-    logger.error('An internal server error occured', err);
+    logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
       status: StatusCodes.INTERNAL_SERVER_ERROR,
       code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'An internal server error occured. Try again later!',
+      message: 'Internal server error occured',
     });
   }
 }
 
-export async function createNewUser(
-  userData: Omit<Users, 'createdAt' | 'updatedAt'>,
+export async function createUser(
+  data: Omit<Users, 'createdAt' | 'updatedAt'>,
   db: Db,
 ) {
   try {
-    const hashedPassword = await hashPassword(userData.password);
-
+    const hashedPassword = await hashPassword(data.password);
     const user = await db.collection<Users>(USERS_COLLECTION).insertOne({
-      email: userData.email,
-      name: userData.name,
+      email: data.email,
+      name: data.name,
       password: hashedPassword,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-
     return user;
   } catch (err) {
-    logger.error('An internal server error occured', err);
+    logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
       status: StatusCodes.INTERNAL_SERVER_ERROR,
       code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'An internal server error occured. Try again later!',
+      message: 'Internal server error occured',
     });
   }
 }
@@ -57,22 +53,20 @@ export async function createAuthSession(userId: string, db: Db) {
   try {
     const sessionId = generateRandomString();
     const sessionExpiresIn = config.SESSION_EXPIRES_IN;
-
     await db.collection<Session>(SESSION_COLLECTION).insertOne({
-      userId: new ObjectId(userId),
       sessionId,
+      userId: new ObjectId(userId),
       expiresIn: sessionExpiresIn,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-
     return sessionId;
   } catch (err) {
-    logger.error('An internal server error occured', err);
+    logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
       status: StatusCodes.INTERNAL_SERVER_ERROR,
       code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'An internal server error occured. Try again later!',
+      message: 'Internal server error occured',
     });
   }
 }
@@ -81,11 +75,11 @@ export async function revokeAuthSession(sessionId: string, db: Db) {
   try {
     await db.collection<Session>(SESSION_COLLECTION).deleteOne({ sessionId });
   } catch (err) {
-    logger.error('An internal server error occured', err);
+    logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
       status: StatusCodes.INTERNAL_SERVER_ERROR,
       code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'An internal server error occured. Try again later!',
+      message: 'Internal server error occured',
     });
   }
 }
@@ -97,40 +91,40 @@ export async function getAuthSession(sessionId: string, db: Db) {
       .findOne({ sessionId, expiresIn: { $gt: new Date() } });
     return authSession;
   } catch (err) {
-    logger.error('An internal server error occured', err);
+    logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
       status: StatusCodes.INTERNAL_SERVER_ERROR,
       code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'An internal server error occured. Try again later!',
+      message: 'Internal server error occured',
     });
   }
 }
 
-export async function updateProfile(
+export async function editUserProfile(
   userId: string,
-  updatedData: TUpdateProfileSchema,
+  data: TEditUserProfileBody,
   db: Db,
 ) {
   try {
     await db.collection<Users>(USERS_COLLECTION).updateOne(
       { _id: new ObjectId(userId) },
       {
-        $set: updatedData,
+        $set: data,
       },
     );
   } catch (err) {
-    logger.error('An internal server error occured', err);
+    logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
       status: StatusCodes.INTERNAL_SERVER_ERROR,
       code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'An internal server error occured. Try again later!',
+      message: 'Internal server error occured',
     });
   }
 }
 
 export async function getUserDetails(userId: string, db: Db) {
   try {
-    const userData = await db.collection<Users>(USERS_COLLECTION).findOne(
+    const data = await db.collection<Users>(USERS_COLLECTION).findOne(
       { _id: new ObjectId(userId) },
       {
         projection: {
@@ -142,14 +136,13 @@ export async function getUserDetails(userId: string, db: Db) {
         },
       },
     );
-
-    return userData;
+    return data;
   } catch (err) {
-    logger.error('An internal server error occured', err);
+    logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
       status: StatusCodes.INTERNAL_SERVER_ERROR,
       code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'An internal server error occured. Try again later!',
+      message: 'Internal server error occured',
     });
   }
 }

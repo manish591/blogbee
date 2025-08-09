@@ -1,52 +1,31 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate';
+import { validateRequest } from '../../middlewares/validate-request';
+import { UPLOADED_BLOG_LOGO_FILE_NAME } from '../../utils/constants';
 import { upload } from '../../utils/upload-files';
 import {
-  createNewBlogHandler,
-  createNewTagHandler,
-  createPostHandler,
+  createBlogHandler,
   deleteBlogHandler,
-  deletePostHandler,
-  deleteTagsHandler,
   editBlogHandler,
-  editPostHandler,
-  editTagsHandler,
   getAllBlogsHandler,
-  getAllTagsHandler,
-  getPostsHandler,
   uploadBlogLogoHandler,
 } from './blogs.controllers';
-import { validateRequest } from './blogs.middlewares';
 import {
-  createNewBlogSchema,
-  createNewTagSchema,
-  createPostsSchema,
+  createBlogSchema,
   deleteBlogSchema,
-  deletePostsSchema,
-  deleteTagsSchema,
   editBlogSchema,
-  editPostSchema,
-  editTagsSchema,
   getAllBlogsSchema,
-  getAllTagsSchema,
-  getPostsSchema,
 } from './blogs.schema';
 
 const router = Router();
 
-/**
- * POST blogs/:blogId/posts - create a new post for a blog
- * GET blogs/:blogId/posts - Get all posts for a blog, filter: pagination, search, sort, categories
- * PATCH blogs/posts/:postId - Update a post by ID
- * DELETE blogs/posts/:postId - Delete a post by ID
- *
- */
 router.post(
   '/',
   authenticate,
-  validateRequest(createNewBlogSchema),
-  createNewBlogHandler,
+  validateRequest(createBlogSchema),
+  createBlogHandler,
 );
+router.get('/:blogId', authenticate);
 router.get(
   '/',
   authenticate,
@@ -56,7 +35,7 @@ router.get(
 router.post(
   '/logo',
   authenticate,
-  upload.single('blogLogo'),
+  upload.single(UPLOADED_BLOG_LOGO_FILE_NAME),
   uploadBlogLogoHandler,
 );
 router.patch(
@@ -71,33 +50,5 @@ router.delete(
   validateRequest(deleteBlogSchema),
   deleteBlogHandler,
 );
-router.post(
-  '/:blogId/tags',
-  authenticate,
-  validateRequest(createNewTagSchema),
-  createNewTagHandler,
-);
-router.get(
-  '/:blogId/tags',
-  authenticate,
-  validateRequest(getAllTagsSchema),
-  getAllTagsHandler,
-);
-router.patch(
-  '/:blogId/tags/:tagId',
-  authenticate,
-  validateRequest(editTagsSchema),
-  editTagsHandler,
-);
-router.delete(
-  '/:blogId/tags/:tagId',
-  authenticate,
-  validateRequest(deleteTagsSchema),
-  deleteTagsHandler,
-);
-router.post("/:blogId/posts", authenticate, validateRequest(createPostsSchema), createPostHandler);
-router.get("/:blogId/posts", authenticate, validateRequest(getPostsSchema), getPostsHandler);
-router.patch("/:blogId/posts/:postId", authenticate, validateRequest(editPostSchema), editPostHandler);
-router.delete("/:blogId/posts/:postId", authenticate, validateRequest(deletePostsSchema), deletePostHandler);
 
 export { router as blogsRoutes };

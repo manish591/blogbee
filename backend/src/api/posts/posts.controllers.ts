@@ -3,35 +3,18 @@ import { StatusCodes } from 'http-status-codes';
 import { APIResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
 import {
-  uploadFileToCloudinary,
-  uploadSingleFile,
-} from '../../utils/upload-files';
-import type {
-  TCreateBlogBody,
-  TEditBlogBody,
-  TEditBlogParams,
-} from './blogs.schema';
-import {
-  createBlog,
-  deleteBlog,
-  editBlog,
-  getAllBlogs,
-  isSlugTaken,
-} from './blogs.services';
+  createPost,
+  deletePost,
+  editPost,
+  getAllPosts,
+} from './posts.services';
 
-export async function createBlogHandler(
-  req: Request<
-    Record<string, unknown>,
-    Record<string, unknown>,
-    TCreateBlogBody
-  >,
-  res: Response,
-) {
+export async function createPostHandler(req: Request, res: Response) {
   try {
     const userData = res.locals.user;
 
     if (!userData) {
-      logger.info('UNAUTHORIZED_ERROR: User not found in res.locals');
+      logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
         .json(
@@ -40,21 +23,10 @@ export async function createBlogHandler(
       return;
     }
 
-    const { slug } = req.body;
-    const isSlugAvailable = await isSlugTaken(slug, req.db);
-
-    if (isSlugAvailable) {
-      logger.error('SLUG_CONFLICT_ERROR: Slug not available');
-      res
-        .status(StatusCodes.CONFLICT)
-        .json(
-          new APIResponse('error', StatusCodes.CONFLICT, 'Slug not available'),
-        );
-      return;
-    }
-
-    await createBlog(userData.userId, req.body, req.db);
-    logger.info('CREATE_BLOG_SUCCESS: Created the blog successfully');
+    const userId = userData.userId;
+    const blogId = req.params.blogId;
+    await createPost(userId, blogId, req.db);
+    logger.info('CREATE_POST_SUCCESS: Post created successfully');
 
     res
       .status(StatusCodes.CREATED)
@@ -62,7 +34,7 @@ export async function createBlogHandler(
         new APIResponse(
           'success',
           StatusCodes.CREATED,
-          'Created the blog successfully',
+          'Post created successfully',
         ),
       );
   } catch (err) {
@@ -79,7 +51,7 @@ export async function createBlogHandler(
   }
 }
 
-export async function getAllBlogsHandler(req: Request, res: Response) {
+export async function getAllPostsHandler(req: Request, res: Response) {
   try {
     const userData = res.locals.user;
 
@@ -93,17 +65,10 @@ export async function getAllBlogsHandler(req: Request, res: Response) {
       return;
     }
 
-    const query = req.query.query as string;
-    const limit = req.query.limit as string;
-    const page = req.query.page as string;
-    const data = await getAllBlogs(
-      userData.userId,
-      req.db,
-      query,
-      Number(page),
-      Number(limit),
-    );
-    logger.info('FETCH_ALL_BLOG_SUCCESS: Blogs fetched successfully');
+    const userId = userData.userId;
+    const blogId = req.params.blogId;
+    const data = await getAllPosts(userId, blogId, req.db);
+    logger.info('GET_POST_SUCCESS: Posts fetched successfully');
 
     res
       .status(StatusCodes.OK)
@@ -111,53 +76,11 @@ export async function getAllBlogsHandler(req: Request, res: Response) {
         new APIResponse(
           'success',
           StatusCodes.OK,
-          'Blogs fetched successfully',
+          'Posts fetched successfully',
           data,
         ),
       );
   } catch (err) {
-    logger.error('Internal server error', err);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
-          'Internal server error occured',
-        ),
-      );
-  }
-}
-
-export async function uploadBlogLogoHandler(req: Request, res: Response) {
-  try {
-    const uploadedFile = req.file;
-
-    if (!uploadedFile) {
-      logger.error('UPLOAD_FILE_ERROR: File not found in req.file');
-      res
-        .status(StatusCodes.BAD_REQUEST)
-        .json(new APIResponse('error', StatusCodes.BAD_REQUEST, 'Bad request'));
-      return;
-    }
-
-    const profileImageUrl = await uploadSingleFile(
-      uploadedFile,
-      uploadFileToCloudinary,
-    );
-    logger.info('BLOG_LOGO_UPLOAD_SUCCESS: Blog logo uploaded successfully');
-
-    res.status(StatusCodes.OK).json(
-      new APIResponse(
-        'success',
-        StatusCodes.OK,
-        'Blog logo uploaded successfully',
-        {
-          url: profileImageUrl,
-        },
-      ),
-    );
-  } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -171,10 +94,7 @@ export async function uploadBlogLogoHandler(req: Request, res: Response) {
   }
 }
 
-export async function editBlogHandler(
-  req: Request<TEditBlogParams, Record<string, unknown>, TEditBlogBody>,
-  res: Response,
-) {
+export async function getPostByIdHandler(req: Request, res: Response) {
   try {
     const userData = res.locals.user;
 
@@ -190,18 +110,9 @@ export async function editBlogHandler(
 
     const userId = userData.userId;
     const blogId = req.params.blogId;
-    await editBlog(userId, blogId, req.body, req.db);
-    logger.info('EDIT_BLOG_SUCCESS: Edited the blog successfully');
+    console.log(userId, blogId);
 
-    res
-      .status(StatusCodes.OK)
-      .json(
-        new APIResponse(
-          'success',
-          StatusCodes.OK,
-          'Edited the blog successfully',
-        ),
-      );
+    res.send('Data');
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
@@ -216,7 +127,7 @@ export async function editBlogHandler(
   }
 }
 
-export async function deleteBlogHandler(req: Request, res: Response) {
+export async function editPostHandler(req: Request, res: Response) {
   try {
     const userData = res.locals.user;
 
@@ -232,9 +143,48 @@ export async function deleteBlogHandler(req: Request, res: Response) {
 
     const userId = userData.userId;
     const blogId = req.params.blogId;
+    const postId = req.params.postId;
+    await editPost(userId, blogId, postId, req.body, req.db);
+    logger.info('EDIT_POST_SUCCESS: Posts edited successfully');
 
-    await deleteBlog(userId, blogId, req.db);
-    logger.info('DELETE_BLOG_SUCCESS: Deleted the blog successfully');
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new APIResponse('success', StatusCodes.OK, 'Posts edited successfully'),
+      );
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
+  }
+}
+
+export async function deletePostHandler(req: Request, res: Response) {
+  try {
+    const userData = res.locals.user;
+
+    if (!userData) {
+      logger.info('Unauthorized_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
+      return;
+    }
+
+    const userId = userData.userId;
+    const blogId = req.params.blogId;
+    const postId = req.params.postId;
+    await deletePost(userId, blogId, postId, req.db);
+    logger.info('DELETE_POST_SUCCESS: Posts deleted successfully');
 
     res
       .status(StatusCodes.OK)
@@ -242,7 +192,7 @@ export async function deleteBlogHandler(req: Request, res: Response) {
         new APIResponse(
           'success',
           StatusCodes.OK,
-          'Deleted the blog successfully',
+          'Posts deleted successfully',
         ),
       );
   } catch (err) {
@@ -253,7 +203,7 @@ export async function deleteBlogHandler(req: Request, res: Response) {
         new APIResponse(
           'error',
           StatusCodes.INTERNAL_SERVER_ERROR,
-          'Internal Server error occured',
+          'Internal server error occured',
         ),
       );
   }

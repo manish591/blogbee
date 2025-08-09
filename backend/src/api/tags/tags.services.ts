@@ -1,129 +1,98 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { type Db, ObjectId } from 'mongodb';
 import { dbClient } from '../../db';
-import type { Blogs, Posts, Tags } from '../../db/schema';
+import type { Posts, Tags } from '../../db/schema';
 import { AppError } from '../../utils/app-error';
-import {
-  BLOG_COLLECTION,
-  POSTS_COLLECTION,
-  TAGS_COLLECTION,
-} from '../../utils/constants';
+import { POSTS_COLLECTION, TAGS_COLLECTION } from '../../utils/constants';
 import { logger } from '../../utils/logger';
-import type { TCreateBlogBody, TEditBlogBody } from './blogs.schema';
+import type { TCreateTagBody, TEditTagBody } from './tags.schema';
 
-export async function isSlugTaken(slug: string, db: Db) {
-  try {
-    const isBlogFound = await db.collection<Blogs>('blogs').findOne({
-      slug,
-    });
-    return isBlogFound !== null;
-  } catch (err) {
-    logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
-  }
-}
-
-export async function createBlog(
-  userId: string,
-  blogData: TCreateBlogBody,
-  db: Db,
-) {
-  try {
-    const data = await db.collection<Blogs>(BLOG_COLLECTION).insertOne({
-      userId: new ObjectId(userId),
-      name: blogData.name,
-      slug: blogData.slug,
-      about: blogData.about,
-      logo: blogData.logo,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    return {
-      isSuccess: data.acknowledged,
-      blogId: data.insertedId,
-    };
-  } catch (err) {
-    logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
-  }
-}
-
-export async function getBlogById(userId: string, blogId: string, db: Db) {
-  try {
-    const blogData = await db.collection<Blogs>(BLOG_COLLECTION).findOne({
-      userId: new ObjectId(userId),
-      _id: new ObjectId(blogId),
-    });
-    return blogData;
-  } catch (err) {
-    logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
-  }
-}
-
-export async function getAllBlogs(
-  userId: string,
-  db: Db,
-  query: string = '',
-  page: number = 0,
-  limit: number = 10,
-) {
-  try {
-    const allBlogs = await db
-      .collection<Blogs>(BLOG_COLLECTION)
-      .find(
-        {
-          userId: new ObjectId(userId),
-          slug: {
-            $regex: query,
-            $options: 'i',
-          },
-        },
-        {
-          skip: page,
-          limit,
-        },
-      )
-      .toArray();
-    return allBlogs;
-  } catch (err) {
-    logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
-  }
-}
-
-export async function editBlog(
+export async function createTag(
   userId: string,
   blogId: string,
-  blogData: TEditBlogBody,
+  data: TCreateTagBody,
   db: Db,
 ) {
   try {
-    const data = await db.collection<Blogs>(BLOG_COLLECTION).updateOne(
-      {
-        _id: new ObjectId(blogId),
+    await db.collection<Tags>(TAGS_COLLECTION).insertOne({
+      posts: [],
+      name: data.name,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      description: data.description,
+      userId: new ObjectId(userId),
+      blogId: new ObjectId(blogId),
+    });
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
+  }
+}
+
+export async function getTag(
+  userId: string,
+  blogId: string,
+  tagId: string,
+  db: Db,
+) {
+  try {
+    const data = await db.collection<Tags>(TAGS_COLLECTION).findOne({
+      _id: new ObjectId(tagId),
+      blogId: new ObjectId(blogId),
+      userId: new ObjectId(userId),
+    });
+    return data;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
+  }
+}
+
+export async function getAllTags(userId: string, blogId: string, db: Db) {
+  try {
+    const allTagsData = await db
+      .collection<Tags>(TAGS_COLLECTION)
+      .find({
         userId: new ObjectId(userId),
+        blogId: new ObjectId(blogId),
+      })
+      .toArray();
+    return allTagsData;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
+  }
+}
+
+export async function editTag(
+  userId: string,
+  blogId: string,
+  tagId: string,
+  tagData: TEditTagBody,
+  db: Db,
+) {
+  try {
+    const data = await db.collection<Tags>(TAGS_COLLECTION).updateOne(
+      {
+        _id: new ObjectId(tagId),
+        userId: new ObjectId(userId),
+        blogId: new ObjectId(blogId),
       },
       {
         $set: {
-          ...blogData,
+          ...tagData,
           updatedAt: new Date(),
         },
       },
@@ -139,29 +108,38 @@ export async function editBlog(
   }
 }
 
-export async function deleteBlog(userId: string, blogId: string, db: Db) {
+export async function deleteTag(
+  userId: string,
+  blogId: string,
+  tagId: string,
+  db: Db,
+) {
   const session = dbClient.startSession();
-
   try {
     session.startTransaction();
 
-    await db.collection<Blogs>(BLOG_COLLECTION).deleteOne({
-      _id: new ObjectId(blogId),
+    const tagData = await db.collection<Tags>(TAGS_COLLECTION).findOne({
+      _id: new ObjectId(tagId),
       userId: new ObjectId(userId),
-    });
-    await db.collection<Tags>(TAGS_COLLECTION).deleteMany({
       blogId: new ObjectId(blogId),
-      userId: new ObjectId(userId),
     });
-    await db.collection<Posts>(POSTS_COLLECTION).deleteMany({
-      blogId: new ObjectId(blogId),
+
+    await db.collection<Posts>(POSTS_COLLECTION).updateMany(
+      {
+        _id: { $in: tagData?.posts },
+      },
+      {
+        $pull: { tags: tagData?._id },
+      },
+    );
+
+    await db.collection<Tags>(TAGS_COLLECTION).deleteOne({
       userId: new ObjectId(userId),
+      blogId: new ObjectId(blogId),
+      _id: new ObjectId(tagId),
     });
 
     await session.commitTransaction();
-    return {
-      isDeleted: true,
-    };
   } catch (err) {
     await session.abortTransaction();
     logger.error('SERVER_ERROR: Internal server error occured', err);

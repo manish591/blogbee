@@ -75,7 +75,7 @@ export function buildServer({ db }: { db: mongo.Db }) {
     next();
   });
 
-  app.use('/api/v1', v1Routes);
+  app.use('/v1', v1Routes);
 
   app.use((_req, _res, next) => {
     next(

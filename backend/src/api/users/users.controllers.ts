@@ -1,73 +1,90 @@
 import type { CookieOptions, Request, Response } from 'express';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { StatusCodes } from 'http-status-codes';
+import { APIResponse } from '../../utils/api-response';
 import { comparePassword } from '../../utils/compare-password';
+import { SESSION_COOKIE_NAME } from '../../utils/constants';
 import { logger } from '../../utils/logger';
 import {
   uploadFileToCloudinary,
   uploadSingleFile,
 } from '../../utils/upload-files';
 import type {
-  TCreateUserRequestBody,
-  TLoginUserRequestBody,
-  TUpdateProfileSchema,
+  TCreateUserBody,
+  TEditUserProfileBody,
+  TLoginUserBody,
 } from './users.schema';
 import {
   createAuthSession,
-  createNewUser,
+  createUser,
+  editUserProfile,
+  getUserByEmail,
   getUserDetails,
-  getUserWithEmail,
   revokeAuthSession,
-  updateProfile,
 } from './users.services';
 
-export const SESSION_COOKIE_NAME = 'sessionId';
-
-export const cookieOptions: CookieOptions = {
-  maxAge: 1000 * 60 * 60 * 24 * 30,
-  sameSite: 'lax',
-  httpOnly: true,
+export const COOKIE_OPTIONS: CookieOptions = {
   secure: true,
+  httpOnly: true,
+  sameSite: 'lax',
+  maxAge: 1000 * 60 * 60 * 24 * 30,
 };
 
 export async function createUserHandler(
   req: Request<
     Record<string, unknown>,
     Record<string, unknown>,
-    TCreateUserRequestBody
+    TCreateUserBody
   >,
   res: Response,
 ) {
   try {
     const { email } = req.body;
 
-    const isUserExists = await getUserWithEmail(email, req.db);
+    const isUserExists = await getUserByEmail(email, req.db);
 
     if (isUserExists) {
-      logger.error('User with email already exists');
-      res.status(StatusCodes.CONFLICT).json({
-        status: StatusCodes.CONFLICT,
-        code: ReasonPhrases.CONFLICT,
-        message: 'A user with the email already exists!',
-      });
+      logger.error('CONFLICT_ERROR: User with email already exists');
+      res
+        .status(StatusCodes.CONFLICT)
+        .json(
+          new APIResponse(
+            'error',
+            StatusCodes.CONFLICT,
+            'User with email already exists',
+          ),
+        );
 
       return;
     }
 
-    const userData = await createNewUser(req.body, req.db);
-    const sessionId = await createAuthSession(userData.insertedId.toString(), req.db);
+    const userData = await createUser(req.body, req.db);
+    const sessionId = await createAuthSession(
+      userData.insertedId.toString(),
+      req.db,
+    );
+    logger.info('CREATE_USER_SUCCESS', 'User created successfully');
 
-    res.cookie(SESSION_COOKIE_NAME, sessionId, cookieOptions);
-    res.status(StatusCodes.CREATED).json({
-      status: StatusCodes.CREATED,
-      message: 'User created successfully',
-    });
+    res.cookie(SESSION_COOKIE_NAME, sessionId, COOKIE_OPTIONS);
+    res
+      .status(StatusCodes.CREATED)
+      .json(
+        new APIResponse(
+          'success',
+          StatusCodes.CREATED,
+          'User created successfully',
+        ),
+      );
   } catch (err) {
-    logger.error('Internal server error', err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured. Please try again later!',
-    });
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
   }
 }
 
@@ -75,23 +92,26 @@ export async function loginUserHandler(
   req: Request<
     Record<string, unknown>,
     Record<string, unknown>,
-    TLoginUserRequestBody
+    TLoginUserBody
   >,
   res: Response,
 ) {
   try {
     const { email, password } = req.body;
 
-    const userData = await getUserWithEmail(email, req.db);
+    const userData = await getUserByEmail(email, req.db);
 
     if (!userData) {
-      logger.error('Unauthenticated user. Credentials are invalid.');
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        code: ReasonPhrases.UNAUTHORIZED,
-        message: 'The credentials you have provided are incorrect!',
-      });
-
+      logger.error('UNAUTHORIZED_ERROR: Invalid credentials');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse(
+            'error',
+            StatusCodes.UNAUTHORIZED,
+            'Invalid credentials',
+          ),
+        );
       return;
     }
 
@@ -101,30 +121,42 @@ export async function loginUserHandler(
     );
 
     if (!isPasswordCorrect) {
-      logger.error('Unauthenticated user. Credentials are invalid.');
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        code: ReasonPhrases.UNAUTHORIZED,
-        message: 'The credentials you have provided are incorrect!',
-      });
-
+      logger.error('UNAUTHORIZED_ERROR: Invalid credentials');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse(
+            'error',
+            StatusCodes.UNAUTHORIZED,
+            'Invalid credentials',
+          ),
+        );
       return;
     }
 
     const sessionId = await createAuthSession(userData._id.toString(), req.db);
-
-    res.cookie(SESSION_COOKIE_NAME, sessionId, cookieOptions);
-    res.status(StatusCodes.OK).json({
-      status: StatusCodes.OK,
-      message: 'Logged in successfully',
-    });
+    logger.info('LOGIN_USER_SUCCESS: Logged into account successfully');
+    res.cookie(SESSION_COOKIE_NAME, sessionId, COOKIE_OPTIONS);
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new APIResponse(
+          'success',
+          StatusCodes.OK,
+          'Logged into account successfully',
+        ),
+      );
   } catch (err) {
-    logger.error('Internal server error', err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured. Please try again later!',
-    });
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
   }
 }
 
@@ -133,30 +165,33 @@ export async function logoutUserHandler(req: Request, res: Response) {
     const userData = res.locals.user;
 
     if (!userData) {
-      logger.info('User not found');
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        code: ReasonPhrases.UNAUTHORIZED,
-        message: 'You are not logged in',
-      });
-
+      logger.info('UNAUTHORIZED_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
       return;
     }
 
     await revokeAuthSession(userData.sessionId, req.db);
+    logger.info('LOGOUT_USER_SUCCESS: Logout successfully');
 
     res.clearCookie(SESSION_COOKIE_NAME);
-    res.status(StatusCodes.OK).json({
-      status: StatusCodes.OK,
-      message: 'Logout successfully',
-    });
+    res
+      .status(StatusCodes.OK)
+      .json(new APIResponse('success', StatusCodes.OK, 'Logout successfully'));
   } catch (err) {
-    logger.error('Internal server error', err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured. Please try again later!',
-    });
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
   }
 }
 
@@ -165,42 +200,46 @@ export async function uploadProfileImageHandler(req: Request, res: Response) {
     const uploadedFile = req.file;
 
     if (!uploadedFile) {
-      res.status(StatusCodes.BAD_REQUEST).json({
-        status: StatusCodes.BAD_REQUEST,
-        code: ReasonPhrases.BAD_REQUEST,
-        message: 'File not found',
-      });
-
+      logger.error('BAD_REQUEST_ERROR: Upload profile image not found');
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(new APIResponse('error', StatusCodes.BAD_REQUEST, 'Bad request'));
       return;
     }
 
-    const profileImageUrl = await uploadSingleFile(
-      uploadedFile,
-      uploadFileToCloudinary,
+    const data = await uploadSingleFile(uploadedFile, uploadFileToCloudinary);
+    logger.info(
+      'UPLOAD_PROFILE_IMAGE_SUCCESS: Profile image uploaded successfully',
     );
-
-    res.status(StatusCodes.OK).json({
-      status: StatusCodes.OK,
-      message: 'File uploaded successfully',
-      data: {
-        url: profileImageUrl,
-      },
-    });
+    res.status(StatusCodes.OK).json(
+      new APIResponse(
+        'success',
+        StatusCodes.OK,
+        'Profile image uploaded successfully',
+        {
+          data,
+        },
+      ),
+    );
   } catch (err) {
-    logger.error('Internal server error', err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured. Please try again later!',
-    });
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
   }
 }
 
-export async function updateProfileHandler(
+export async function editProfileHandler(
   req: Request<
     Record<string, unknown>,
     Record<string, unknown>,
-    TUpdateProfileSchema
+    TEditUserProfileBody
   >,
   res: Response,
 ) {
@@ -208,31 +247,40 @@ export async function updateProfileHandler(
     const userData = res.locals.user;
 
     if (!userData) {
-      logger.info('User not found');
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        code: ReasonPhrases.UNAUTHORIZED,
-        message: 'You are not logged in',
-      });
-
+      logger.info('UNAUTHORIZED_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
       return;
     }
 
     const userId = userData.userId;
 
-    await updateProfile(userId, req.body, req.db);
+    await editUserProfile(userId, req.body, req.db);
+    logger.info('EDIT_USER_SUCCESS: User data edited successfully');
 
-    res.status(StatusCodes.OK).json({
-      status: StatusCodes.OK,
-      message: 'Profile data updated successfully',
-    });
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new APIResponse(
+          'success',
+          StatusCodes.OK,
+          'User data edited successfully',
+        ),
+      );
   } catch (err) {
-    logger.error('Internal server error', err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured. Please try again later!',
-    });
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
   }
 }
 
@@ -241,32 +289,39 @@ export async function getUserDetailsHandler(req: Request, res: Response) {
     const userData = res.locals.user;
 
     if (!userData) {
-      logger.info('User not found');
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        code: ReasonPhrases.UNAUTHORIZED,
-        message: 'You are not logged in',
-      });
-
+      logger.info('UNAUTHORIZED_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
       return;
     }
 
     const userId = userData.userId;
-    const userDetails = await getUserDetails(userId, req.db);
+    const data = await getUserDetails(userId, req.db);
+    logger.info('GET_USER_DETAILS_SUCCESS: User details fetched successfully');
 
-    res.status(StatusCodes.OK).json({
-      status: StatusCodes.OK,
-      message: 'Successfully fetched user details',
-      data: {
-        user: userDetails,
-      },
-    });
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new APIResponse(
+          'success',
+          StatusCodes.OK,
+          'User details fetched successfully',
+          data,
+        ),
+      );
   } catch (err) {
-    logger.error('Internal server error', err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured. Please try again later!',
-    });
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
   }
 }

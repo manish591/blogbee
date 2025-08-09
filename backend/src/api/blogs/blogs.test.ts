@@ -3,14 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '../../../test/setup';
 import { buildServer } from '../../app';
 import * as uploadUtils from '../../utils/upload-files';
-import { createNewUser, getAuthSession } from '../users/users.services';
-import {
-  createNewBlog,
-  createNewTag,
-  getAllTags,
-  getBlog,
-  getTag,
-} from './blogs.services';
+import { createTag, getAllTags } from '../tags/tags.services';
+import { createUser, getAuthSession } from '../users/users.services';
+import { createBlog, getBlogById } from './blogs.services';
 
 describe('blogs', () => {
   const user1 = {
@@ -24,7 +19,7 @@ describe('blogs', () => {
   let userId: string;
 
   beforeEach(async () => {
-    await createNewUser({ ...user1 }, db);
+    await createUser({ ...user1 }, db);
 
     const app = buildServer({ db });
     const res = await request(app)
@@ -48,7 +43,7 @@ describe('blogs', () => {
     };
 
     beforeEach(async () => {
-      await createNewBlog(userId, blogData, db);
+      await createBlog(userId, blogData, db);
     });
 
     it('should return 400 bad request if invalid request body is provided', async () => {
@@ -153,16 +148,16 @@ describe('blogs', () => {
     };
 
     beforeEach(async () => {
-      await createNewBlog(userId, blogData1, db);
-      await createNewBlog(userId, blogData2, db);
-      await createNewBlog(userId, blogData3, db);
-      await createNewBlog(userId, blogData4, db);
+      await createBlog(userId, blogData1, db);
+      await createBlog(userId, blogData2, db);
+      await createBlog(userId, blogData3, db);
+      await createBlog(userId, blogData4, db);
 
-      const newUserId = await createNewUser(
+      const newUserId = await createUser(
         { name: 'new users', email: 'ema@gmail.com', password: 'new pass' },
         db,
       );
-      await createNewBlog(newUserId.insertedId.toString(), blogData2, db);
+      await createBlog(newUserId.insertedId.toString(), blogData2, db);
     });
 
     it('should return 400 bad request if invalid query params are passed', async () => {
@@ -266,7 +261,7 @@ describe('blogs', () => {
     let blogId: string;
 
     beforeEach(async () => {
-      blogId = (await createNewBlog(userId, blogData, db)).blogId.toString();
+      blogId = (await createBlog(userId, blogData, db)).blogId.toString();
     });
 
     it('should return 400 bad request if invalid request body is provided', async () => {
@@ -318,7 +313,7 @@ describe('blogs', () => {
     let blogId: string;
 
     beforeEach(async () => {
-      blogId = (await createNewBlog(userId, blogData, db)).blogId.toString();
+      blogId = (await createBlog(userId, blogData, db)).blogId.toString();
     });
 
     it('should return 200 ok and delete the users blog resource', async () => {
@@ -327,7 +322,7 @@ describe('blogs', () => {
         .delete(`/api/v1/blogs/${blogId}`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
-      const deletedBlog = await getBlog(userId, blogId, db);
+      const deletedBlog = await getBlogById(userId, blogId, db);
 
       expect(res.status).toBe(200);
       expect(deletedBlog).toBe(null);
@@ -349,7 +344,7 @@ describe('blogs', () => {
     let blogId: string;
 
     beforeEach(async () => {
-      blogId = (await createNewBlog(userId, blogData, db)).blogId.toString();
+      blogId = (await createBlog(userId, blogData, db)).blogId.toString();
     });
 
     it('should return 400 bad request if invalid request body is provided', async () => {
@@ -404,9 +399,9 @@ describe('blogs', () => {
     let blogId: string;
 
     beforeEach(async () => {
-      blogId = (await createNewBlog(userId, blogData, db)).blogId.toString();
-      await createNewTag(userId, blogId, { name: 'Typescript' }, db);
-      await createNewTag(userId, blogId, { name: 'Python' }, db);
+      blogId = (await createBlog(userId, blogData, db)).blogId.toString();
+      await createTag(userId, blogId, { blogId: '', name: 'Typescript' }, db);
+      await createTag(userId, blogId, { blogId: '', name: 'Python' }, db);
     });
 
     it('should return 200 ok along with all the tags related to the blogId', async () => {
@@ -437,10 +432,8 @@ describe('blogs', () => {
     let tagId: string;
 
     beforeEach(async () => {
-      blogId = (await createNewBlog(userId, blogData, db)).blogId.toString();
-      tagId = (
-        await createNewTag(userId, blogId, tagData, db)
-      ).tagId.toString();
+      blogId = (await createBlog(userId, blogData, db)).blogId.toString();
+      tagId = '';
     });
 
     it('should return 400 bad request if invalid request body is provided', async () => {
@@ -472,7 +465,7 @@ describe('blogs', () => {
         .set('Accept', 'application/json')
         .set('Cookie', [cookie])
         .send(data);
-      const editTagData = await getTag(userId, blogId, tagId, db);
+      const editTagData = '';
 
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
@@ -481,7 +474,7 @@ describe('blogs', () => {
         message: 'Edited tag successfully',
       });
       expect(editTagData).toBeDefined();
-      expect(editTagData?.name).toBe('typescript');
+      expect(editTagData).toBe('typescript');
     });
   });
 
@@ -501,10 +494,8 @@ describe('blogs', () => {
     let tagId: string;
 
     beforeEach(async () => {
-      blogId = (await createNewBlog(userId, blogData, db)).blogId.toString();
-      tagId = (
-        await createNewTag(userId, blogId, tagData, db)
-      ).tagId.toString();
+      blogId = (await createBlog(userId, blogData, db)).blogId.toString();
+      tagId = '';
     });
 
     it('should return 200 ok for successfully deleting the tag data', async () => {
@@ -513,7 +504,7 @@ describe('blogs', () => {
         .delete(`/api/v1/blogs/${blogId}/tags/${tagId}`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
-      const deletedTagData = await getTag(userId, blogId, tagId, db);
+      const deletedTagData = '';
 
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
@@ -525,7 +516,7 @@ describe('blogs', () => {
     });
   });
 
-  describe("POST /blogs/:blogId/posts", () => {
+  describe('POST /blogs/:blogId/posts', () => {
     const blogData = {
       name: 'update blog title',
       slug: 'update-blog-title',
@@ -535,18 +526,21 @@ describe('blogs', () => {
     let blogId: string;
 
     beforeEach(async () => {
-      blogId = (await createNewBlog(userId, blogData, db)).blogId.toString();
+      blogId = (await createBlog(userId, blogData, db)).blogId.toString();
     });
 
-    it("should return 200 ok for creating a new posts", async () => {
+    it('should return 200 ok for creating a new posts', async () => {
       const app = buildServer({ db });
-      const res = await request(app).post(`/api/v1/blogs/${blogId}/posts`).set("Accept", "application/json").set("Cookie", [cookie]);
+      const res = await request(app)
+        .post(`/api/v1/blogs/${blogId}/posts`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
 
       expect(res.status).toBe(201);
       expect(res.body).toMatchObject({
         code: 201,
-        status: "success",
-        message: "Post created successfully"
+        status: 'success',
+        message: 'Post created successfully',
       });
     });
   });

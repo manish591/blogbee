@@ -1,37 +1,38 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate';
+import { validateRequest } from '../../middlewares/validate-request';
+import { UPLOADED_PROFILE_IMG_FILE_NAME } from '../../utils/constants';
 import { upload } from '../../utils/upload-files';
 import {
   createUserHandler,
+  editProfileHandler,
   getUserDetailsHandler,
   loginUserHandler,
   logoutUserHandler,
-  updateProfileHandler,
   uploadProfileImageHandler,
 } from './users.controllers';
-import { validateRequestBody } from './users.middleware';
 import {
   createUserSchema,
+  editUserProfileSchema,
   loginUserSchema,
-  updateProfileSchema,
 } from './users.schema';
 
 const router = Router();
 
-router.post('/', validateRequestBody(createUserSchema), createUserHandler);
-router.post('/login', validateRequestBody(loginUserSchema), loginUserHandler);
+router.post('/', validateRequest(createUserSchema), createUserHandler);
+router.post('/login', validateRequest(loginUserSchema), loginUserHandler);
 router.post('/logout', authenticate, logoutUserHandler);
 router.post(
   '/picture',
   authenticate,
-  upload.single('profileImg'),
+  upload.single(UPLOADED_PROFILE_IMG_FILE_NAME),
   uploadProfileImageHandler,
 );
 router.patch(
   '/me',
   authenticate,
-  validateRequestBody(updateProfileSchema),
-  updateProfileHandler,
+  validateRequest(editUserProfileSchema),
+  editProfileHandler,
 );
 router.get('/me', authenticate, getUserDetailsHandler);
 

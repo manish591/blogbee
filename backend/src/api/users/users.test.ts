@@ -4,7 +4,7 @@ import { db } from '../../../test/setup';
 import { buildServer } from '../../app';
 import type { Users } from '../../db/schema';
 import * as uploadUtils from '../../utils/upload-files';
-import { createNewUser, getUserDetails } from './users.services';
+import { createUser, getUserDetails } from './users.services';
 
 describe('users', () => {
   const user1 = {
@@ -59,7 +59,7 @@ describe('users', () => {
     });
 
     it('should return 409 confict if user with email already exists', async () => {
-      await createNewUser({ ...user1 }, db);
+      await createUser({ ...user1 }, db);
       const app = buildServer({ db });
       const data = { ...user1 };
 
@@ -95,7 +95,7 @@ describe('users', () => {
 
   describe('POST /users/login', () => {
     beforeEach(async () => {
-      await createNewUser({ ...user1 }, db);
+      await createUser({ ...user1 }, db);
     });
 
     it('should return 400 bad request for invalid request body', async () => {
@@ -170,7 +170,7 @@ describe('users', () => {
     let cookie: string;
 
     beforeEach(async () => {
-      await createNewUser({ ...user1 }, db);
+      await createUser({ ...user1 }, db);
 
       const app = buildServer({ db });
       const res = await request(app)
@@ -234,7 +234,7 @@ describe('users', () => {
     let cookie: string;
 
     beforeEach(async () => {
-      await createNewUser({ ...user1 }, db);
+      await createUser({ ...user1 }, db);
 
       const app = buildServer({ db });
       const res = await request(app)
@@ -299,7 +299,7 @@ describe('users', () => {
     };
 
     beforeEach(async () => {
-      await createNewUser({ ...user1 }, db);
+      await createUser({ ...user1 }, db);
 
       const app = buildServer({ db });
       const res = await request(app)
@@ -353,7 +353,7 @@ describe('users', () => {
     };
 
     beforeEach(async () => {
-      const insertedUser = await createNewUser({ ...user1 }, db);
+      const insertedUser = await createUser({ ...user1 }, db);
       const userData = (await getUserDetails(
         insertedUser.insertedId.toString(),
         db,
