@@ -2,38 +2,71 @@ import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '../../../test/setup';
 import { buildServer } from '../../app';
-import type { Users } from '../../db/schema';
 import * as uploadUtils from '../../utils/upload-files';
-import { createUser, getUserDetails } from './users.services';
+import { createUser, getAllAuthSessions, getUserAuthSessions, getUserByEmail } from './users.services';
+import { UPLOADED_PROFILE_IMG_FILE_NAME } from '../../utils/constants';
 
 describe('users', () => {
-  const user1 = {
-    name: 'manish',
-    email: 'manish@gmail.com',
-    password: '124578drd',
-  };
+  describe('POST /v1/users', () => {
+    const requestBodyRequiredField = ["email", "password", "name"];
 
-  const user2 = {
-    name: 'prachi',
-    email: 'prachi@gmail.com',
-    password: '4574114',
-  };
+    requestBodyRequiredField.forEach(field => {
+      it(`should return 400 bad request if ${field} is not provided`, async () => {
+        const app = buildServer({ db });
+        const data = { name: "test1", email: "manish@gmail.com", password: "14577952" };
+        delete data[field];
+        const res = await request(app)
+          .post('/v1/users')
+          .set('Accept', 'application/json')
+          .set('Content-Type', "application/json")
+          .send(data);
+        const createdUser = await getUserByEmail(data.email, db);
 
-  describe('POST /users', () => {
-    it('should return 400 bad request if email is not provided', async () => {
+        expect(createdUser).toBeNull();
+        expect(res.status).toBe(400);
+        expect(res.body).toMatchObject({
+          code: 400,
+          status: "error",
+          message: 'Bad request',
+        });
+      });
+    });
+
+    it("should return 400 bad request if invalid fields provided", async () => {
       const app = buildServer({ db });
-      const data = {};
-
+      const data = { name: "test1", email: "manish@gmail.com", password: "14577952", extraField: "extra" };
       const res = await request(app)
-        .post('/api/v1/users')
-        .send(data)
-        .set('Accept', 'application/json');
+        .post('/v1/users')
+        .set('Accept', 'application/json')
+        .set('Content-Type', "application/json")
+        .send(data);
+      const createdUser = await getUserByEmail(data.email, db);
 
+      expect(createdUser).toBeNull();
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
-        status: 400,
-        code: 'Bad Request',
-        message: 'Request body is invalid.',
+        code: 400,
+        status: "error",
+        message: 'Bad request',
+      });
+    });
+
+    it("should return 400 bad request if valid email is not provided", async () => {
+      const app = buildServer({ db });
+      const data = { name: "test1", email: "gmail", password: "14577952" };
+      const res = await request(app)
+        .post('/v1/users')
+        .set('Accept', 'application/json')
+        .set('Content-Type', "application/json")
+        .send(data);
+      const createdUser = await getUserByEmail(data.email, db);
+
+      expect(createdUser).toBeNull();
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        code: 400,
+        status: "error",
+        message: 'Bad request',
       });
     });
 
@@ -44,219 +77,283 @@ describe('users', () => {
         email: 'manish@gmail.com',
         password: '24',
       };
-
       const res = await request(app)
-        .post('/api/v1/users')
-        .send(data)
-        .set('Accept', 'application/json');
+        .post('/v1/users')
+        .set('Accept', 'application/json')
+        .set('Content-Type', "application/json")
+        .send(data);
+      const createdUser = await getUserByEmail(data.email, db);
 
+      expect(createdUser).toBeNull();
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
-        status: 400,
-        code: 'Bad Request',
-        message: 'Request body is invalid.',
+        code: 400,
+        status: "error",
+        message: 'Bad request',
       });
     });
 
     it('should return 409 confict if user with email already exists', async () => {
-      await createUser({ ...user1 }, db);
+      const existingUser = {
+        name: "manish",
+        email: "manish@gmail.com",
+        password: "12457mans"
+      }
+      await createUser(existingUser, db);
       const app = buildServer({ db });
-      const data = { ...user1 };
-
+      const data = { ...existingUser, name: "newname", password: "147928d4d" };
       const res = await request(app)
-        .post('/api/v1/users')
+        .post('/v1/users')
+        .set('Accept', 'application/json')
+        .set('Content-Type', "application/json")
         .send(data)
-        .set('Accept', 'application/json');
+      const createdUser = await getUserByEmail(existingUser.email, db);
 
+      expect(createdUser?.name).not.toBe(data.name);
       expect(res.status).toBe(409);
       expect(res.body).toMatchObject({
-        status: 409,
-        code: 'Conflict',
-        message: 'A user with the email already exists!',
+        code: 409,
+        status: 'error',
+        message: 'User with email already exists',
       });
     });
 
-    it('should return 201 created for successfully creating user account', async () => {
+    it('should return 201 created for successfully creating user', async () => {
       const app = buildServer({ db });
-      const data = { ...user2 };
-
+      const data = { name: "anjali", email: "anjali@gmail.com", password: "anjali78545" };
       const res = await request(app)
-        .post('/api/v1/users')
-        .send(data)
-        .set('Accept', 'application/json');
+        .post('/v1/users')
+        .set('Content-Type', "application/json")
+        .set('Accept', 'application/json')
+        .send(data);
+      const createdUser = await getUserByEmail(data.email, db);
 
+      expect(createdUser).toBeDefined();
+      expect(createdUser?.name).toBe(data.name);
       expect(res.status).toBe(201);
       expect(res.body).toMatchObject({
-        status: 201,
+        code: 201,
+        status: "success",
         message: 'User created successfully',
       });
     });
   });
 
-  describe('POST /users/login', () => {
+  describe('POST /v1/users/login', () => {
+    const requestBodyRequiredField = ["email", "password"];
+    const loggedOutUser = {
+      name: "manish",
+      email: "manish@gmail.com",
+      password: "hdhfhf455"
+    }
+
     beforeEach(async () => {
-      await createUser({ ...user1 }, db);
+      await createUser(loggedOutUser, db);
     });
 
-    it('should return 400 bad request for invalid request body', async () => {
+    requestBodyRequiredField.forEach(field => {
+      it(`should return 400 bad request if ${field} is not provided`, async () => {
+        const app = buildServer({ db });
+        const data = { email: loggedOutUser.email, password: loggedOutUser.password };
+        delete data[field];
+        const res = await request(app)
+          .post('/v1/users/login')
+          .set('Accept', 'application/json')
+          .set('Content-Type', "application/json")
+          .send(data)
+        const loggedInUser = await getUserByEmail(data.email, db);
+        const userId = loggedInUser?._id.toString() as string;
+        const loggedInUserSessions = await getUserAuthSessions(userId, db);
+
+        expect(loggedInUserSessions.length).toBe(0)
+        expect(res.status).toBe(400);
+        expect(res.body).toMatchObject({
+          code: 400,
+          status: "error",
+          message: 'Bad request',
+        });
+      });
+    });
+
+    it("should return 400 bad request if invalid fields provided", async () => {
       const app = buildServer({ db });
-      const data = {};
-
+      const data = { email: "manish@gmail.com", password: "14577952", extraField: "extra" };
       const res = await request(app)
-        .post('/api/v1/users/login')
-        .send(data)
-        .set('Accept', 'application/json');
+        .post('/v1/users/login')
+        .set('Accept', 'application/json')
+        .set('Content-Type', "application/json")
+        .send(data);
+      const loggedInUser = await getUserByEmail(data.email, db);
+      const userId = loggedInUser?._id.toString() as string;
+      const loggedInUserSessions = await getUserAuthSessions(userId, db);
 
+      expect(loggedInUserSessions.length).toBe(0)
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
-        status: 400,
-        code: 'Bad Request',
-        message: 'Request body is invalid.',
+        code: 400,
+        status: "error",
+        message: 'Bad request',
       });
     });
 
     it('should return 401 unauthorized if user with email does not exists', async () => {
+      const userNotExistsInDB = {
+        name: "anjali",
+        email: "anjali@gmail.com",
+        password: "annu@2925"
+      }
       const app = buildServer({ db });
-      const data = { email: user2.email, password: user2.password };
-
+      const data = { email: userNotExistsInDB.email, password: userNotExistsInDB.password };
       const res = await request(app)
-        .post('/api/v1/users/login')
-        .send(data)
-        .set('Accept', 'application/json');
+        .post('/v1/users/login')
+        .set('Accept', 'application/json')
+        .set('Content-Type', "application/json")
+        .send(data);
+      const allAuthSessions = await getAllAuthSessions(db);
 
+      // it means no new session has been created
+      expect(allAuthSessions.length).toBe(0);
       expect(res.status).toBe(401);
       expect(res.body).toMatchObject({
-        status: 401,
-        code: 'Unauthorized',
-        message: 'The credentials you have provided are incorrect!',
+        code: 401,
+        status: "error",
+        message: 'Invalid credentials',
       });
     });
 
-    it('should return return 401 unauthorized if password is not correct', async () => {
+    it('should return return 401 unauthorized if password is  incorrect', async () => {
       const app = buildServer({ db });
-      const data = { email: user1.email, password: 'incorrectpass' };
+      const data = { email: loggedOutUser.email, password: 'incorrectpass' };
 
       const res = await request(app)
-        .post('/api/v1/users/login')
+        .post('/v1/users/login')
+        .set('Accept', 'application/json')
+        .set('Content-Type', "application/json")
         .send(data)
-        .set('Accept', 'application/json');
+      const allAuthSessions = await getAllAuthSessions(db);
 
+      // it means no new session has been created
+      expect(allAuthSessions.length).toBe(0);
       expect(res.status).toBe(401);
       expect(res.body).toMatchObject({
-        status: 401,
-        code: 'Unauthorized',
-        message: 'The credentials you have provided are incorrect!',
+        code: 401,
+        status: "error",
+        message: 'Invalid credentials',
       });
     });
 
     it('should return 200 ok if credentials are correct', async () => {
       const app = buildServer({ db });
-      const data = { email: user1.email, password: user1.password };
-
+      const data = { email: loggedOutUser.email, password: loggedOutUser.password };
       const res = await request(app)
-        .post('/api/v1/users/login')
+        .post('/v1/users/login')
+        .set('Accept', 'application/json')
+        .set('Content-Type', "application/json")
         .send(data)
-        .set('Accept', 'application/json');
+      const loggedInUser = await getUserByEmail(data.email, db);
+      const userId = loggedInUser?._id.toString() as string;
+      const loggedInUserSessions = await getUserAuthSessions(userId, db);
 
+      expect(loggedInUserSessions.length).toBe(1)
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
-        status: 200,
+        code: 200,
+        status: "success",
         message: 'Logged in successfully',
       });
     });
   });
 
-  describe('POST /users/logout', () => {
+  describe('POST /v1/users/logout', () => {
     let cookie: string;
+    const loggedInUser = {
+      name: "anjali",
+      email: "anjali@gmail.com",
+      password: "annu@2925"
+    }
 
     beforeEach(async () => {
-      await createUser({ ...user1 }, db);
-
+      await createUser(loggedInUser, db);
       const app = buildServer({ db });
       const res = await request(app)
-        .post('/api/v1/users/login')
-        .send({ email: user1.email, password: user1.password })
-        .set('Accept', 'application/json');
+        .post('/v1/users/login')
+        .set('Accept', 'application/json')
+        .send({ email: loggedInUser.email, password: loggedInUser.password })
 
       cookie = res.headers['set-cookie'][0];
     });
 
-    it('should return 401 if authorization cookies not found', async () => {
+    it('should return 200 ok for logging out user successfully', async () => {
       const app = buildServer({ db });
       const res = await request(app)
-        .post('/api/v1/users/logout')
-        .set('Accept', 'application/json')
-        .set('Cookie', []);
-
-      expect(res.status).toBe(401);
-      expect(res.body).toMatchObject({
-        status: 401,
-        code: 'Unauthorized',
-        message: 'You are not authorized.',
-      });
-    });
-
-    it('should return 401 if session has expired', async () => {
-      vi.setSystemTime(new Date(Date.now() + 1000 * 60 * 60 * 24 * 40)); // 40days
-      const app = buildServer({ db });
-      const res = await request(app)
-        .post('/api/v1/users/logout')
+        .post('/v1/users/logout')
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
+      const loggedOutUser = await getUserByEmail(loggedInUser.email, db);
+      const userId = loggedOutUser?._id.toString() as string;
+      const userAuthSession = await getUserAuthSessions(userId, db);
 
-      expect(res.status).toBe(401);
-      expect(res.body).toMatchObject({
-        status: 401,
-        code: 'Unauthorized',
-        message: 'You are not authorized.',
-      });
-
-      vi.useRealTimers();
-    });
-
-    it('should return 200 ok and logout user successfully', async () => {
-      const app = buildServer({ db });
-
-      const res = await request(app)
-        .post('/api/v1/users/logout')
-        .set('Accept', 'application/json')
-        .set('Cookie', [cookie]);
-
+      // it means user auth session table is not altered
+      expect(userAuthSession.length).toBe(0);
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
-        status: 200,
+        code: 200,
+        status: "success",
         message: 'Logout successfully',
       });
     });
   });
 
-  describe('POST /users/picture', () => {
+  describe('POST /v1/users/picture', () => {
     let cookie: string;
+    const loggedInUser = {
+      name: "anjali",
+      email: "anjali@gmail.com",
+      password: "annu@2925"
+    }
 
     beforeEach(async () => {
-      await createUser({ ...user1 }, db);
-
+      await createUser(loggedInUser, db);
       const app = buildServer({ db });
       const res = await request(app)
-        .post('/api/v1/users/login')
-        .send({ email: user1.email, password: user1.password })
-        .set('Accept', 'application/json');
+        .post('/v1/users/login')
+        .set('Accept', 'application/json')
+        .set("Content-Type", "application/json")
+        .send({ email: loggedInUser.email, password: loggedInUser.password })
 
       cookie = res.headers['set-cookie'][0];
     });
 
-    it('should return 400 bad request if image file not attached', async () => {
+    it('should return 400 bad request if profile image is not attached', async () => {
       const app = buildServer({ db });
       const res = await request(app)
-        .post('/api/v1/users/picture')
+        .post('/v1/users/picture')
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
-        status: 400,
-        code: 'Bad Request',
-        message: 'File not found',
+        code: 400,
+        status: 'error',
+        message: 'Bad request',
+      });
+    });
+
+    it("should return 400 bad request if profile image size exceeds 10MB", async () => {
+      const app = buildServer({ db });
+      const res = await request(app)
+        .post('/v1/users/picture')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .attach(UPLOADED_PROFILE_IMG_FILE_NAME, Buffer.alloc(11 * 1024 * 1024), {
+          filename: "large.jpg"
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        code: 400,
+        status: 'error',
+        message: 'Allowed file size limit is 10MB',
       });
     });
 
@@ -266,17 +363,18 @@ describe('users', () => {
       });
       const app = buildServer({ db });
       const res = await request(app)
-        .post('/api/v1/users/picture')
+        .post('/v1/users/picture')
         .set('Accept', 'application/json')
         .set('Cookie', [cookie])
-        .attach('profileImg', Buffer.from('test-file'), {
+        .attach(UPLOADED_PROFILE_IMG_FILE_NAME, Buffer.from('test-file'), {
           filename: 'test.png',
         });
 
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
-        status: 200,
-        message: 'File uploaded successfully',
+        code: 200,
+        status: "success",
+        message: 'Profile image uploaded successfully',
         data: {
           url: 'https://img-url.png',
         },
@@ -284,94 +382,93 @@ describe('users', () => {
     });
   });
 
-  describe('PATCH /users/me', () => {
+  describe('PATCH /v1/users/me', () => {
     let cookie: string;
 
-    const invalidProfileData = {
-      name: 'manish',
-      profileImg: 'https://picsum.photos/536/354',
-      otherData: 'other data not required',
-    };
-
-    const validProfileData = {
-      name: 'manish',
-      profileImg: 'https://picsum.photos/536/354',
-    };
+    const loggedInUser = {
+      name: "anjali",
+      email: "anjali@gmail.com",
+      password: "annu@2925"
+    }
 
     beforeEach(async () => {
-      await createUser({ ...user1 }, db);
+      await createUser(loggedInUser, db);
 
       const app = buildServer({ db });
       const res = await request(app)
-        .post('/api/v1/users/login')
-        .send({ email: user1.email, password: user1.password })
-        .set('Accept', 'application/json');
+        .post('/v1/users/login')
+        .set('Accept', 'application/json')
+        .set("Content-Type", "application/json")
+        .send({ email: loggedInUser.email, password: loggedInUser.password })
 
       cookie = res.headers['set-cookie'][0];
     });
 
     it('should return 400 bad request if invalid profile data is provided', async () => {
       const app = buildServer({ db });
+      const invalidData = {
+        name: 'manish',
+        profileImg: 'https://picsum.photos/536/354',
+        otherData: 'other data not required',
+      };
       const res = await request(app)
-        .patch('/api/v1/users/me')
-        .send(invalidProfileData)
+        .patch('/v1/users/me')
+        .send(invalidData)
         .set('Accept', 'application/json')
+        .set("Content-Type", "application/json")
         .set('Cookie', [cookie]);
+      const userData = await getUserByEmail(loggedInUser.email, db);
 
+      expect(userData?.name).not.toBe(invalidData.name);
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
-        status: 400,
-        code: 'Bad Request',
-        message: 'Request body is invalid.',
+        code: 400,
+        status: "error",
+        message: 'Bad request',
       });
     });
 
     it('should return 200 ok for successfully updating the profile data', async () => {
       const app = buildServer({ db });
+      const validData = {
+        name: 'manish',
+        profileImg: 'https://picsum.photos/536/354',
+      };
       const res = await request(app)
-        .patch('/api/v1/users/me')
-        .send(validProfileData)
+        .patch('/v1/users/me')
+        .send(validData)
         .set('Accept', 'application/json')
+        .set("Content-Type", "application/json")
         .set('Cookie', [cookie]);
+      const userData = await getUserByEmail(loggedInUser.email, db);
 
+      expect(userData?.name).toBe(validData.name);
+      expect(userData?.profileImg).toBe(validData.profileImg);
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
-        status: 200,
-        message: 'Profile data updated successfully',
+        code: 200,
+        status: "success",
+        message: 'User data edited successfully',
       });
     });
   });
 
   describe('GET /users/me', () => {
     let cookie: string;
-    let createdUserData: {
-      _id?: string;
-      email: string;
-      name: string;
-      createdAt: string;
-      updatedAt: string;
-    };
+    const loggedInUser = {
+      name: "anjali",
+      email: "anjali@gmail.com",
+      password: "annu@2925"
+    }
 
     beforeEach(async () => {
-      const insertedUser = await createUser({ ...user1 }, db);
-      const userData = (await getUserDetails(
-        insertedUser.insertedId.toString(),
-        db,
-      )) as Users;
-      createdUserData = {
-        _id: userData._id?.toString(),
-        name: userData.name,
-        email: userData.email,
-        createdAt: userData.createdAt.toISOString(),
-        updatedAt: userData.updatedAt.toISOString(),
-        ...(userData.profileImg && { profileImg: userData.profileImg }),
-      };
-
+      await createUser(loggedInUser, db);
       const app = buildServer({ db });
       const res = await request(app)
-        .post('/api/v1/users/login')
-        .send({ email: user1.email, password: user1.password })
-        .set('Accept', 'application/json');
+        .post('/v1/users/login')
+        .set('Accept', 'application/json')
+        .set("Content-Type", "application/json")
+        .send({ email: loggedInUser.email, password: loggedInUser.password })
 
       cookie = res.headers['set-cookie'][0];
     });
@@ -379,16 +476,23 @@ describe('users', () => {
     it('should return 200 ok for successfully fetching the user data', async () => {
       const app = buildServer({ db });
       const res = await request(app)
-        .get('/api/v1/users/me')
+        .get('/v1/users/me')
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
+      const userData = await getUserByEmail(loggedInUser.email, db);
 
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
-        status: 200,
-        message: 'Successfully fetched user details',
+        code: 200,
+        status: "success",
+        message: 'User details fetched successfully',
         data: {
-          user: createdUserData,
+          _id: userData?._id.toString(),
+          name: userData?.name,
+          email: userData?.email,
+          createdAt: userData?.createdAt.toISOString(),
+          updatedAt: userData?.updatedAt.toISOString(),
+          ...(userData?.profileImg && { profileImg: userData.profileImg })
         },
       });
     });

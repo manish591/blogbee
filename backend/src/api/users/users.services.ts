@@ -100,6 +100,36 @@ export async function getAuthSession(sessionId: string, db: Db) {
   }
 }
 
+export async function getUserAuthSessions(userId: string, db: Db) {
+  try {
+    const data = db.collection<Session>(SESSION_COLLECTION).find({
+      userId: new ObjectId(userId)
+    }).toArray();
+    return data;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
+  }
+}
+
+export async function getAllAuthSessions(db: Db) {
+  try {
+    const data = await db.collection<Session>(SESSION_COLLECTION).find({}).toArray();
+    return data;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
+  }
+}
+
 export async function editUserProfile(
   userId: string,
   data: TEditUserProfileBody,

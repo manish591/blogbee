@@ -135,7 +135,8 @@ export async function loginUserHandler(
     }
 
     const sessionId = await createAuthSession(userData._id.toString(), req.db);
-    logger.info('LOGIN_USER_SUCCESS: Logged into account successfully');
+    logger.info('LOGIN_USER_SUCCESS: Logged in successfully');
+
     res.cookie(SESSION_COOKIE_NAME, sessionId, COOKIE_OPTIONS);
     res
       .status(StatusCodes.OK)
@@ -143,7 +144,7 @@ export async function loginUserHandler(
         new APIResponse(
           'success',
           StatusCodes.OK,
-          'Logged into account successfully',
+          'Logged in successfully',
         ),
       );
   } catch (err) {
@@ -217,7 +218,7 @@ export async function uploadProfileImageHandler(req: Request, res: Response) {
         StatusCodes.OK,
         'Profile image uploaded successfully',
         {
-          data,
+          url: data,
         },
       ),
     );

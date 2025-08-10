@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { StatusCodes } from 'http-status-codes';
 import { getAuthSession } from '../api/users/users.services';
+import { APIResponse } from '../utils/api-response';
 import { logger } from '../utils/logger';
 
 export async function authenticate(
@@ -13,26 +14,16 @@ export async function authenticate(
     const sessionId: string | undefined = cookie.sessionId;
 
     if (!sessionId) {
-      logger.error('Invalid cookies found in the request');
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        code: ReasonPhrases.UNAUTHORIZED,
-        message: 'You are not authorized.',
-      });
-
+      logger.error('UNAUTHORIZED_ERROR: Invalid cookies found in the request');
+      res.status(StatusCodes.UNAUTHORIZED).json(new APIResponse("error", StatusCodes.UNAUTHORIZED, "Unauthorized"));
       return;
     }
 
     const sessionData = await getAuthSession(sessionId, req.db);
 
     if (!sessionData) {
-      logger.error('No session found.');
-      res.status(StatusCodes.UNAUTHORIZED).json({
-        status: StatusCodes.UNAUTHORIZED,
-        code: ReasonPhrases.UNAUTHORIZED,
-        message: 'You are not authorized.',
-      });
-
+      logger.error('UNAUTHORIZED_ERROR: Session not found');
+      res.status(StatusCodes.UNAUTHORIZED).json(new APIResponse("error", StatusCodes.UNAUTHORIZED, "Unauthorized"));
       return;
     }
 
@@ -43,11 +34,15 @@ export async function authenticate(
 
     next();
   } catch (err) {
-    logger.error('Internal server error', err);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured. Please try again later!',
-    });
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
   }
 }

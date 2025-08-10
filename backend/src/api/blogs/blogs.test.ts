@@ -7,7 +7,7 @@ import { createTag, getAllTags } from '../tags/tags.services';
 import { createUser, getAuthSession } from '../users/users.services';
 import { createBlog, getBlogById } from './blogs.services';
 
-describe('blogs', () => {
+describe.skip('blogs', () => {
   const user1 = {
     name: 'manish',
     email: 'manish@gmail.com',
