@@ -10,6 +10,7 @@ import {
   createDatabaseClient,
   disconnectFromDatabase,
 } from '../src/db';
+import { BLOG_COLLECTION } from '../src/utils/constants';
 
 let db: mongo.Db;
 let dbClient: mongo.MongoClient;
@@ -32,6 +33,10 @@ beforeAll(async () => {
 beforeEach(async () => {
   // clean up db with fresh data
   await db.dropDatabase();
+  await db.collection(BLOG_COLLECTION).createIndex({
+    name: "text",
+    slug: "text"
+  });
 }, timeout);
 
 afterAll(async () => {

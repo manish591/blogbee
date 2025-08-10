@@ -4,7 +4,7 @@ export interface Users {
   _id?: ObjectId;
   name: string;
   email: string;
-  profileImg?: string;
+  profileImg?: string | null;
   password: string;
   createdAt: Date;
   updatedAt: Date;
@@ -23,9 +23,9 @@ export interface Blogs {
   _id?: ObjectId;
   userId: ObjectId;
   name: string;
-  about?: string;
+  about?: string | null;
   slug: string;
-  logo?: string;
+  logo?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,7 +33,7 @@ export interface Blogs {
 export interface Tags {
   _id?: ObjectId;
   name: string;
-  description?: string;
+  description?: string | null;
   blogId: ObjectId;
   userId: ObjectId;
   posts: ObjectId[];

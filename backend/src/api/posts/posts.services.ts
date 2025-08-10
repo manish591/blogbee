@@ -49,6 +49,22 @@ export async function getPostById(
   }
 }
 
+export async function getAllUserPosts(userId: string, db: Db) {
+  try {
+    const res = await db.collection<Posts>(POSTS_COLLECTION).find({
+      userId: new ObjectId(userId)
+    }).limit(10).toArray();
+    return res;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
+  }
+}
+
 export async function getAllPosts(
   userId: string,
   blogId: string,

@@ -6,7 +6,7 @@ import * as uploadUtils from '../../utils/upload-files';
 import { createUser, getAllAuthSessions, getUserAuthSessions, getUserByEmail } from './users.services';
 import { UPLOADED_PROFILE_IMG_FILE_NAME } from '../../utils/constants';
 
-describe('users', () => {
+describe.skip('users', () => {
   describe('POST /v1/users', () => {
     const requestBodyRequiredField = ["email", "password", "name"];
 

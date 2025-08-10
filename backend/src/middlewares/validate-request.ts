@@ -15,7 +15,7 @@ export function validateRequest(schema: ZodObject) {
       });
       next();
       logger.info(
-        'REQUEST_RESOUCRCE_PARSE_SUCCESS: Successfully pared the request resources',
+        'REQUEST_RESOUCRCE_PARSE_SUCCESS: Successfully parsed the request resources',
       );
     } catch (err) {
       if (err instanceof ZodError) {

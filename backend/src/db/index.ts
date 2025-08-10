@@ -1,5 +1,6 @@
 import * as mongoDB from 'mongodb';
 import { config } from '../config';
+import { BLOG_COLLECTION } from '../utils/constants';
 import { logger } from '../utils/logger';
 
 export const dbClientOptions: mongoDB.MongoClientOptions = {
@@ -23,14 +24,16 @@ export async function connectToDatabase(
 ) {
   try {
     await client.connect();
-
     const db: mongoDB.Db = client.db(databaseName);
-
-    logger.info('Successfully Connected To The Database');
+    await db.collection(BLOG_COLLECTION).createIndex({
+      name: "text",
+      slug: "text"
+    });
+    logger.info('DB_CONNECTION_SUCCESS: Successfully connected to the database');
 
     return db;
   } catch (err) {
-    logger.error('Failed To Connect To The Database', err);
+    logger.error('DB_CONNECTION_FAILED: Failed to connect to the database', err);
     process.exit(1);
   }
 }
@@ -38,10 +41,9 @@ export async function connectToDatabase(
 export async function disconnectFromDatabase(client: mongoDB.MongoClient) {
   try {
     await client.close();
-
-    logger.warn('Successfully Disconnected From The Database');
+    logger.warn('DB_DISCONNECT_SUCCESS: Successfully disconnected from the database');
   } catch (err) {
-    logger.error('Failed To Disconnect From The Database', err);
+    logger.error('DB_DISCONNECT_FAILED: Failed to disconnect from the database', err);
   }
 }
 

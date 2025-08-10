@@ -8,6 +8,7 @@ import {
   deleteBlogHandler,
   editBlogHandler,
   getAllBlogsHandler,
+  getBlogByIdHandler,
   uploadBlogLogoHandler,
 } from './blogs.controllers';
 import {
@@ -15,6 +16,7 @@ import {
   deleteBlogSchema,
   editBlogSchema,
   getAllBlogsSchema,
+  getBlogByIdSchema,
 } from './blogs.schema';
 
 const router = Router();
@@ -25,13 +27,13 @@ router.post(
   validateRequest(createBlogSchema),
   createBlogHandler,
 );
-router.get('/:blogId', authenticate);
 router.get(
   '/',
   authenticate,
   validateRequest(getAllBlogsSchema),
   getAllBlogsHandler,
 );
+router.get('/:blogId', authenticate, validateRequest(getBlogByIdSchema), getBlogByIdHandler);
 router.post(
   '/logo',
   authenticate,

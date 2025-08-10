@@ -9,7 +9,6 @@ import type { TCreateTagBody, TEditTagBody } from './tags.schema';
 
 export async function createTag(
   userId: string,
-  blogId: string,
   data: TCreateTagBody,
   db: Db,
 ) {
@@ -21,7 +20,7 @@ export async function createTag(
       updatedAt: new Date(),
       description: data.description,
       userId: new ObjectId(userId),
-      blogId: new ObjectId(blogId),
+      blogId: new ObjectId(data.blogId),
     });
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
@@ -46,6 +45,22 @@ export async function getTag(
       userId: new ObjectId(userId),
     });
     return data;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
+  }
+}
+
+export async function getAllUserTags(userId: string, db: Db) {
+  try {
+    const res = await db.collection<Tags>(TAGS_COLLECTION).find({
+      userId: new ObjectId(userId)
+    }).limit(10).toArray();
+    return res;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({

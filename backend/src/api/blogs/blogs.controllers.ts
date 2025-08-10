@@ -16,6 +16,7 @@ import {
   deleteBlog,
   editBlog,
   getAllBlogs,
+  getBlogById,
   isSlugTaken,
 } from './blogs.services';
 
@@ -53,7 +54,8 @@ export async function createBlogHandler(
       return;
     }
 
-    await createBlog(userData.userId, req.body, req.db);
+    const userId = userData.userId;
+    await createBlog(userId, req.body, req.db);
     logger.info('CREATE_BLOG_SUCCESS: Created the blog successfully');
 
     res
@@ -93,13 +95,13 @@ export async function getAllBlogsHandler(req: Request, res: Response) {
       return;
     }
 
-    const query = req.query.query as string;
+    const q = req.query.q as string;
     const limit = req.query.limit as string;
     const page = req.query.page as string;
     const data = await getAllBlogs(
       userData.userId,
       req.db,
-      query,
+      q,
       Number(page),
       Number(limit),
     );
@@ -115,6 +117,40 @@ export async function getAllBlogsHandler(req: Request, res: Response) {
           data,
         ),
       );
+  } catch (err) {
+    logger.error('Internal server error', err);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(
+        new APIResponse(
+          'error',
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
+      );
+  }
+}
+
+export async function getBlogByIdHandler(req: Request, res: Response) {
+  try {
+    const userData = res.locals.user;
+
+    if (!userData) {
+      logger.info('Unauthorized_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
+      return;
+    }
+
+    const userId = userData.userId;
+    const blogId = req.params.blogId;
+    const data = await getBlogById(userId, blogId, req.db);
+    logger.info("GET_BLOG_BY_ID_SUCCESS: Blog returned successfully");
+
+    res.status(StatusCodes.OK).json(new APIResponse("success", StatusCodes.OK, "Blog returned successfully", data))
   } catch (err) {
     logger.error('Internal server error', err);
     res
@@ -232,7 +268,6 @@ export async function deleteBlogHandler(req: Request, res: Response) {
 
     const userId = userData.userId;
     const blogId = req.params.blogId;
-
     await deleteBlog(userId, blogId, req.db);
     logger.info('DELETE_BLOG_SUCCESS: Deleted the blog successfully');
 

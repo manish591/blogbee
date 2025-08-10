@@ -19,8 +19,7 @@ export async function createTagHandler(req: Request, res: Response) {
     }
 
     const userId = userData.userId;
-    const blogId = req.params.blogId;
-    await createTag(userId, blogId, req.body, req.db);
+    await createTag(userId, req.body, req.db);
     logger.info('CREATE_TAG_SUCCESS: Tag created successfully');
 
     res

@@ -31,14 +31,13 @@ export async function createUser(
 ) {
   try {
     const hashedPassword = await hashPassword(data.password);
-    const user = await db.collection<Users>(USERS_COLLECTION).insertOne({
+    await db.collection<Users>(USERS_COLLECTION).insertOne({
       email: data.email,
       name: data.name,
       password: hashedPassword,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    return user;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
