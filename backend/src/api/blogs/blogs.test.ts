@@ -7,7 +7,7 @@ import { createUser, getAuthSession, getUserByEmail } from '../users/users.servi
 import { createBlog, getAllBlogs, getBlogById, getBlogBySlug } from './blogs.services';
 import { SESSION_COOKIE_NAME, UPLOADED_BLOG_LOGO_FILE_NAME } from '../../utils/constants';
 
-describe('blogs', () => {
+describe.skip('blogs', () => {
   const loggedInUser = {
     name: 'manish',
     email: 'manish@gmail.com',

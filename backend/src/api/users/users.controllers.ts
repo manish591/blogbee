@@ -57,14 +57,12 @@ export async function createUserHandler(
       return;
     }
 
-    const userData = await createUser(req.body, req.db);
-    const sessionId = await createAuthSession(
-      userData.insertedId.toString(),
-      req.db,
-    );
+    const createUserResult = await createUser(req.body, req.db);
+    const userId = createUserResult.userId.toString();
+    const createSessionResult = await createAuthSession(userId, req.db);
     logger.info('CREATE_USER_SUCCESS', 'User created successfully');
 
-    res.cookie(SESSION_COOKIE_NAME, sessionId, COOKIE_OPTIONS);
+    res.cookie(SESSION_COOKIE_NAME, createSessionResult.sessionId, COOKIE_OPTIONS);
     res
       .status(StatusCodes.CREATED)
       .json(
@@ -134,10 +132,10 @@ export async function loginUserHandler(
       return;
     }
 
-    const sessionId = await createAuthSession(userData._id.toString(), req.db);
+    const createSessionResult = await createAuthSession(userData._id.toString(), req.db);
     logger.info('LOGIN_USER_SUCCESS: Logged in successfully');
 
-    res.cookie(SESSION_COOKIE_NAME, sessionId, COOKIE_OPTIONS);
+    res.cookie(SESSION_COOKIE_NAME, createSessionResult.sessionId, COOKIE_OPTIONS);
     res
       .status(StatusCodes.OK)
       .json(

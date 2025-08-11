@@ -11,10 +11,10 @@ import type { TEditUserProfileBody } from './users.schema';
 
 export async function getUserByEmail(email: string, db: Db) {
   try {
-    const userData = await db
+    const res = await db
       .collection<Users>(USERS_COLLECTION)
       .findOne({ email });
-    return userData;
+    return res;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
@@ -31,13 +31,16 @@ export async function createUser(
 ) {
   try {
     const hashedPassword = await hashPassword(data.password);
-    await db.collection<Users>(USERS_COLLECTION).insertOne({
+    const res = await db.collection<Users>(USERS_COLLECTION).insertOne({
       email: data.email,
       name: data.name,
       password: hashedPassword,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+    return {
+      userId: res.insertedId
+    }
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
@@ -59,7 +62,9 @@ export async function createAuthSession(userId: string, db: Db) {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    return sessionId;
+    return {
+      sessionId
+    };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
@@ -72,7 +77,11 @@ export async function createAuthSession(userId: string, db: Db) {
 
 export async function revokeAuthSession(sessionId: string, db: Db) {
   try {
-    await db.collection<Session>(SESSION_COLLECTION).deleteOne({ sessionId });
+    const res = await db.collection<Session>(SESSION_COLLECTION).deleteOne({ sessionId });
+    return {
+      success: res.acknowledged,
+      deleteCount: res.deletedCount
+    }
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
@@ -85,10 +94,10 @@ export async function revokeAuthSession(sessionId: string, db: Db) {
 
 export async function getAuthSession(sessionId: string, db: Db) {
   try {
-    const authSession = await db
+    const res = await db
       .collection<Session>(SESSION_COLLECTION)
       .findOne({ sessionId, expiresIn: { $gt: new Date() } });
-    return authSession;
+    return res;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
@@ -115,32 +124,25 @@ export async function getUserAuthSessions(userId: string, db: Db) {
   }
 }
 
-export async function getAllAuthSessions(db: Db) {
-  try {
-    const data = await db.collection<Session>(SESSION_COLLECTION).find({}).toArray();
-    return data;
-  } catch (err) {
-    logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
-  }
-}
-
 export async function editUserProfile(
   userId: string,
   data: TEditUserProfileBody,
   db: Db,
 ) {
   try {
-    await db.collection<Users>(USERS_COLLECTION).updateOne(
+    const cleanUpdates = Object.fromEntries(Object.entries(data).filter(([_, val]) => val !== null));
+    const res = await db.collection<Users>(USERS_COLLECTION).updateOne(
       { _id: new ObjectId(userId) },
       {
-        $set: data,
+        $set: {
+          ...cleanUpdates
+        },
       },
     );
+    return {
+      success: res.acknowledged,
+      editedCount: res.modifiedCount
+    }
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
