@@ -134,6 +134,19 @@ export async function getAllBlogsByUserHandler(req: Request, res: Response) {
 
 export async function getBlogByIdHandler(req: Request, res: Response) {
   try {
+    const userData = res.locals.user;
+
+    if (!userData) {
+      logger.info('Unauthorized_ERROR: User not found in res.locals');
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
+      return;
+    }
+
+    const userId = userData.userId;
     const blogId = req.params.blogId;
     const blogData = await getBlogById(blogId, req.db);
 
@@ -143,9 +156,17 @@ export async function getBlogByIdHandler(req: Request, res: Response) {
       return;
     }
 
-    logger.info("GET_BLOG_BY_ID_SUCCESS: Blog returned successfully");
+    const ownsBlog = await isBlogOwnedByUser(userId, blogId, req.db);
 
-    res.status(StatusCodes.OK).json(new APIResponse("success", StatusCodes.OK, "Blog returned successfully", blogData))
+    if (!ownsBlog) {
+      logger.error("FORBIDDEN_ERROR: User does not have permission to read the content of the blog.");
+      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permission to read the content of the blog"));
+      return;
+    }
+
+    logger.info("GET_BLOG_BY_ID_SUCCESS: Blog data returned successfully");
+
+    res.status(StatusCodes.OK).json(new APIResponse("success", StatusCodes.OK, "Blog data returned successfully", blogData))
   } catch (err) {
     logger.error('Internal server error', err);
     res

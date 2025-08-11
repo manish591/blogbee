@@ -33,7 +33,7 @@ export async function createBlog(
   db: Db,
 ) {
   try {
-    await db.collection<Blogs>(BLOG_COLLECTION).insertOne({
+    const res = await db.collection<Blogs>(BLOG_COLLECTION).insertOne({
       userId: new ObjectId(userId),
       name: data.name,
       slug: data.slug,
@@ -42,6 +42,9 @@ export async function createBlog(
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+    return {
+      blogId: res.insertedId
+    }
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
@@ -137,7 +140,10 @@ export async function editBlog(
         },
       },
     );
-    return res;
+    return {
+      success: res.acknowledged,
+      editedCount: res.modifiedCount
+    };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
@@ -154,19 +160,22 @@ export async function deleteBlog(blogId: string, db: Db) {
   try {
     session.startTransaction();
 
-    await db.collection<Blogs>(BLOG_COLLECTION).deleteOne({
+    const deleteBlogResult = await db.collection<Blogs>(BLOG_COLLECTION).deleteOne({
       _id: new ObjectId(blogId),
     });
-    await db.collection<Tags>(TAGS_COLLECTION).deleteMany({
+    const deleteTagsResult = await db.collection<Tags>(TAGS_COLLECTION).deleteMany({
       blogId: new ObjectId(blogId),
     });
-    await db.collection<Posts>(POSTS_COLLECTION).deleteMany({
+    const deletePostsResult = await db.collection<Posts>(POSTS_COLLECTION).deleteMany({
       blogId: new ObjectId(blogId),
     });
 
     await session.commitTransaction();
     return {
-      isDeleted: true,
+      sucesss: true,
+      deleteBlogCount: deleteBlogResult.deletedCount,
+      deletePostCount: deletePostsResult.deletedCount,
+      deleteTagCount: deleteTagsResult.deletedCount
     };
   } catch (err) {
     await session.abortTransaction();
@@ -184,8 +193,8 @@ export async function deleteBlog(blogId: string, db: Db) {
 export async function isBlogOwnedByUser(userId: string, blogId: string, db: Db) {
   try {
     const res = await db.collection<Blogs>(BLOG_COLLECTION).findOne({
+      _id: new ObjectId(blogId),
       userId: new ObjectId(userId),
-      blogId: new ObjectId(blogId)
     });
     return res !== null;
   } catch (err) {
