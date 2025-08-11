@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate';
 import { validateRequest } from '../../middlewares/validate-request';
-import { UPLOADED_PROFILE_IMG_FILE_NAME } from '../../utils/constants';
+import { UPLOADED_PROFILE_IMG_IDENTIFIER } from '../../utils/constants';
 import { upload } from '../../utils/upload-files';
 import {
   createUserHandler,
@@ -25,7 +25,7 @@ router.post('/logout', authenticate, logoutUserHandler);
 router.post(
   '/picture',
   authenticate,
-  upload.single(UPLOADED_PROFILE_IMG_FILE_NAME),
+  upload.single(UPLOADED_PROFILE_IMG_IDENTIFIER),
   uploadProfileImageHandler,
 );
 router.patch(
