@@ -6,8 +6,6 @@ import * as uploadUtils from '../../utils/upload-files';
 import { createUser, getAuthSession, getUserByEmail } from '../users/users.services';
 import { createBlog, getAllBlogs, getBlogById, getBlogBySlug } from './blogs.services';
 import { SESSION_COOKIE_NAME, UPLOADED_BLOG_LOGO_FILE_NAME } from '../../utils/constants';
-import { createPost, getAllPosts, getAllUserPosts } from '../posts/posts.services';
-import { createTag, getAllUserTags } from '../tags/tags.services';
 
 describe('blogs', () => {
   const loggedInUser = {
@@ -392,7 +390,7 @@ describe('blogs', () => {
         .set('Accept', 'application/json')
         .set('Cookie', [cookie])
         .send(data);
-      const editedBlogData = await getBlogById(userId, blogId, db);
+      const editedBlogData = await getBlogById(blogId, db);
 
       expect(editedBlogData).toBeDefined();
       expect(editedBlogData?.name).toBe(data.name);
@@ -428,7 +426,7 @@ describe('blogs', () => {
         .delete(`/v1/blogs/${blogId}`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
-      const deletedBlog = await getBlogById(userId, blogId, db);
+      const deletedBlog = await getBlogById(blogId, db);
 
       expect(res.status).toBe(200);
       expect(deletedBlog).toBe(null);

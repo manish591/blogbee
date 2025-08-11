@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import { z } from 'zod';
 
 export const createBlogSchema = z.object({
@@ -27,7 +28,7 @@ export const createBlogSchema = z.object({
     .strict(),
 });
 
-export const getAllBlogsSchema = z.object({
+export const getAllBlogsByUserSchema = z.object({
   query: z
     .object({
       q: z.string().optional().default(''),
@@ -40,7 +41,9 @@ export const getAllBlogsSchema = z.object({
 export const getBlogByIdSchema = z.object({
   params: z
     .object({
-      blogId: z.string(),
+      blogId: z.string().trim().refine(val => ObjectId.isValid(val), {
+        message: "Invalid mongodb objectid"
+      }),
     })
     .strict(),
 });
@@ -48,9 +51,13 @@ export const getBlogByIdSchema = z.object({
 export const editBlogSchema = z.object({
   body: z
     .object({
-      name: z.string().transform(val => val.trim()).refine(val => val.length >= 5 && val.length <= 30, {
+      name: z.union([z.string(), z.undefined()]).transform(val => {
+        if (val === undefined) return null;
+        const trimmedValue = val.trim();
+        return trimmedValue === "" ? null : trimmedValue;
+      }).refine(val => val && val.length >= 5 && val.length <= 30, {
         message: "name should be greater than 5 characters and less than 30 characters"
-      }),
+      }).nullable(),
       about: z.union([z.string(), z.undefined()]).transform(val => {
         if (val === undefined) return null;
         const trimmedValue = val.trim();
@@ -64,7 +71,9 @@ export const editBlogSchema = z.object({
     .strict(),
   params: z
     .object({
-      blogId: z.string(),
+      blogId: z.string().trim().refine(val => ObjectId.isValid(val), {
+        message: "Invalid mongodb objectid"
+      }),
     })
     .strict(),
 });
@@ -72,13 +81,15 @@ export const editBlogSchema = z.object({
 export const deleteBlogSchema = z.object({
   params: z
     .object({
-      blogId: z.string(),
+      blogId: z.string().trim().refine(val => ObjectId.isValid(val), {
+        message: "Invalid mongodb objectid"
+      }),
     })
     .strict(),
 });
 
 export type TCreateBlogBody = z.infer<typeof createBlogSchema>['body'];
-export type TGetAllBlogsQuery = z.infer<typeof getAllBlogsSchema>['query'];
+export type TGetAllBlogsQuery = z.infer<typeof getAllBlogsByUserSchema>['query'];
 export type TGetBlogByIdParams = z.infer<typeof getBlogByIdSchema>['params'];
 export type TEditBlogBody = z.infer<typeof editBlogSchema>['body'];
 export type TEditBlogParams = z.infer<typeof editBlogSchema>['params'];

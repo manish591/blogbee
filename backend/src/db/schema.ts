@@ -45,15 +45,15 @@ export interface Posts {
   _id?: ObjectId;
   userId: ObjectId;
   blogId: ObjectId;
-  title: string;
   postStatus: PostStatus;
+  title: string;
   tags?: ObjectId[];
   slug?: string;
   subTitle?: string;
   content?: string;
   coverImg?: string;
-  createdAt: Date;
   updatedAt: Date;
+  createdAt: Date;
 }
 
 export enum PostStatus {

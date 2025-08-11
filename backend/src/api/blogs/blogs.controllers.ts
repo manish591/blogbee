@@ -15,8 +15,9 @@ import {
   createBlog,
   deleteBlog,
   editBlog,
-  getAllBlogs,
+  getAllBlogsByUser,
   getBlogById,
+  isBlogOwnedByUser,
   isSlugTaken,
 } from './blogs.services';
 
@@ -42,9 +43,9 @@ export async function createBlogHandler(
     }
 
     const { slug } = req.body;
-    const isSlugAvailable = await isSlugTaken(slug, req.db);
+    const isTaken = await isSlugTaken(slug, req.db);
 
-    if (isSlugAvailable) {
+    if (isTaken) {
       logger.error('SLUG_CONFLICT_ERROR: Slug not available');
       res
         .status(StatusCodes.CONFLICT)
@@ -56,7 +57,7 @@ export async function createBlogHandler(
 
     const userId = userData.userId;
     await createBlog(userId, req.body, req.db);
-    logger.info('CREATE_BLOG_SUCCESS: Created the blog successfully');
+    logger.info('CREATE_USER_BLOG_SUCCESS: Created the blog successfully');
 
     res
       .status(StatusCodes.CREATED)
@@ -81,7 +82,7 @@ export async function createBlogHandler(
   }
 }
 
-export async function getAllBlogsHandler(req: Request, res: Response) {
+export async function getAllBlogsByUserHandler(req: Request, res: Response) {
   try {
     const userData = res.locals.user;
 
@@ -98,7 +99,7 @@ export async function getAllBlogsHandler(req: Request, res: Response) {
     const q = req.query.q as string;
     const limit = req.query.limit as string;
     const page = req.query.page as string;
-    const data = await getAllBlogs(
+    const allUserBlogsData = await getAllBlogsByUser(
       userData.userId,
       req.db,
       q,
@@ -114,7 +115,7 @@ export async function getAllBlogsHandler(req: Request, res: Response) {
           'success',
           StatusCodes.OK,
           'Blogs fetched successfully',
-          data,
+          allUserBlogsData,
         ),
       );
   } catch (err) {
@@ -133,24 +134,18 @@ export async function getAllBlogsHandler(req: Request, res: Response) {
 
 export async function getBlogByIdHandler(req: Request, res: Response) {
   try {
-    const userData = res.locals.user;
+    const blogId = req.params.blogId;
+    const blogData = await getBlogById(blogId, req.db);
 
-    if (!userData) {
-      logger.info('Unauthorized_ERROR: User not found in res.locals');
-      res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
-        );
+    if (!blogData) {
+      logger.error("NOT_FOUND_ERROR: Blog not found");
+      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Blog not found"));
       return;
     }
 
-    const userId = userData.userId;
-    const blogId = req.params.blogId;
-    const data = await getBlogById(userId, blogId, req.db);
     logger.info("GET_BLOG_BY_ID_SUCCESS: Blog returned successfully");
 
-    res.status(StatusCodes.OK).json(new APIResponse("success", StatusCodes.OK, "Blog returned successfully", data))
+    res.status(StatusCodes.OK).json(new APIResponse("success", StatusCodes.OK, "Blog returned successfully", blogData))
   } catch (err) {
     logger.error('Internal server error', err);
     res
@@ -173,7 +168,7 @@ export async function uploadBlogLogoHandler(req: Request, res: Response) {
       logger.error('UPLOAD_FILE_ERROR: File not found in req.file');
       res
         .status(StatusCodes.BAD_REQUEST)
-        .json(new APIResponse('error', StatusCodes.BAD_REQUEST, 'Bad request'));
+        .json(new APIResponse('error', StatusCodes.BAD_REQUEST, 'File not found'));
       return;
     }
 
@@ -224,9 +219,25 @@ export async function editBlogHandler(
       return;
     }
 
-    const userId = userData.userId;
     const blogId = req.params.blogId;
-    await editBlog(userId, blogId, req.body, req.db);
+    const blogData = await getBlogById(blogId, req.db);
+
+    if (!blogData) {
+      logger.error("NOT_FOUND_ERROR: Blog not found");
+      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Blog not found"));
+      return;
+    }
+
+    const userId = userData.userId;
+    const isUserOwner = await isBlogOwnedByUser(userId, blogId, req.db);
+
+    if (!isUserOwner) {
+      logger.error("FORBIDDEN_ERROR: Blog does not belog to user");
+      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permissions to edit the blog"));
+      return;
+    }
+
+    await editBlog(blogId, req.body, req.db);
     logger.info('EDIT_BLOG_SUCCESS: Edited the blog successfully');
 
     res
@@ -266,9 +277,25 @@ export async function deleteBlogHandler(req: Request, res: Response) {
       return;
     }
 
-    const userId = userData.userId;
     const blogId = req.params.blogId;
-    await deleteBlog(userId, blogId, req.db);
+    const blogData = await getBlogById(blogId, req.db);
+
+    if (!blogData) {
+      logger.error("NOT_FOUND_ERROR: Blog not found");
+      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Blog not found"));
+      return;
+    }
+
+    const userId = userData.userId;
+    const isUserOwner = await isBlogOwnedByUser(userId, blogId, req.db);
+
+    if (!isUserOwner) {
+      logger.error("FORBIDDEN_ERROR: Blog does not belog to user");
+      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permissions to delete the blog"));
+      return;
+    }
+
+    await deleteBlog(blogId, req.db);
     logger.info('DELETE_BLOG_SUCCESS: Deleted the blog successfully');
 
     res

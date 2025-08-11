@@ -9,6 +9,7 @@ import type { TCreateTagBody, TEditTagBody } from './tags.schema';
 
 export async function createTag(
   userId: string,
+  blogId: string,
   data: TCreateTagBody,
   db: Db,
 ) {
@@ -20,7 +21,7 @@ export async function createTag(
       updatedAt: new Date(),
       description: data.description,
       userId: new ObjectId(userId),
-      blogId: new ObjectId(data.blogId),
+      blogId: new ObjectId(blogId),
     });
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
@@ -32,19 +33,15 @@ export async function createTag(
   }
 }
 
-export async function getTag(
-  userId: string,
-  blogId: string,
+export async function getTagById(
   tagId: string,
   db: Db,
 ) {
   try {
-    const data = await db.collection<Tags>(TAGS_COLLECTION).findOne({
+    const res = await db.collection<Tags>(TAGS_COLLECTION).findOne({
       _id: new ObjectId(tagId),
-      blogId: new ObjectId(blogId),
-      userId: new ObjectId(userId),
     });
-    return data;
+    return res;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
@@ -71,12 +68,11 @@ export async function getAllUserTags(userId: string, db: Db) {
   }
 }
 
-export async function getAllTags(userId: string, blogId: string, db: Db) {
+export async function getBlogTags(blogId: string, db: Db) {
   try {
     const allTagsData = await db
       .collection<Tags>(TAGS_COLLECTION)
       .find({
-        userId: new ObjectId(userId),
         blogId: new ObjectId(blogId),
       })
       .toArray();
@@ -92,27 +88,23 @@ export async function getAllTags(userId: string, blogId: string, db: Db) {
 }
 
 export async function editTag(
-  userId: string,
-  blogId: string,
   tagId: string,
-  tagData: TEditTagBody,
+  data: TEditTagBody,
   db: Db,
 ) {
   try {
-    const data = await db.collection<Tags>(TAGS_COLLECTION).updateOne(
+    const cleanUpdates = Object.fromEntries(Object.entries(data).filter(([_, value]) => value != null));
+    await db.collection<Tags>(TAGS_COLLECTION).updateOne(
       {
         _id: new ObjectId(tagId),
-        userId: new ObjectId(userId),
-        blogId: new ObjectId(blogId),
       },
       {
         $set: {
-          ...tagData,
+          ...cleanUpdates,
           updatedAt: new Date(),
         },
       },
     );
-    return data;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
@@ -124,8 +116,6 @@ export async function editTag(
 }
 
 export async function deleteTag(
-  userId: string,
-  blogId: string,
   tagId: string,
   db: Db,
 ) {
@@ -135,8 +125,6 @@ export async function deleteTag(
 
     const tagData = await db.collection<Tags>(TAGS_COLLECTION).findOne({
       _id: new ObjectId(tagId),
-      userId: new ObjectId(userId),
-      blogId: new ObjectId(blogId),
     });
 
     await db.collection<Posts>(POSTS_COLLECTION).updateMany(
@@ -149,8 +137,6 @@ export async function deleteTag(
     );
 
     await db.collection<Tags>(TAGS_COLLECTION).deleteOne({
-      userId: new ObjectId(userId),
-      blogId: new ObjectId(blogId),
       _id: new ObjectId(tagId),
     });
 
@@ -165,5 +151,22 @@ export async function deleteTag(
     });
   } finally {
     await session.endSession();
+  }
+}
+
+export async function isTagOwnedByUser(userId: string, tagId: string, db: Db) {
+  try {
+    const res = await db.collection<Tags>(TAGS_COLLECTION).findOne({
+      userId: new ObjectId(userId),
+      _id: new ObjectId(tagId)
+    })
+    return res !== null;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
   }
 }

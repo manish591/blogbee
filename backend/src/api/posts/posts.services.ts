@@ -1,10 +1,11 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { type Db, ObjectId } from 'mongodb';
-import { PostStatus, type Posts } from '../../db/schema';
+import { PostStatus, Tags, type Posts } from '../../db/schema';
 import { AppError } from '../../utils/app-error';
-import { POSTS_COLLECTION } from '../../utils/constants';
+import { POSTS_COLLECTION, TAGS_COLLECTION } from '../../utils/constants';
 import { logger } from '../../utils/logger';
 import type { TEditPostBody } from './posts.schema';
+import { dbClient } from '../../db';
 
 export async function createPost(userId: string, blogId: string, db: Db) {
   try {
@@ -27,16 +28,12 @@ export async function createPost(userId: string, blogId: string, db: Db) {
 }
 
 export async function getPostById(
-  userId: string,
-  blogId: string,
   postId: string,
   db: Db,
 ) {
   try {
     const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
       _id: new ObjectId(postId),
-      userId: new ObjectId(userId),
-      blogId: new ObjectId(blogId),
     });
     return res;
   } catch (err) {
@@ -66,7 +63,6 @@ export async function getAllUserPosts(userId: string, db: Db) {
 }
 
 export async function getAllPosts(
-  userId: string,
   blogId: string,
   db: Db,
   search: string = '',
@@ -82,7 +78,6 @@ export async function getAllPosts(
     const res = db
       .collection<Posts>(POSTS_COLLECTION)
       .find({
-        userId: new ObjectId(userId),
         blogId: new ObjectId(blogId),
         $text: {
           $search: search,
@@ -105,25 +100,29 @@ export async function getAllPosts(
 }
 
 export async function editPost(
-  userId: string,
-  blogId: string,
   postId: string,
-  postData: TEditPostBody,
+  data: TEditPostBody,
   db: Db,
 ) {
   try {
-    const tagIds = postData.tags?.map((tag) => new ObjectId(tag));
+    const cleanUpdates = Object.fromEntries(
+      Object.entries(data).
+        filter(([_, value]) => value !== null).
+        map(([key, value]) => {
+          if (key === "tags" && Array.isArray(value)) {
+            return [key, value.map(item => new ObjectId(item))]
+          }
+          return [key, value];
+        })
+    );
 
     await db.collection<Posts>(POSTS_COLLECTION).updateOne(
       {
         _id: new ObjectId(postId),
-        userId: new ObjectId(userId),
-        blogId: new ObjectId(blogId),
       },
       {
         $set: {
-          ...postData,
-          tags: tagIds,
+          ...cleanUpdates,
           updatedAt: new Date(),
         },
       },
@@ -139,8 +138,6 @@ export async function editPost(
 }
 
 export async function deletePost(
-  userId: string,
-  blogId: string,
   postId: string,
   db: Db,
 ) {
@@ -148,8 +145,6 @@ export async function deletePost(
     await db.collection<Posts>(POSTS_COLLECTION).updateOne(
       {
         _id: new ObjectId(postId),
-        userId: new ObjectId(userId),
-        blogId: new ObjectId(blogId),
       },
       {
         $set: {
@@ -187,5 +182,57 @@ export async function isPostSlugAvailable(
       code: ReasonPhrases.INTERNAL_SERVER_ERROR,
       message: 'Internal server error occured',
     });
+  }
+}
+
+export async function isPostOwnedByUser(userId: string, postId: string, db: Db) {
+  try {
+    const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
+      _id: new ObjectId(postId),
+      userId: new ObjectId(userId)
+    });
+    return res != null;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
+  }
+}
+
+export async function addTagToPost(postId: string, tagId: string, db: Db) {
+  const session = dbClient.startSession();
+  try {
+    session.startTransaction();
+
+    await db.collection<Posts>(POSTS_COLLECTION).updateOne({
+      _id: new ObjectId(postId)
+    }, {
+      $push: {
+        tags: new ObjectId(tagId)
+      }
+    });
+
+    await db.collection<Tags>(TAGS_COLLECTION).updateOne({
+      _id: new ObjectId(tagId)
+    }, {
+      $push: {
+        posts: new ObjectId(postId)
+      }
+    })
+
+    await session.commitTransaction();
+  } catch (err) {
+    await session.abortTransaction();
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
+  } finally {
+    await session.endSession();
   }
 }

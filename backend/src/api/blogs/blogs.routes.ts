@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate';
 import { validateRequest } from '../../middlewares/validate-request';
-import { UPLOADED_BLOG_LOGO_FILE_NAME } from '../../utils/constants';
+import { UPLOADED_BLOG_LOGO_IDENTIFIER } from '../../utils/constants';
 import { upload } from '../../utils/upload-files';
 import {
   createBlogHandler,
   deleteBlogHandler,
   editBlogHandler,
-  getAllBlogsHandler,
+  getAllBlogsByUserHandler,
   getBlogByIdHandler,
   uploadBlogLogoHandler,
 } from './blogs.controllers';
@@ -15,7 +15,7 @@ import {
   createBlogSchema,
   deleteBlogSchema,
   editBlogSchema,
-  getAllBlogsSchema,
+  getAllBlogsByUserSchema,
   getBlogByIdSchema,
 } from './blogs.schema';
 
@@ -30,14 +30,14 @@ router.post(
 router.get(
   '/',
   authenticate,
-  validateRequest(getAllBlogsSchema),
-  getAllBlogsHandler,
+  validateRequest(getAllBlogsByUserSchema),
+  getAllBlogsByUserHandler,
 );
 router.get('/:blogId', authenticate, validateRequest(getBlogByIdSchema), getBlogByIdHandler);
 router.post(
   '/logo',
   authenticate,
-  upload.single(UPLOADED_BLOG_LOGO_FILE_NAME),
+  upload.single(UPLOADED_BLOG_LOGO_IDENTIFIER),
   uploadBlogLogoHandler,
 );
 router.patch(

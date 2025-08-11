@@ -5,13 +5,13 @@ import {
   createTagHandler,
   deleteTagHandler,
   editTagHandler,
-  getAllTagsHandler,
+  getBlogTagsHandler,
 } from './tags.controllers';
 import {
   createTagSchema,
   deleteTagSchema,
   editTagSchema,
-  getAllTagsSchema,
+  getBlogTagsSchema,
 } from './tags.schema';
 
 const router = Router();
@@ -22,18 +22,18 @@ router.post(
   validateRequest(createTagSchema),
   createTagHandler,
 );
+router.get(
+  '/',
+  authenticate,
+  validateRequest(getBlogTagsSchema),
+  getBlogTagsHandler,
+);
 router.patch('/', authenticate, validateRequest(editTagSchema), editTagHandler);
 router.delete(
   '/',
   authenticate,
   validateRequest(deleteTagSchema),
   deleteTagHandler,
-);
-router.get(
-  '/',
-  authenticate,
-  validateRequest(getAllTagsSchema),
-  getAllTagsHandler,
 );
 
 export { router as tagsRouter };
