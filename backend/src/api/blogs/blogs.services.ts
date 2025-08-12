@@ -43,6 +43,7 @@ export async function createBlog(
       updatedAt: new Date(),
     });
     return {
+      success: res.acknowledged,
       blogId: res.insertedId
     }
   } catch (err) {

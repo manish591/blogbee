@@ -1,6 +1,6 @@
 import * as mongoDB from 'mongodb';
 import { config } from '../config';
-import { BLOG_COLLECTION } from '../utils/constants';
+import { BLOG_COLLECTION, POSTS_COLLECTION } from '../utils/constants';
 import { logger } from '../utils/logger';
 
 export const dbClientOptions: mongoDB.MongoClientOptions = {
@@ -28,6 +28,10 @@ export async function connectToDatabase(
     await db.collection(BLOG_COLLECTION).createIndex({
       name: "text",
       slug: "text"
+    });
+    await db.collection(POSTS_COLLECTION).createIndex({
+      title: "text",
+      slug: "text",
     });
     logger.info('DB_CONNECTION_SUCCESS: Successfully connected to the database');
 

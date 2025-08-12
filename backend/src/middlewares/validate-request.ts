@@ -28,6 +28,7 @@ export function validateRequest(schema: ZodObject) {
           .json(
             new APIResponse('error', StatusCodes.BAD_REQUEST, 'Bad request'),
           );
+        return;
       }
 
       logger.error('SERVER_ERROR: Internal Server Error occured', err);

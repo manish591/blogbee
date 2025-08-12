@@ -1,6 +1,6 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { type Db, ObjectId } from 'mongodb';
-import { PostStatus, Tags, type Posts } from '../../db/schema';
+import { PostStatus, type Tags, type Posts } from '../../db/schema';
 import { AppError } from '../../utils/app-error';
 import { POSTS_COLLECTION, TAGS_COLLECTION } from '../../utils/constants';
 import { logger } from '../../utils/logger';
@@ -9,14 +9,19 @@ import { dbClient } from '../../db';
 
 export async function createPost(userId: string, blogId: string, db: Db) {
   try {
-    await db.collection<Posts>(POSTS_COLLECTION).insertOne({
+    const res = await db.collection<Posts>(POSTS_COLLECTION).insertOne({
       title: 'untitled',
       userId: new ObjectId(userId),
       blogId: new ObjectId(blogId),
       postStatus: PostStatus.DRAFT,
+      tags: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+    return {
+      success: res.acknowledged,
+      postId: res.insertedId
+    }
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
@@ -65,29 +70,26 @@ export async function getAllUserPosts(userId: string, db: Db) {
 export async function getAllPosts(
   blogId: string,
   db: Db,
-  search: string = '',
-  filter: string = '',
+  q: string = '',
   page: number = 1,
   limit: number = 10,
 ) {
   try {
     const docsToSkip = (page - 1) * limit;
     const numDocsToReturn = limit;
-    const allTagIds = filter.split(',').map((tagId) => new ObjectId(tagId));
 
     const res = db
       .collection<Posts>(POSTS_COLLECTION)
       .find({
         blogId: new ObjectId(blogId),
-        $text: {
-          $search: search,
-        },
-        tags: {
-          $all: allTagIds,
-        },
+        ...(q && {
+          $text: {
+            $search: q
+          }
+        })
       })
       .skip(docsToSkip)
-      .limit(numDocsToReturn);
+      .limit(numDocsToReturn).toArray();
     return res;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
@@ -107,13 +109,7 @@ export async function editPost(
   try {
     const cleanUpdates = Object.fromEntries(
       Object.entries(data).
-        filter(([_, value]) => value !== null).
-        map(([key, value]) => {
-          if (key === "tags" && Array.isArray(value)) {
-            return [key, value.map(item => new ObjectId(item))]
-          }
-          return [key, value];
-        })
+        filter(([_, value]) => value !== null)
     );
 
     await db.collection<Posts>(POSTS_COLLECTION).updateOne(
@@ -234,5 +230,57 @@ export async function addTagToPost(postId: string, tagId: string, db: Db) {
     });
   } finally {
     await session.endSession();
+  }
+}
+
+export async function removeTagFromPost(postId: string, tagId: string, db: Db) {
+  const session = dbClient.startSession();
+  try {
+    session.startTransaction();
+
+    await db.collection<Posts>(POSTS_COLLECTION).updateOne({
+      _id: new ObjectId(postId)
+    }, {
+      $pull: {
+        tags: new ObjectId(tagId)
+      }
+    });
+
+    await db.collection<Tags>(TAGS_COLLECTION).updateOne({
+      _id: new ObjectId(tagId)
+    }, {
+      $pull: {
+        posts: new ObjectId(postId)
+      }
+    })
+
+    await session.commitTransaction();
+  } catch (err) {
+    await session.abortTransaction();
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
+  } finally {
+    await session.endSession();
+  }
+}
+
+export async function isPostContainsTag(postId: string, tagId: string, db: Db) {
+  try {
+    const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
+      _id: new ObjectId(postId),
+      tags: new ObjectId(tagId)
+    });
+    return res != null;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new AppError({
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error occured',
+    });
   }
 }

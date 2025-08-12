@@ -9,10 +9,12 @@ import {
   editPost,
   getAllPosts,
   getPostById,
+  isPostContainsTag,
   isPostOwnedByUser,
+  removeTagFromPost,
 } from './posts.services';
 import { getBlogById, isBlogOwnedByUser } from '../blogs/blogs.services';
-import { getTagById, isTagOwnedByUser } from '../tags/tags.services';
+import { getTagById } from '../tags/tags.services';
 
 export async function createPostHandler(req: Request, res: Response) {
   try {
@@ -100,11 +102,14 @@ export async function getAllPostsHandler(req: Request, res: Response) {
 
     if (!ownsBlog) {
       logger.error("FORBIDDEN_ERROR: Blog does not belog to user");
-      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permissions to read the blog content"));
+      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permissions to read the posts content"));
       return;
     }
 
-    const postsData = await getAllPosts(blogId, req.db);
+    const q = req.query.q as string;
+    const limit = req.query.limit as string;
+    const page = req.query.page as string;
+    const postsData = await getAllPosts(blogId, req.db, q, Number(page), Number(limit));
     logger.info('GET_POST_SUCCESS: Posts fetched successfully');
 
     res
@@ -307,8 +312,8 @@ export async function addTagToPostHandler(req: Request, res: Response) {
     }
 
     const postId = req.params.postId;
+    const tagId = req.params.tagId;
     const userId = userData.userId;
-    const tagId = req.body.tagId;
 
     const postData = await getPostById(postId, req.db);
     if (!postData) {
@@ -325,15 +330,21 @@ export async function addTagToPostHandler(req: Request, res: Response) {
     }
 
     const userOwnsPost = await isPostOwnedByUser(userId, postId, req.db);
-    const userOwnsTag = await isTagOwnedByUser(userId, tagId, req.db);
-
-    if (!userOwnsPost || !userOwnsTag) {
+    if (!userOwnsPost) {
       logger.error("FORBIDDEN_ERROR: Post does not belog to user");
       res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permissions to add tag to this post"));
       return;
     }
 
-    if (postData.blogId !== tagData.blogId) {
+    const containsTag = await isPostContainsTag(postId, tagId, req.db);
+    if (containsTag) {
+      logger.error("CONFLICT_ERROR: Post already contains this tag");
+      res.status(StatusCodes.CONFLICT).json(new APIResponse("error", StatusCodes.CONFLICT, "Post already contains this tag"));
+      return;
+    }
+
+    const isPostAndTagFromSameBlog = postData.blogId.toString() === tagData.blogId.toString();
+    if (!isPostAndTagFromSameBlog) {
       logger.error("FORBIDDEN_ERROR: The post and tag must belong to the same blog");
       res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "The post and tag must belong to the same blog"));
       return;
@@ -370,6 +381,50 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
         );
       return;
     }
+
+    const postId = req.params.postId;
+    const tagId = req.params.tagId;
+    const userId = userData.userId;
+
+    const postData = await getPostById(postId, req.db);
+    if (!postData) {
+      logger.error("POST_NOT_FOUND_ERROR: Post not found");
+      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Post not found"));
+      return;
+    }
+
+    const tagData = await getTagById(tagId, req.db);
+    if (!tagData) {
+      logger.error("NOT_FOUND_ERROR: Tag not found");
+      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Tag not found"));
+      return;
+    }
+
+    const userOwnsPost = await isPostOwnedByUser(userId, postId, req.db);
+    if (!userOwnsPost) {
+      logger.error("FORBIDDEN_ERROR: Post does not belog to user");
+      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permissions to delete the tag from this post"));
+      return;
+    }
+
+    const containsTag = await isPostContainsTag(postId, tagId, req.db);
+    if (!containsTag) {
+      logger.error("NOT_FOUND_ERROR: Post does not contains this tag");
+      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Post does not contains this tag"));
+      return;
+    }
+
+    const isPostAndTagFromSameBlog = postData.blogId.toString() === tagData.blogId.toString();
+    if (!isPostAndTagFromSameBlog) {
+      logger.error("FORBIDDEN_ERROR: The post and tag must belong to the same blog");
+      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "The post and tag must belong to the same blog"));
+      return;
+    }
+
+    await removeTagFromPost(postId, tagId, req.db);
+    logger.info("REMOVE_TAG_FROM_POST_SUCCESS: Tag removed from post successfully");
+
+    res.status(StatusCodes.OK).json(new APIResponse("success", StatusCodes.OK, "Tag removed from post successfully"));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res

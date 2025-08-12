@@ -10,7 +10,7 @@ import {
   createDatabaseClient,
   disconnectFromDatabase,
 } from '../src/db';
-import { BLOG_COLLECTION } from '../src/utils/constants';
+import { BLOG_COLLECTION, POSTS_COLLECTION } from '../src/utils/constants';
 
 let db: mongo.Db;
 let dbClient: mongo.MongoClient;
@@ -36,6 +36,10 @@ beforeEach(async () => {
   await db.collection(BLOG_COLLECTION).createIndex({
     name: "text",
     slug: "text"
+  });
+  await db.collection(POSTS_COLLECTION).createIndex({
+    title: "text",
+    slug: "text",
   });
 }, timeout);
 

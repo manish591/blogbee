@@ -271,7 +271,7 @@ describe('blogs', () => {
       })
     });
 
-    it("should return 404 not found is blog with blogid does not exists", async () => {
+    it("should return 404 not found if blog with blogid does not exists", async () => {
       const nonExistentBlogId = "64d2f5b8e4a7c3f1b9a6d412";
       const app = buildServer({ db });
       const res = await request(app)

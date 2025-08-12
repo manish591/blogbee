@@ -47,7 +47,7 @@ export interface Posts {
   blogId: ObjectId;
   postStatus: PostStatus;
   title: string;
-  tags?: ObjectId[];
+  tags: ObjectId[];
   slug?: string;
   subTitle?: string;
   content?: string;

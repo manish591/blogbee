@@ -52,7 +52,7 @@ router.delete(
   validateRequest(deletePostSchema),
   deletePostHandler,
 );
-router.post("/:postId/tags", authenticate, validateRequest(addTagToPostSchema), addTagToPostHandler);
-router.delete("/:postId/tags", authenticate, validateRequest(removeTagFromPostSchema), removeTagFromPostHandler);
+router.post("/:postId/tags/:tagId", authenticate, validateRequest(addTagToPostSchema), addTagToPostHandler);
+router.delete("/:postId/tags/:tagId", authenticate, validateRequest(removeTagFromPostSchema), removeTagFromPostHandler);
 
 export { router as postsRouter };

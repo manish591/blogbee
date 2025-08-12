@@ -4,7 +4,7 @@ import { db } from '../../../test/setup';
 import { buildServer } from '../../app';
 import * as uploadUtils from '../../utils/upload-files';
 import { createUser, getUserAuthSessions, getUserByEmail } from './users.services';
-import { UPLOADED_PROFILE_IMG_FILE_NAME } from '../../utils/constants';
+import { UPLOADED_PROFILE_IMG_IDENTIFIER } from '../../utils/constants';
 
 describe('users', () => {
   describe('POST /v1/users', () => {
@@ -338,7 +338,7 @@ describe('users', () => {
         .post('/v1/users/picture')
         .set('Accept', 'application/json')
         .set('Cookie', [cookie])
-        .attach(UPLOADED_PROFILE_IMG_FILE_NAME, Buffer.alloc(11 * 1024 * 1024), {
+        .attach(UPLOADED_PROFILE_IMG_IDENTIFIER, Buffer.alloc(11 * 1024 * 1024), {
           filename: "large.jpg"
         });
 
@@ -359,7 +359,7 @@ describe('users', () => {
         .post('/v1/users/picture')
         .set('Accept', 'application/json')
         .set('Cookie', [cookie])
-        .attach(UPLOADED_PROFILE_IMG_FILE_NAME, Buffer.from('test-file'), {
+        .attach(UPLOADED_PROFILE_IMG_IDENTIFIER, Buffer.from('test-file'), {
           filename: 'test.png',
         });
 
