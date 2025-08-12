@@ -2,8 +2,15 @@ import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { APIResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
-import { createTag, deleteTag, editTag, getBlogTags, getTagById, isTagOwnedByUser } from './tags.services';
 import { getBlogById, isBlogOwnedByUser } from '../blogs/blogs.services';
+import {
+  createTag,
+  deleteTag,
+  editTag,
+  getBlogTags,
+  getTagById,
+  isTagOwnedByUser,
+} from './tags.services';
 
 export async function createTagHandler(req: Request, res: Response) {
   try {
@@ -23,8 +30,12 @@ export async function createTagHandler(req: Request, res: Response) {
     const isExists = await getBlogById(blogId, req.db);
 
     if (!isExists) {
-      logger.error("NOT_FOUND_ERROR: Blog not found");
-      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Blog not found"));
+      logger.error('NOT_FOUND_ERROR: Blog not found');
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json(
+          new APIResponse('error', StatusCodes.NOT_FOUND, 'Blog not found'),
+        );
       return;
     }
 
@@ -32,8 +43,16 @@ export async function createTagHandler(req: Request, res: Response) {
     const isUserOwner = await isBlogOwnedByUser(userId, blogId, req.db);
 
     if (!isUserOwner) {
-      logger.error("FORBIDDEN_ERROR: Blog does not belog to user");
-      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permissions to create the tag in this blog"));
+      logger.error('FORBIDDEN_ERROR: Blog does not belog to user');
+      res
+        .status(StatusCodes.FORBIDDEN)
+        .json(
+          new APIResponse(
+            'error',
+            StatusCodes.FORBIDDEN,
+            'You do not have permissions to create the tag in this blog',
+          ),
+        );
       return;
     }
 
@@ -81,8 +100,12 @@ export async function getBlogTagsHandler(req: Request, res: Response) {
     const isExists = await getBlogById(blogId, req.db);
 
     if (!isExists) {
-      logger.error("NOT_FOUND_ERROR: Blog not found");
-      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Blog not found"));
+      logger.error('NOT_FOUND_ERROR: Blog not found');
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json(
+          new APIResponse('error', StatusCodes.NOT_FOUND, 'Blog not found'),
+        );
       return;
     }
 
@@ -90,8 +113,16 @@ export async function getBlogTagsHandler(req: Request, res: Response) {
     const isUserOwner = await isBlogOwnedByUser(userId, blogId, req.db);
 
     if (!isUserOwner) {
-      logger.error("FORBIDDEN_ERROR: Blog does not belog to user");
-      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permissions to read the content of the tags"));
+      logger.error('FORBIDDEN_ERROR: Blog does not belog to user');
+      res
+        .status(StatusCodes.FORBIDDEN)
+        .json(
+          new APIResponse(
+            'error',
+            StatusCodes.FORBIDDEN,
+            'You do not have permissions to read the content of the tags',
+          ),
+        );
       return;
     }
 
@@ -140,8 +171,10 @@ export async function editTagHandler(req: Request, res: Response) {
     const tagData = await getTagById(tagId, req.db);
 
     if (!tagData) {
-      logger.error("NOT_FOUND_ERROR: Tag not found");
-      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Tag not found"));
+      logger.error('NOT_FOUND_ERROR: Tag not found');
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json(new APIResponse('error', StatusCodes.NOT_FOUND, 'Tag not found'));
       return;
     }
 
@@ -149,8 +182,16 @@ export async function editTagHandler(req: Request, res: Response) {
     const ownsTag = await isTagOwnedByUser(userId, tagId, req.db);
 
     if (!ownsTag) {
-      logger.error("FORBIDDEN_ERROR: Tag does not belog to user");
-      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permissions to edit the content of the tags"));
+      logger.error('FORBIDDEN_ERROR: Tag does not belog to user');
+      res
+        .status(StatusCodes.FORBIDDEN)
+        .json(
+          new APIResponse(
+            'error',
+            StatusCodes.FORBIDDEN,
+            'You do not have permissions to edit the content of the tags',
+          ),
+        );
       return;
     }
 
@@ -194,8 +235,10 @@ export async function deleteTagHandler(req: Request, res: Response) {
     const tagData = await getTagById(tagId, req.db);
 
     if (!tagData) {
-      logger.error("NOT_FOUND_ERROR: Tag not found");
-      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Tag not found"));
+      logger.error('NOT_FOUND_ERROR: Tag not found');
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json(new APIResponse('error', StatusCodes.NOT_FOUND, 'Tag not found'));
       return;
     }
 
@@ -203,8 +246,16 @@ export async function deleteTagHandler(req: Request, res: Response) {
     const ownsTag = await isTagOwnedByUser(userId, tagId, req.db);
 
     if (!ownsTag) {
-      logger.error("FORBIDDEN_ERROR: Tag does not belog to user");
-      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permissions to delete the content of the tags"));
+      logger.error('FORBIDDEN_ERROR: Tag does not belog to user');
+      res
+        .status(StatusCodes.FORBIDDEN)
+        .json(
+          new APIResponse(
+            'error',
+            StatusCodes.FORBIDDEN,
+            'You do not have permissions to delete the content of the tags',
+          ),
+        );
       return;
     }
 

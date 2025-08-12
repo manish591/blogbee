@@ -4,17 +4,23 @@ import { z } from 'zod';
 export const createTagSchema = z.object({
   body: z
     .object({
-      blogId: z.string().trim().refine(val => ObjectId.isValid(val), {
-        message: "Invalid mongodb objectid"
-      }),
+      blogId: z
+        .string()
+        .trim()
+        .refine((val) => ObjectId.isValid(val), {
+          message: 'Invalid mongodb objectid',
+        }),
       name: z.string().trim().max(30, {
-        message: "tag length should not exceed 30 characters"
+        message: 'tag length should not exceed 30 characters',
       }),
-      description: z.union([z.string(), z.undefined()]).transform(val => {
-        if (val === undefined) return null;
-        const trimmedValue = val.trim();
-        return trimmedValue === "" ? null : trimmedValue;
-      }).nullable(),
+      description: z
+        .union([z.string(), z.undefined()])
+        .transform((val) => {
+          if (val === undefined) return null;
+          const trimmedValue = val.trim();
+          return trimmedValue === '' ? null : trimmedValue;
+        })
+        .nullable(),
     })
     .strict(),
 });
@@ -22,9 +28,12 @@ export const createTagSchema = z.object({
 export const getBlogTagsSchema = z.object({
   query: z
     .object({
-      blogId: z.string().trim().refine(val => ObjectId.isValid(val), {
-        message: "Invalid mongodb objectid"
-      }),
+      blogId: z
+        .string()
+        .trim()
+        .refine((val) => ObjectId.isValid(val), {
+          message: 'Invalid mongodb objectid',
+        }),
     })
     .strict(),
 });
@@ -32,23 +41,32 @@ export const getBlogTagsSchema = z.object({
 export const editTagSchema = z.object({
   body: z
     .object({
-      name: z.union([z.string(), z.undefined()]).transform(val => {
-        if (val === undefined) return null;
-        const trimmedValue = val.trim();
-        return trimmedValue === "" ? null : trimmedValue;
-      }).nullable(),
-      description: z.union([z.string(), z.undefined()]).transform(val => {
-        if (val === undefined) return null;
-        const trimmedValue = val.trim();
-        return trimmedValue === "" ? null : trimmedValue;
-      }).nullable(),
+      name: z
+        .union([z.string(), z.undefined()])
+        .transform((val) => {
+          if (val === undefined) return null;
+          const trimmedValue = val.trim();
+          return trimmedValue === '' ? null : trimmedValue;
+        })
+        .nullable(),
+      description: z
+        .union([z.string(), z.undefined()])
+        .transform((val) => {
+          if (val === undefined) return null;
+          const trimmedValue = val.trim();
+          return trimmedValue === '' ? null : trimmedValue;
+        })
+        .nullable(),
     })
     .strict(),
   params: z
     .object({
-      tagId: z.string().trim().refine(val => ObjectId.isValid(val), {
-        message: "Invalid mongodb objectid"
-      }),
+      tagId: z
+        .string()
+        .trim()
+        .refine((val) => ObjectId.isValid(val), {
+          message: 'Invalid mongodb objectid',
+        }),
     })
     .strict(),
 });
@@ -56,9 +74,12 @@ export const editTagSchema = z.object({
 export const deleteTagSchema = z.object({
   params: z
     .object({
-      tagId: z.string().trim().refine(val => ObjectId.isValid(val), {
-        message: "Invalid mongodb objectid"
-      }),
+      tagId: z
+        .string()
+        .trim()
+        .refine((val) => ObjectId.isValid(val), {
+          message: 'Invalid mongodb objectid',
+        }),
     })
     .strict(),
 });

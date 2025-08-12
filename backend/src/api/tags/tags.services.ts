@@ -25,8 +25,8 @@ export async function createTag(
     });
     return {
       success: res.acknowledged,
-      tagId: res.insertedId
-    }
+      tagId: res.insertedId,
+    };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
@@ -37,10 +37,7 @@ export async function createTag(
   }
 }
 
-export async function getTagById(
-  tagId: string,
-  db: Db,
-) {
+export async function getTagById(tagId: string, db: Db) {
   try {
     const res = await db.collection<Tags>(TAGS_COLLECTION).findOne({
       _id: new ObjectId(tagId),
@@ -58,9 +55,13 @@ export async function getTagById(
 
 export async function getAllUserTags(userId: string, db: Db) {
   try {
-    const res = await db.collection<Tags>(TAGS_COLLECTION).find({
-      userId: new ObjectId(userId)
-    }).limit(10).toArray();
+    const res = await db
+      .collection<Tags>(TAGS_COLLECTION)
+      .find({
+        userId: new ObjectId(userId),
+      })
+      .limit(10)
+      .toArray();
     return res;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
@@ -91,13 +92,11 @@ export async function getBlogTags(blogId: string, db: Db) {
   }
 }
 
-export async function editTag(
-  tagId: string,
-  data: TEditTagBody,
-  db: Db,
-) {
+export async function editTag(tagId: string, data: TEditTagBody, db: Db) {
   try {
-    const cleanUpdates = Object.fromEntries(Object.entries(data).filter(([_, value]) => value != null));
+    const cleanUpdates = Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => value != null),
+    );
     await db.collection<Tags>(TAGS_COLLECTION).updateOne(
       {
         _id: new ObjectId(tagId),
@@ -119,10 +118,7 @@ export async function editTag(
   }
 }
 
-export async function deleteTag(
-  tagId: string,
-  db: Db,
-) {
+export async function deleteTag(tagId: string, db: Db) {
   const session = dbClient.startSession();
   try {
     session.startTransaction();
@@ -162,8 +158,8 @@ export async function isTagOwnedByUser(userId: string, tagId: string, db: Db) {
   try {
     const res = await db.collection<Tags>(TAGS_COLLECTION).findOne({
       userId: new ObjectId(userId),
-      _id: new ObjectId(tagId)
-    })
+      _id: new ObjectId(tagId),
+    });
     return res !== null;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);

@@ -33,7 +33,12 @@ router.get(
   validateRequest(getAllBlogsByUserSchema),
   getAllBlogsByUserHandler,
 );
-router.get('/:blogId', authenticate, validateRequest(getBlogByIdSchema), getBlogByIdHandler);
+router.get(
+  '/:blogId',
+  authenticate,
+  validateRequest(getBlogByIdSchema),
+  getBlogByIdHandler,
+);
 router.post(
   '/logo',
   authenticate,

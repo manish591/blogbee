@@ -62,7 +62,11 @@ export async function createUserHandler(
     const createSessionResult = await createAuthSession(userId, req.db);
     logger.info('CREATE_USER_SUCCESS', 'User created successfully');
 
-    res.cookie(SESSION_COOKIE_NAME, createSessionResult.sessionId, COOKIE_OPTIONS);
+    res.cookie(
+      SESSION_COOKIE_NAME,
+      createSessionResult.sessionId,
+      COOKIE_OPTIONS,
+    );
     res
       .status(StatusCodes.CREATED)
       .json(
@@ -132,18 +136,21 @@ export async function loginUserHandler(
       return;
     }
 
-    const createSessionResult = await createAuthSession(userData._id.toString(), req.db);
+    const createSessionResult = await createAuthSession(
+      userData._id.toString(),
+      req.db,
+    );
     logger.info('LOGIN_USER_SUCCESS: Logged in successfully');
 
-    res.cookie(SESSION_COOKIE_NAME, createSessionResult.sessionId, COOKIE_OPTIONS);
+    res.cookie(
+      SESSION_COOKIE_NAME,
+      createSessionResult.sessionId,
+      COOKIE_OPTIONS,
+    );
     res
       .status(StatusCodes.OK)
       .json(
-        new APIResponse(
-          'success',
-          StatusCodes.OK,
-          'Logged in successfully',
-        ),
+        new APIResponse('success', StatusCodes.OK, 'Logged in successfully'),
       );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);

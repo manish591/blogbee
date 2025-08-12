@@ -10,7 +10,7 @@ describe('healthcheck', () => {
       const res = await request(app).get('/v1/healthcheck');
 
       expect(res.status).toBe(200);
-      expect(res.body.message).toBe("Ok");
+      expect(res.body.message).toBe('Ok');
     });
   });
 });

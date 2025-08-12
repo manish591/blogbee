@@ -1,11 +1,11 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { type Db, ObjectId } from 'mongodb';
-import { PostStatus, type Tags, type Posts } from '../../db/schema';
+import { dbClient } from '../../db';
+import { PostStatus, type Posts, type Tags } from '../../db/schema';
 import { AppError } from '../../utils/app-error';
 import { POSTS_COLLECTION, TAGS_COLLECTION } from '../../utils/constants';
 import { logger } from '../../utils/logger';
 import type { TEditPostBody } from './posts.schema';
-import { dbClient } from '../../db';
 
 export async function createPost(userId: string, blogId: string, db: Db) {
   try {
@@ -20,8 +20,8 @@ export async function createPost(userId: string, blogId: string, db: Db) {
     });
     return {
       success: res.acknowledged,
-      postId: res.insertedId
-    }
+      postId: res.insertedId,
+    };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
@@ -32,10 +32,7 @@ export async function createPost(userId: string, blogId: string, db: Db) {
   }
 }
 
-export async function getPostById(
-  postId: string,
-  db: Db,
-) {
+export async function getPostById(postId: string, db: Db) {
   try {
     const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
       _id: new ObjectId(postId),
@@ -53,9 +50,13 @@ export async function getPostById(
 
 export async function getAllUserPosts(userId: string, db: Db) {
   try {
-    const res = await db.collection<Posts>(POSTS_COLLECTION).find({
-      userId: new ObjectId(userId)
-    }).limit(10).toArray();
+    const res = await db
+      .collection<Posts>(POSTS_COLLECTION)
+      .find({
+        userId: new ObjectId(userId),
+      })
+      .limit(10)
+      .toArray();
     return res;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
@@ -84,12 +85,13 @@ export async function getAllPosts(
         blogId: new ObjectId(blogId),
         ...(q && {
           $text: {
-            $search: q
-          }
-        })
+            $search: q,
+          },
+        }),
       })
       .skip(docsToSkip)
-      .limit(numDocsToReturn).toArray();
+      .limit(numDocsToReturn)
+      .toArray();
     return res;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
@@ -101,15 +103,10 @@ export async function getAllPosts(
   }
 }
 
-export async function editPost(
-  postId: string,
-  data: TEditPostBody,
-  db: Db,
-) {
+export async function editPost(postId: string, data: TEditPostBody, db: Db) {
   try {
     const cleanUpdates = Object.fromEntries(
-      Object.entries(data).
-        filter(([_, value]) => value !== null)
+      Object.entries(data).filter(([_, value]) => value !== null),
     );
 
     await db.collection<Posts>(POSTS_COLLECTION).updateOne(
@@ -133,10 +130,7 @@ export async function editPost(
   }
 }
 
-export async function deletePost(
-  postId: string,
-  db: Db,
-) {
+export async function deletePost(postId: string, db: Db) {
   try {
     await db.collection<Posts>(POSTS_COLLECTION).updateOne(
       {
@@ -181,11 +175,15 @@ export async function isPostSlugAvailable(
   }
 }
 
-export async function isPostOwnedByUser(userId: string, postId: string, db: Db) {
+export async function isPostOwnedByUser(
+  userId: string,
+  postId: string,
+  db: Db,
+) {
   try {
     const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
       _id: new ObjectId(postId),
-      userId: new ObjectId(userId)
+      userId: new ObjectId(userId),
     });
     return res != null;
   } catch (err) {
@@ -203,21 +201,27 @@ export async function addTagToPost(postId: string, tagId: string, db: Db) {
   try {
     session.startTransaction();
 
-    await db.collection<Posts>(POSTS_COLLECTION).updateOne({
-      _id: new ObjectId(postId)
-    }, {
-      $push: {
-        tags: new ObjectId(tagId)
-      }
-    });
+    await db.collection<Posts>(POSTS_COLLECTION).updateOne(
+      {
+        _id: new ObjectId(postId),
+      },
+      {
+        $push: {
+          tags: new ObjectId(tagId),
+        },
+      },
+    );
 
-    await db.collection<Tags>(TAGS_COLLECTION).updateOne({
-      _id: new ObjectId(tagId)
-    }, {
-      $push: {
-        posts: new ObjectId(postId)
-      }
-    })
+    await db.collection<Tags>(TAGS_COLLECTION).updateOne(
+      {
+        _id: new ObjectId(tagId),
+      },
+      {
+        $push: {
+          posts: new ObjectId(postId),
+        },
+      },
+    );
 
     await session.commitTransaction();
   } catch (err) {
@@ -238,21 +242,27 @@ export async function removeTagFromPost(postId: string, tagId: string, db: Db) {
   try {
     session.startTransaction();
 
-    await db.collection<Posts>(POSTS_COLLECTION).updateOne({
-      _id: new ObjectId(postId)
-    }, {
-      $pull: {
-        tags: new ObjectId(tagId)
-      }
-    });
+    await db.collection<Posts>(POSTS_COLLECTION).updateOne(
+      {
+        _id: new ObjectId(postId),
+      },
+      {
+        $pull: {
+          tags: new ObjectId(tagId),
+        },
+      },
+    );
 
-    await db.collection<Tags>(TAGS_COLLECTION).updateOne({
-      _id: new ObjectId(tagId)
-    }, {
-      $pull: {
-        posts: new ObjectId(postId)
-      }
-    })
+    await db.collection<Tags>(TAGS_COLLECTION).updateOne(
+      {
+        _id: new ObjectId(tagId),
+      },
+      {
+        $pull: {
+          posts: new ObjectId(postId),
+        },
+      },
+    );
 
     await session.commitTransaction();
   } catch (err) {
@@ -272,7 +282,7 @@ export async function isPostContainsTag(postId: string, tagId: string, db: Db) {
   try {
     const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
       _id: new ObjectId(postId),
-      tags: new ObjectId(tagId)
+      tags: new ObjectId(tagId),
     });
     return res != null;
   } catch (err) {

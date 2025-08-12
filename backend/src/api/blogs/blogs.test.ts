@@ -2,12 +2,17 @@ import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '../../../test/setup';
 import { buildServer } from '../../app';
-import * as uploadUtils from '../../utils/upload-files';
-import { createUser } from '../users/users.services';
-import { createBlog, getAllBlogsByUser, getBlogById, getBlogBySlug } from './blogs.services';
 import { UPLOADED_BLOG_LOGO_IDENTIFIER } from '../../utils/constants';
+import * as uploadUtils from '../../utils/upload-files';
 import { createPost, getPostById } from '../posts/posts.services';
 import { createTag, getTagById } from '../tags/tags.services';
+import { createUser } from '../users/users.services';
+import {
+  createBlog,
+  getAllBlogsByUser,
+  getBlogById,
+  getBlogBySlug,
+} from './blogs.services';
 
 describe('blogs', () => {
   const loggedInUser = {
@@ -27,21 +32,21 @@ describe('blogs', () => {
     const res = await request(app)
       .post('/v1/users/login')
       .set('Accept', 'application/json')
-      .set("Content-Type", "application/json")
-      .send({ email: loggedInUser.email, password: loggedInUser.password })
+      .set('Content-Type', 'application/json')
+      .send({ email: loggedInUser.email, password: loggedInUser.password });
 
     cookie = res.headers['set-cookie'][0];
   });
 
   describe('POST /v1/blogs', () => {
-    const requiredField = ["name", "slug"];
+    const requiredField = ['name', 'slug'];
     const blogData = {
       name: 'first blog',
       slug: 'first-blog',
       about: 'something about the blog',
-    }
+    };
 
-    requiredField.forEach(field => {
+    requiredField.forEach((field) => {
       it(`should return 400 bad request if ${field} field is not provided`, async () => {
         const app = buildServer({ db });
         const data = { name: blogData.name, slug: blogData.slug };
@@ -49,7 +54,7 @@ describe('blogs', () => {
         const res = await request(app)
           .post('/v1/blogs')
           .set('Accept', 'application/json')
-          .set("Content-Type", "application/json")
+          .set('Content-Type', 'application/json')
           .set('Cookie', [cookie])
           .send(data);
         const createdBlog = await getBlogBySlug(blogData.slug, db);
@@ -66,11 +71,15 @@ describe('blogs', () => {
 
     it('should return 400 bad request if invalid request body is provided', async () => {
       const app = buildServer({ db });
-      const data = { name: blogData.name, slug: blogData.slug, invalidData: "" };
+      const data = {
+        name: blogData.name,
+        slug: blogData.slug,
+        invalidData: '',
+      };
       const res = await request(app)
         .post('/v1/blogs')
         .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
+        .set('Content-Type', 'application/json')
         .set('Cookie', [cookie])
         .send(data);
       const createdBlog = await getBlogBySlug(blogData.slug, db);
@@ -86,11 +95,11 @@ describe('blogs', () => {
 
     it('should return 400 bad request if slug contains characters other than lowercase, numbers and hyphes', async () => {
       const app = buildServer({ db });
-      const data = { name: blogData.name, slug: "myslug$%jf" };
+      const data = { name: blogData.name, slug: 'myslug$%jf' };
       const res = await request(app)
         .post('/v1/blogs')
         .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
+        .set('Content-Type', 'application/json')
         .set('Cookie', [cookie])
         .send(data);
       const createdBlog = await getBlogBySlug(blogData.slug, db);
@@ -105,13 +114,17 @@ describe('blogs', () => {
     });
 
     it('should return 409 conflict if blog with slug already exists', async () => {
-      await createBlog(userId, { name: blogData.name, slug: blogData.slug, about: null, logo: null }, db);
+      await createBlog(
+        userId,
+        { name: blogData.name, slug: blogData.slug, about: null, logo: null },
+        db,
+      );
       const app = buildServer({ db });
-      const data = { name: "different name", slug: blogData.slug };
+      const data = { name: 'different name', slug: blogData.slug };
       const res = await request(app)
         .post('/v1/blogs')
         .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
+        .set('Content-Type', 'application/json')
         .set('Cookie', [cookie])
         .send(data);
       const allBlogs = await getAllBlogsByUser(userId, db);
@@ -138,7 +151,7 @@ describe('blogs', () => {
       const res = await request(app)
         .post('/v1/blogs')
         .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
+        .set('Content-Type', 'application/json')
         .set('Cookie', [cookie])
         .send(data);
       const createdBlog = await getBlogBySlug(data.slug, db);
@@ -158,41 +171,41 @@ describe('blogs', () => {
       name: 'first blog',
       slug: 'first-blog',
       about: null,
-      logo: null
+      logo: null,
     };
 
     const blogData2 = {
       name: 'Second blog',
       slug: 'second-blog',
       about: null,
-      logo: null
+      logo: null,
     };
 
     const blogData3 = {
       name: 'Third blog',
       slug: 'third-blog',
       about: null,
-      logo: null
+      logo: null,
     };
 
     const blogData4 = {
       name: 'Fourth blog',
       slug: 'fourth-blog',
       about: null,
-      logo: null
+      logo: null,
     };
 
     const blogData5 = {
-      name: "fifth blog",
-      slug: "fifth-blog",
+      name: 'fifth blog',
+      slug: 'fifth-blog',
       about: null,
-      logo: null
-    }
+      logo: null,
+    };
 
     const userData = {
       name: 'new users',
       email: 'ema@gmail.com',
-      password: 'new pass'
+      password: 'new pass',
     };
 
     beforeEach(async () => {
@@ -254,9 +267,9 @@ describe('blogs', () => {
     });
   });
 
-  describe("GET /blogs/:blogId", () => {
-    it("should return 400 bad request if blog id passed in params is not a valid mongo object id", async () => {
-      const invalidBlogId = "invalidid";
+  describe('GET /blogs/:blogId', () => {
+    it('should return 400 bad request if blog id passed in params is not a valid mongo object id', async () => {
+      const invalidBlogId = 'invalidid';
       const app = buildServer({ db });
       const res = await request(app)
         .get(`/v1/blogs/${invalidBlogId}`)
@@ -266,13 +279,13 @@ describe('blogs', () => {
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 400,
-        status: "error",
-        message: "Bad request"
-      })
+        status: 'error',
+        message: 'Bad request',
+      });
     });
 
-    it("should return 404 not found if blog with blogid does not exists", async () => {
-      const nonExistentBlogId = "64d2f5b8e4a7c3f1b9a6d412";
+    it('should return 404 not found if blog with blogid does not exists', async () => {
+      const nonExistentBlogId = '64d2f5b8e4a7c3f1b9a6d412';
       const app = buildServer({ db });
       const res = await request(app)
         .get(`/v1/blogs/${nonExistentBlogId}`)
@@ -282,22 +295,22 @@ describe('blogs', () => {
       expect(res.status).toBe(404);
       expect(res.body).toMatchObject({
         code: 404,
-        status: "error",
-        message: "Blog not found"
-      })
+        status: 'error',
+        message: 'Blog not found',
+      });
     });
 
-    it("should return 403 forbidden if user attempts to access blog they do not own", async () => {
+    it('should return 403 forbidden if user attempts to access blog they do not own', async () => {
       const otherUserData = {
-        name: "virat",
-        email: "virat@gmail.com",
-        password: "4578222djjd"
+        name: 'virat',
+        email: 'virat@gmail.com',
+        password: '4578222djjd',
       };
       const blogData = {
-        name: "other blog",
-        slug: "other-user-blog",
-        about: "",
-        logo: ""
+        name: 'other blog',
+        slug: 'other-user-blog',
+        about: '',
+        logo: '',
       };
       const otherUser = await createUser(otherUserData, db);
       const otherUserId = otherUser.userId.toString();
@@ -312,18 +325,18 @@ describe('blogs', () => {
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
         code: 403,
-        status: "error",
-        message: "You do not have permission to read the content of the blog"
+        status: 'error',
+        message: 'You do not have permission to read the content of the blog',
       });
     });
 
-    it("should return 200 ok along with blog data", async () => {
+    it('should return 200 ok along with blog data', async () => {
       const blogData = {
-        name: "fifth blog",
-        slug: "fifth-blog",
+        name: 'fifth blog',
+        slug: 'fifth-blog',
         about: null,
-        logo: null
-      }
+        logo: null,
+      };
       const createdBlogResult = await createBlog(userId, blogData, db);
       const blogId = createdBlogResult.blogId.toString();
 
@@ -334,7 +347,7 @@ describe('blogs', () => {
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
-      expect(res.body.message).toBe("Blog data returned successfully");
+      expect(res.body.message).toBe('Blog data returned successfully');
       expect(res.body.data.slug).toBe(blogData.slug);
       expect(res.body.data.name).toBe(blogData.name);
     });
@@ -363,7 +376,7 @@ describe('blogs', () => {
         .set('Accept', 'application/json')
         .set('Cookie', [cookie])
         .attach(UPLOADED_BLOG_LOGO_IDENTIFIER, Buffer.alloc(11 * 1024 * 1024), {
-          filename: "big.png"
+          filename: 'big.png',
         });
 
       expect(res.status).toBe(400);
@@ -401,11 +414,11 @@ describe('blogs', () => {
 
   describe('PATCH /blogs/:blogId', () => {
     const blogData = {
-      name: "fifth blog",
-      slug: "fifth-blog",
+      name: 'fifth blog',
+      slug: 'fifth-blog',
       about: null,
-      logo: null
-    }
+      logo: null,
+    };
 
     let blogId: string;
 
@@ -425,7 +438,7 @@ describe('blogs', () => {
       const editedBlog = await getBlogById(blogId, db);
 
       // checking for invalidData not get added to the db
-      expect(editedBlog).not.toHaveProperty("invalidData");
+      expect(editedBlog).not.toHaveProperty('invalidData');
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 400,
@@ -434,21 +447,21 @@ describe('blogs', () => {
       });
     });
 
-    it("should return 403 forbidden if user attempts to edit blog they do not own", async () => {
+    it('should return 403 forbidden if user attempts to edit blog they do not own', async () => {
       const otherUserData = {
-        name: "virat",
-        email: "virat@gmail.com",
-        password: "4578222djjd"
+        name: 'virat',
+        email: 'virat@gmail.com',
+        password: '4578222djjd',
       };
       const blogData = {
-        name: "other blog",
-        slug: "other-user-blog",
-        about: "",
-        logo: ""
+        name: 'other blog',
+        slug: 'other-user-blog',
+        about: '',
+        logo: '',
       };
       const blogDataToEdit = {
-        name: "otherblogedited",
-      }
+        name: 'otherblogedited',
+      };
       const otherUser = await createUser(otherUserData, db);
       const otherUserId = otherUser.userId.toString();
       const otherUserBlog = await createBlog(otherUserId, blogData, db);
@@ -458,15 +471,15 @@ describe('blogs', () => {
         .patch(`/v1/blogs/${otherUserBlogId}`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie])
-        .send(blogDataToEdit)
+        .send(blogDataToEdit);
       const otherBlogAfterEditing = await getBlogById(otherUserBlogId, db);
 
       expect(otherBlogAfterEditing?.name).not.toBe(blogDataToEdit.name);
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
         code: 403,
-        status: "error",
-        message: "You do not have permissions to edit the blog"
+        status: 'error',
+        message: 'You do not have permissions to edit the blog',
       });
     });
 
@@ -498,11 +511,11 @@ describe('blogs', () => {
 
   describe('DELETE /blogs/:blogId', () => {
     const blogData = {
-      name: "fifth blog",
-      slug: "fifth-blog",
+      name: 'fifth blog',
+      slug: 'fifth-blog',
       about: null,
-      logo: null
-    }
+      logo: null,
+    };
 
     let blogId: string;
 
@@ -511,17 +524,17 @@ describe('blogs', () => {
       blogId = createdBlogResult.blogId.toString();
     });
 
-    it("should return 403 forbidden if user attempts to delete the blog they do not own", async () => {
+    it('should return 403 forbidden if user attempts to delete the blog they do not own', async () => {
       const otherUserData = {
-        name: "virat",
-        email: "virat@gmail.com",
-        password: "4578222djjd"
+        name: 'virat',
+        email: 'virat@gmail.com',
+        password: '4578222djjd',
       };
       const blogData = {
-        name: "other blog",
-        slug: "other-user-blog",
-        about: "",
-        logo: ""
+        name: 'other blog',
+        slug: 'other-user-blog',
+        about: '',
+        logo: '',
       };
       const otherUser = await createUser(otherUserData, db);
       const otherUserId = otherUser.userId.toString();
@@ -539,8 +552,8 @@ describe('blogs', () => {
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
         code: 403,
-        status: "error",
-        message: "You do not have permissions to delete the blog"
+        status: 'error',
+        message: 'You do not have permissions to delete the blog',
       });
     });
 
@@ -561,14 +574,18 @@ describe('blogs', () => {
       });
     });
 
-    it("should return 200 ok and delete the corresponding posts and tags related to blog", async () => {
+    it('should return 200 ok and delete the corresponding posts and tags related to blog', async () => {
       const newTagData = {
         blogId,
-        name: "typescript",
-        description: null
-      }
-      const newPostId = (await createPost(userId, blogId, db)).postId.toString();
-      const newTagId = (await createTag(userId, blogId, newTagData, db)).tagId.toString();
+        name: 'typescript',
+        description: null,
+      };
+      const newPostId = (
+        await createPost(userId, blogId, db)
+      ).postId.toString();
+      const newTagId = (
+        await createTag(userId, blogId, newTagData, db)
+      ).tagId.toString();
       const app = buildServer({ db });
       const res = await request(app)
         .delete(`/v1/blogs/${blogId}`)

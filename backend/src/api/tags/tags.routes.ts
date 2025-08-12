@@ -28,7 +28,12 @@ router.get(
   validateRequest(getBlogTagsSchema),
   getBlogTagsHandler,
 );
-router.patch('/:tagId', authenticate, validateRequest(editTagSchema), editTagHandler);
+router.patch(
+  '/:tagId',
+  authenticate,
+  validateRequest(editTagSchema),
+  editTagHandler,
+);
 router.delete(
   '/:tagId',
   authenticate,

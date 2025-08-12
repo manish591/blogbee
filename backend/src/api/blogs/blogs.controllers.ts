@@ -151,22 +151,45 @@ export async function getBlogByIdHandler(req: Request, res: Response) {
     const blogData = await getBlogById(blogId, req.db);
 
     if (!blogData) {
-      logger.error("NOT_FOUND_ERROR: Blog not found");
-      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Blog not found"));
+      logger.error('NOT_FOUND_ERROR: Blog not found');
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json(
+          new APIResponse('error', StatusCodes.NOT_FOUND, 'Blog not found'),
+        );
       return;
     }
 
     const ownsBlog = await isBlogOwnedByUser(userId, blogId, req.db);
 
     if (!ownsBlog) {
-      logger.error("FORBIDDEN_ERROR: User does not have permission to read the content of the blog.");
-      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permission to read the content of the blog"));
+      logger.error(
+        'FORBIDDEN_ERROR: User does not have permission to read the content of the blog.',
+      );
+      res
+        .status(StatusCodes.FORBIDDEN)
+        .json(
+          new APIResponse(
+            'error',
+            StatusCodes.FORBIDDEN,
+            'You do not have permission to read the content of the blog',
+          ),
+        );
       return;
     }
 
-    logger.info("GET_BLOG_BY_ID_SUCCESS: Blog data returned successfully");
+    logger.info('GET_BLOG_BY_ID_SUCCESS: Blog data returned successfully');
 
-    res.status(StatusCodes.OK).json(new APIResponse("success", StatusCodes.OK, "Blog data returned successfully", blogData))
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new APIResponse(
+          'success',
+          StatusCodes.OK,
+          'Blog data returned successfully',
+          blogData,
+        ),
+      );
   } catch (err) {
     logger.error('Internal server error', err);
     res
@@ -189,7 +212,9 @@ export async function uploadBlogLogoHandler(req: Request, res: Response) {
       logger.error('UPLOAD_FILE_ERROR: File not found in req.file');
       res
         .status(StatusCodes.BAD_REQUEST)
-        .json(new APIResponse('error', StatusCodes.BAD_REQUEST, 'File not found'));
+        .json(
+          new APIResponse('error', StatusCodes.BAD_REQUEST, 'File not found'),
+        );
       return;
     }
 
@@ -244,8 +269,12 @@ export async function editBlogHandler(
     const blogData = await getBlogById(blogId, req.db);
 
     if (!blogData) {
-      logger.error("NOT_FOUND_ERROR: Blog not found");
-      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Blog not found"));
+      logger.error('NOT_FOUND_ERROR: Blog not found');
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json(
+          new APIResponse('error', StatusCodes.NOT_FOUND, 'Blog not found'),
+        );
       return;
     }
 
@@ -253,8 +282,16 @@ export async function editBlogHandler(
     const isUserOwner = await isBlogOwnedByUser(userId, blogId, req.db);
 
     if (!isUserOwner) {
-      logger.error("FORBIDDEN_ERROR: Blog does not belog to user");
-      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permissions to edit the blog"));
+      logger.error('FORBIDDEN_ERROR: Blog does not belog to user');
+      res
+        .status(StatusCodes.FORBIDDEN)
+        .json(
+          new APIResponse(
+            'error',
+            StatusCodes.FORBIDDEN,
+            'You do not have permissions to edit the blog',
+          ),
+        );
       return;
     }
 
@@ -302,8 +339,12 @@ export async function deleteBlogHandler(req: Request, res: Response) {
     const blogData = await getBlogById(blogId, req.db);
 
     if (!blogData) {
-      logger.error("NOT_FOUND_ERROR: Blog not found");
-      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Blog not found"));
+      logger.error('NOT_FOUND_ERROR: Blog not found');
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json(
+          new APIResponse('error', StatusCodes.NOT_FOUND, 'Blog not found'),
+        );
       return;
     }
 
@@ -311,8 +352,16 @@ export async function deleteBlogHandler(req: Request, res: Response) {
     const isUserOwner = await isBlogOwnedByUser(userId, blogId, req.db);
 
     if (!isUserOwner) {
-      logger.error("FORBIDDEN_ERROR: Blog does not belog to user");
-      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "You do not have permissions to delete the blog"));
+      logger.error('FORBIDDEN_ERROR: Blog does not belog to user');
+      res
+        .status(StatusCodes.FORBIDDEN)
+        .json(
+          new APIResponse(
+            'error',
+            StatusCodes.FORBIDDEN,
+            'You do not have permissions to delete the blog',
+          ),
+        );
       return;
     }
 

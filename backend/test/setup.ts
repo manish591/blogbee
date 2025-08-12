@@ -34,12 +34,12 @@ beforeEach(async () => {
   // clean up db with fresh data
   await db.dropDatabase();
   await db.collection(BLOG_COLLECTION).createIndex({
-    name: "text",
-    slug: "text"
+    name: 'text',
+    slug: 'text',
   });
   await db.collection(POSTS_COLLECTION).createIndex({
-    title: "text",
-    slug: "text",
+    title: 'text',
+    slug: 'text',
   });
 }, timeout);
 

@@ -1,13 +1,13 @@
-import request from "supertest";
-import { describe, beforeEach, it, expect } from "vitest";
-import { createBlog } from "../blogs/blogs.services";
-import { db } from "../../../test/setup";
-import { buildServer } from "../../app";
-import { createUser } from "../users/users.services";
-import { createTag, getBlogTags, getTagById } from "./tags.services";
-import { addTagToPost, createPost, getPostById } from "../posts/posts.services";
+import request from 'supertest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { db } from '../../../test/setup';
+import { buildServer } from '../../app';
+import { createBlog } from '../blogs/blogs.services';
+import { addTagToPost, createPost, getPostById } from '../posts/posts.services';
+import { createUser } from '../users/users.services';
+import { createTag, getBlogTags, getTagById } from './tags.services';
 
-describe("TAGS", () => {
+describe('TAGS', () => {
   const loggedInUser = {
     name: 'manish',
     email: 'manish@gmail.com',
@@ -25,8 +25,8 @@ describe("TAGS", () => {
     const res = await request(app)
       .post('/v1/users/login')
       .set('Accept', 'application/json')
-      .set("Content-Type", "application/json")
-      .send({ email: loggedInUser.email, password: loggedInUser.password })
+      .set('Content-Type', 'application/json')
+      .send({ email: loggedInUser.email, password: loggedInUser.password });
 
     cookie = res.headers['set-cookie'][0];
   });
@@ -36,7 +36,7 @@ describe("TAGS", () => {
       name: 'blog title',
       slug: 'blog-title',
       about: 'This is a content.',
-      logo: null
+      logo: null,
     };
 
     let blogId: string;
@@ -45,12 +45,12 @@ describe("TAGS", () => {
       blogId = (await createBlog(userId, blogData, db)).blogId.toString();
     });
 
-    const requiredFields = ["blogId", "name"];
+    const requiredFields = ['blogId', 'name'];
 
-    requiredFields.forEach(field => {
+    requiredFields.forEach((field) => {
       it(`should return 400 bad request if ${field} field is not provided`, async () => {
         const app = buildServer({ db });
-        const data = { name: "typescript", blogId };
+        const data = { name: 'typescript', blogId };
         delete data[field];
         const res = await request(app)
           .post(`/v1/tags`)
@@ -71,7 +71,7 @@ describe("TAGS", () => {
 
     it('should return 400 bad request if invalid request body is provided', async () => {
       const app = buildServer({ db });
-      const data = { name: "typescript", blogId, invalidData: "" };
+      const data = { name: 'typescript', blogId, invalidData: '' };
       const res = await request(app)
         .post('/v1/tags')
         .set('Accept', 'application/json')
@@ -88,9 +88,9 @@ describe("TAGS", () => {
       });
     });
 
-    it("should return 404 not found if blog with blogId passed in body does not exists", async () => {
-      const nonExistentBlogId = "64d2f5b8e4a7c3f1b9a6d412";
-      const data = { name: "typescript", blogId: nonExistentBlogId };
+    it('should return 404 not found if blog with blogId passed in body does not exists', async () => {
+      const nonExistentBlogId = '64d2f5b8e4a7c3f1b9a6d412';
+      const data = { name: 'typescript', blogId: nonExistentBlogId };
       const app = buildServer({ db });
       const res = await request(app)
         .post(`/v1/tags`)
@@ -101,28 +101,28 @@ describe("TAGS", () => {
       expect(res.status).toBe(404);
       expect(res.body).toMatchObject({
         code: 404,
-        status: "error",
-        message: "Blog not found"
-      })
+        status: 'error',
+        message: 'Blog not found',
+      });
     });
 
-    it("should return 403 forbidden if user attempts to add create tag in blog they do not own", async () => {
+    it('should return 403 forbidden if user attempts to add create tag in blog they do not own', async () => {
       const otherUserData = {
-        name: "virat",
-        email: "virat@gmail.com",
-        password: "4578222djjd"
+        name: 'virat',
+        email: 'virat@gmail.com',
+        password: '4578222djjd',
       };
       const blogData = {
-        name: "other blog",
-        slug: "other-user-blog",
-        about: "",
-        logo: ""
+        name: 'other blog',
+        slug: 'other-user-blog',
+        about: '',
+        logo: '',
       };
       const otherUser = await createUser(otherUserData, db);
       const otherUserId = otherUser.userId.toString();
       const otherUserBlog = await createBlog(otherUserId, blogData, db);
       const otherUserBlogId = otherUserBlog.blogId.toString();
-      const data = { name: "typescript", blogId: otherUserBlogId };
+      const data = { name: 'typescript', blogId: otherUserBlogId };
       const app = buildServer({ db });
       const res = await request(app)
         .post('/v1/tags')
@@ -135,8 +135,8 @@ describe("TAGS", () => {
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
         code: 403,
-        status: "error",
-        message: "You do not have permissions to create the tag in this blog"
+        status: 'error',
+        message: 'You do not have permissions to create the tag in this blog',
       });
     });
 
@@ -178,11 +178,21 @@ describe("TAGS", () => {
 
     beforeEach(async () => {
       blogId = (await createBlog(userId, blogData, db)).blogId.toString();
-      await createTag(userId, blogId, { blogId, name: 'Typescript', description: "" }, db);
-      await createTag(userId, blogId, { blogId, name: 'Python', description: "" }, db);
+      await createTag(
+        userId,
+        blogId,
+        { blogId, name: 'Typescript', description: '' },
+        db,
+      );
+      await createTag(
+        userId,
+        blogId,
+        { blogId, name: 'Python', description: '' },
+        db,
+      );
     });
 
-    it("should return 400 bad request if blogId is not passed in query params", async () => {
+    it('should return 400 bad request if blogId is not passed in query params', async () => {
       const app = buildServer({ db });
       const res = await request(app)
         .get('/v1/tags')
@@ -192,22 +202,22 @@ describe("TAGS", () => {
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 400,
-        status: "error",
-        message: "Bad request"
+        status: 'error',
+        message: 'Bad request',
       });
     });
 
-    it("should return 403 forbidden if user attempts to add read the content of tag in the blog they do not own", async () => {
+    it('should return 403 forbidden if user attempts to add read the content of tag in the blog they do not own', async () => {
       const otherUserData = {
-        name: "virat",
-        email: "virat@gmail.com",
-        password: "4578222djjd"
+        name: 'virat',
+        email: 'virat@gmail.com',
+        password: '4578222djjd',
       };
       const blogData = {
-        name: "other blog",
-        slug: "other-user-blog",
-        about: "",
-        logo: ""
+        name: 'other blog',
+        slug: 'other-user-blog',
+        about: '',
+        logo: '',
       };
       const otherUser = await createUser(otherUserData, db);
       const otherUserId = otherUser.userId.toString();
@@ -217,13 +227,13 @@ describe("TAGS", () => {
       const res = await request(app)
         .get(`/v1/tags?blogId=${otherUserBlogId}`)
         .set('Accept', 'application/json')
-        .set('Cookie', [cookie])
+        .set('Cookie', [cookie]);
 
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
         code: 403,
-        status: "error",
-        message: "You do not have permissions to read the content of the tags"
+        status: 'error',
+        message: 'You do not have permissions to read the content of the tags',
       });
     });
 
@@ -247,13 +257,13 @@ describe("TAGS", () => {
         name: 'update blog title',
         slug: 'update-blog-title',
         about: 'This is a content.',
-        logo: null
+        logo: null,
       };
       const blogId = (await createBlog(userId, blogData, db)).blogId.toString();
       const tagData = {
         name: 'javascript',
         description: 'Contains all the blogs related to the javascript',
-        blogId
+        blogId,
       };
       tagId = (await createTag(userId, blogId, tagData, db)).tagId.toString();
     });
@@ -277,45 +287,47 @@ describe("TAGS", () => {
       });
     });
 
-    it("should return 403 forbidden if user attempts to edit the content of tag in the they do not own", async () => {
+    it('should return 403 forbidden if user attempts to edit the content of tag in the they do not own', async () => {
       const otherUserData = {
-        name: "virat",
-        email: "virat@gmail.com",
-        password: "4578222djjd"
+        name: 'virat',
+        email: 'virat@gmail.com',
+        password: '4578222djjd',
       };
       const blogData = {
-        name: "other blog",
-        slug: "other-user-blog",
-        about: "",
-        logo: ""
+        name: 'other blog',
+        slug: 'other-user-blog',
+        about: '',
+        logo: '',
       };
       const otherUser = await createUser(otherUserData, db);
       const otherUserId = otherUser.userId.toString();
       const otherUserBlog = await createBlog(otherUserId, blogData, db);
       const otherUserBlogId = otherUserBlog.blogId.toString();
       const tagData = {
-        name: "typescript",
+        name: 'typescript',
         description: null,
-        blogId: otherUserBlogId
-      }
-      const otherUserTagId = (await createTag(otherUserId, otherUserBlogId, tagData, db)).tagId.toString();
+        blogId: otherUserBlogId,
+      };
+      const otherUserTagId = (
+        await createTag(otherUserId, otherUserBlogId, tagData, db)
+      ).tagId.toString();
       const editTagContent = {
-        name: "javascript"
-      }
+        name: 'javascript',
+      };
       const app = buildServer({ db });
       const res = await request(app)
         .patch(`/v1/tags/${otherUserTagId}`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie])
         .send(editTagContent);
-      const editedTagData = await getTagById(otherUserTagId, db)
+      const editedTagData = await getTagById(otherUserTagId, db);
 
       expect(editedTagData?.name).not.toBe(editTagContent.name);
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
         code: 403,
-        status: "error",
-        message: "You do not have permissions to edit the content of the tags"
+        status: 'error',
+        message: 'You do not have permissions to edit the content of the tags',
       });
     });
 
@@ -350,61 +362,64 @@ describe("TAGS", () => {
         name: 'update blog title',
         slug: 'update-blog-title',
         about: 'This is a content.',
-        logo: null
+        logo: null,
       };
       const blogId = (await createBlog(userId, blogData, db)).blogId.toString();
       const tagData = {
         name: 'javascript',
         description: 'Contains all the blogs related to the javascript',
-        blogId
+        blogId,
       };
       tagId = (await createTag(userId, blogId, tagData, db)).tagId.toString();
     });
 
-    it("should return 403 forbidden if user attempts to edit the content of tag in the they do not own", async () => {
+    it('should return 403 forbidden if user attempts to edit the content of tag in the they do not own', async () => {
       const otherUserData = {
-        name: "virat",
-        email: "virat@gmail.com",
-        password: "4578222djjd"
+        name: 'virat',
+        email: 'virat@gmail.com',
+        password: '4578222djjd',
       };
       const blogData = {
-        name: "other blog",
-        slug: "other-user-blog",
-        about: "",
-        logo: ""
+        name: 'other blog',
+        slug: 'other-user-blog',
+        about: '',
+        logo: '',
       };
       const otherUser = await createUser(otherUserData, db);
       const otherUserId = otherUser.userId.toString();
       const otherUserBlog = await createBlog(otherUserId, blogData, db);
       const otherUserBlogId = otherUserBlog.blogId.toString();
       const tagData = {
-        name: "typescript",
+        name: 'typescript',
         description: null,
-        blogId: otherUserBlogId
-      }
-      const otherUserTagId = (await createTag(otherUserId, otherUserBlogId, tagData, db)).tagId.toString();
+        blogId: otherUserBlogId,
+      };
+      const otherUserTagId = (
+        await createTag(otherUserId, otherUserBlogId, tagData, db)
+      ).tagId.toString();
       const app = buildServer({ db });
       const res = await request(app)
         .delete(`/v1/tags/${otherUserTagId}`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
-      const editedTagData = await getTagById(otherUserTagId, db)
+      const editedTagData = await getTagById(otherUserTagId, db);
 
       expect(editedTagData).toBeDefined();
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
         code: 403,
-        status: "error",
-        message: "You do not have permissions to delete the content of the tags"
+        status: 'error',
+        message:
+          'You do not have permissions to delete the content of the tags',
       });
     });
 
     it('should return 200 ok for successfully deleting the tag data and removing corresponding reference in posts', async () => {
       const blogData = {
-        name: "other blog",
-        slug: "other-user-blog",
-        about: "",
-        logo: ""
+        name: 'other blog',
+        slug: 'other-user-blog',
+        about: '',
+        logo: '',
       };
       const createdBlog = await createBlog(userId, blogData, db);
       const createdBlogId = createdBlog.blogId.toString();

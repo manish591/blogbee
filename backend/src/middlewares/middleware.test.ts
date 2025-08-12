@@ -1,5 +1,3 @@
-import { describe } from "vitest";
+import { describe } from 'vitest';
 
-describe.skip("MIDDLEWARES", () => {
-
-});
+describe.skip('MIDDLEWARES', () => {});

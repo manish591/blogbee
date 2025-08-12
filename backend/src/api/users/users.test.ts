@@ -2,23 +2,31 @@ import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { db } from '../../../test/setup';
 import { buildServer } from '../../app';
-import * as uploadUtils from '../../utils/upload-files';
-import { createUser, getUserAuthSessions, getUserByEmail } from './users.services';
 import { UPLOADED_PROFILE_IMG_IDENTIFIER } from '../../utils/constants';
+import * as uploadUtils from '../../utils/upload-files';
+import {
+  createUser,
+  getUserAuthSessions,
+  getUserByEmail,
+} from './users.services';
 
 describe('users', () => {
   describe('POST /v1/users', () => {
-    const requestBodyRequiredField = ["email", "password", "name"];
+    const requestBodyRequiredField = ['email', 'password', 'name'];
 
-    requestBodyRequiredField.forEach(field => {
+    requestBodyRequiredField.forEach((field) => {
       it(`should return 400 bad request if ${field} is not provided`, async () => {
         const app = buildServer({ db });
-        const data = { name: "test1", email: "manish@gmail.com", password: "14577952" };
+        const data = {
+          name: 'test1',
+          email: 'manish@gmail.com',
+          password: '14577952',
+        };
         delete data[field];
         const res = await request(app)
           .post('/v1/users')
           .set('Accept', 'application/json')
-          .set('Content-Type', "application/json")
+          .set('Content-Type', 'application/json')
           .send(data);
         const createdUser = await getUserByEmail(data.email, db);
 
@@ -26,19 +34,24 @@ describe('users', () => {
         expect(res.status).toBe(400);
         expect(res.body).toMatchObject({
           code: 400,
-          status: "error",
+          status: 'error',
           message: 'Bad request',
         });
       });
     });
 
-    it("should return 400 bad request if invalid fields provided", async () => {
+    it('should return 400 bad request if invalid fields provided', async () => {
       const app = buildServer({ db });
-      const data = { name: "test1", email: "manish@gmail.com", password: "14577952", extraField: "extra" };
+      const data = {
+        name: 'test1',
+        email: 'manish@gmail.com',
+        password: '14577952',
+        extraField: 'extra',
+      };
       const res = await request(app)
         .post('/v1/users')
         .set('Accept', 'application/json')
-        .set('Content-Type', "application/json")
+        .set('Content-Type', 'application/json')
         .send(data);
       const createdUser = await getUserByEmail(data.email, db);
 
@@ -46,18 +59,18 @@ describe('users', () => {
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 400,
-        status: "error",
+        status: 'error',
         message: 'Bad request',
       });
     });
 
-    it("should return 400 bad request if valid email is not provided", async () => {
+    it('should return 400 bad request if valid email is not provided', async () => {
       const app = buildServer({ db });
-      const data = { name: "test1", email: "gmail", password: "14577952" };
+      const data = { name: 'test1', email: 'gmail', password: '14577952' };
       const res = await request(app)
         .post('/v1/users')
         .set('Accept', 'application/json')
-        .set('Content-Type', "application/json")
+        .set('Content-Type', 'application/json')
         .send(data);
       const createdUser = await getUserByEmail(data.email, db);
 
@@ -65,7 +78,7 @@ describe('users', () => {
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 400,
-        status: "error",
+        status: 'error',
         message: 'Bad request',
       });
     });
@@ -80,7 +93,7 @@ describe('users', () => {
       const res = await request(app)
         .post('/v1/users')
         .set('Accept', 'application/json')
-        .set('Content-Type', "application/json")
+        .set('Content-Type', 'application/json')
         .send(data);
       const createdUser = await getUserByEmail(data.email, db);
 
@@ -88,25 +101,25 @@ describe('users', () => {
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 400,
-        status: "error",
+        status: 'error',
         message: 'Bad request',
       });
     });
 
     it('should return 409 confict if user with email already exists', async () => {
       const existingUser = {
-        name: "manish",
-        email: "manish@gmail.com",
-        password: "12457mans"
-      }
+        name: 'manish',
+        email: 'manish@gmail.com',
+        password: '12457mans',
+      };
       await createUser(existingUser, db);
       const app = buildServer({ db });
-      const data = { ...existingUser, name: "newname", password: "147928d4d" };
+      const data = { ...existingUser, name: 'newname', password: '147928d4d' };
       const res = await request(app)
         .post('/v1/users')
         .set('Accept', 'application/json')
-        .set('Content-Type', "application/json")
-        .send(data)
+        .set('Content-Type', 'application/json')
+        .send(data);
       const createdUser = await getUserByEmail(existingUser.email, db);
 
       expect(createdUser?.name).not.toBe(data.name);
@@ -120,10 +133,14 @@ describe('users', () => {
 
     it('should return 201 created for successfully creating user', async () => {
       const app = buildServer({ db });
-      const data = { name: "anjali", email: "anjali@gmail.com", password: "anjali78545" };
+      const data = {
+        name: 'anjali',
+        email: 'anjali@gmail.com',
+        password: 'anjali78545',
+      };
       const res = await request(app)
         .post('/v1/users')
-        .set('Content-Type', "application/json")
+        .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .send(data);
       const createdUser = await getUserByEmail(data.email, db);
@@ -133,87 +150,97 @@ describe('users', () => {
       expect(res.status).toBe(201);
       expect(res.body).toMatchObject({
         code: 201,
-        status: "success",
+        status: 'success',
         message: 'User created successfully',
       });
     });
   });
 
   describe('POST /v1/users/login', () => {
-    const requestBodyRequiredField = ["email", "password"];
+    const requestBodyRequiredField = ['email', 'password'];
     const loggedOutUser = {
-      name: "manish",
-      email: "manish@gmail.com",
-      password: "hdhfhf455"
-    }
+      name: 'manish',
+      email: 'manish@gmail.com',
+      password: 'hdhfhf455',
+    };
 
     beforeEach(async () => {
       await createUser(loggedOutUser, db);
     });
 
-    requestBodyRequiredField.forEach(field => {
+    requestBodyRequiredField.forEach((field) => {
       it(`should return 400 bad request if ${field} is not provided`, async () => {
         const app = buildServer({ db });
-        const data = { email: loggedOutUser.email, password: loggedOutUser.password };
+        const data = {
+          email: loggedOutUser.email,
+          password: loggedOutUser.password,
+        };
         delete data[field];
         const res = await request(app)
           .post('/v1/users/login')
           .set('Accept', 'application/json')
-          .set('Content-Type', "application/json")
-          .send(data)
+          .set('Content-Type', 'application/json')
+          .send(data);
         const loggedInUser = await getUserByEmail(data.email, db);
         const userId = loggedInUser?._id.toString() as string;
         const loggedInUserSessions = await getUserAuthSessions(userId, db);
 
-        expect(loggedInUserSessions.length).toBe(0)
+        expect(loggedInUserSessions.length).toBe(0);
         expect(res.status).toBe(400);
         expect(res.body).toMatchObject({
           code: 400,
-          status: "error",
+          status: 'error',
           message: 'Bad request',
         });
       });
     });
 
-    it("should return 400 bad request if invalid fields provided", async () => {
+    it('should return 400 bad request if invalid fields provided', async () => {
       const app = buildServer({ db });
-      const data = { email: "manish@gmail.com", password: "14577952", extraField: "extra" };
+      const data = {
+        email: 'manish@gmail.com',
+        password: '14577952',
+        extraField: 'extra',
+      };
       const res = await request(app)
         .post('/v1/users/login')
         .set('Accept', 'application/json')
-        .set('Content-Type', "application/json")
+        .set('Content-Type', 'application/json')
         .send(data);
       const loggedInUser = await getUserByEmail(data.email, db);
       const userId = loggedInUser?._id.toString() as string;
       const loggedInUserSessions = await getUserAuthSessions(userId, db);
 
-      expect(loggedInUserSessions.length).toBe(0)
+      expect(loggedInUserSessions.length).toBe(0);
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 400,
-        status: "error",
+        status: 'error',
         message: 'Bad request',
       });
     });
 
     it('should return 401 unauthorized if user with email does not exists', async () => {
       const userNotExistsInDB = {
-        name: "anjali",
-        email: "anjali@gmail.com",
-        password: "annu@2925"
-      }
+        name: 'anjali',
+        email: 'anjali@gmail.com',
+        password: 'annu@2925',
+      };
       const app = buildServer({ db });
-      const data = { email: userNotExistsInDB.email, password: userNotExistsInDB.password };
+      const data = {
+        email: userNotExistsInDB.email,
+        password: userNotExistsInDB.password,
+      };
       const res = await request(app)
         .post('/v1/users/login')
         .set('Accept', 'application/json')
-        .set('Content-Type', "application/json")
+        .set('Content-Type', 'application/json')
         .send(data);
 
       expect(res.status).toBe(401);
       expect(res.body).toMatchObject({
         code: 401,
-        status: "error",
+        status: 'error',
         message: 'Invalid credentials',
       });
     });
@@ -225,34 +252,37 @@ describe('users', () => {
       const res = await request(app)
         .post('/v1/users/login')
         .set('Accept', 'application/json')
-        .set('Content-Type', "application/json")
-        .send(data)
+        .set('Content-Type', 'application/json')
+        .send(data);
 
       expect(res.status).toBe(401);
       expect(res.body).toMatchObject({
         code: 401,
-        status: "error",
+        status: 'error',
         message: 'Invalid credentials',
       });
     });
 
     it('should return 200 ok if credentials are correct', async () => {
       const app = buildServer({ db });
-      const data = { email: loggedOutUser.email, password: loggedOutUser.password };
+      const data = {
+        email: loggedOutUser.email,
+        password: loggedOutUser.password,
+      };
       const res = await request(app)
         .post('/v1/users/login')
         .set('Accept', 'application/json')
-        .set('Content-Type', "application/json")
-        .send(data)
+        .set('Content-Type', 'application/json')
+        .send(data);
       const loggedInUser = await getUserByEmail(data.email, db);
       const userId = loggedInUser?._id.toString() as string;
       const loggedInUserSessions = await getUserAuthSessions(userId, db);
 
-      expect(loggedInUserSessions.length).toBe(1)
+      expect(loggedInUserSessions.length).toBe(1);
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
         code: 200,
-        status: "success",
+        status: 'success',
         message: 'Logged in successfully',
       });
     });
@@ -261,10 +291,10 @@ describe('users', () => {
   describe('POST /v1/users/logout', () => {
     let cookie: string;
     const loggedInUser = {
-      name: "anjali",
-      email: "anjali@gmail.com",
-      password: "annu@2925"
-    }
+      name: 'anjali',
+      email: 'anjali@gmail.com',
+      password: 'annu@2925',
+    };
 
     beforeEach(async () => {
       await createUser(loggedInUser, db);
@@ -272,7 +302,7 @@ describe('users', () => {
       const res = await request(app)
         .post('/v1/users/login')
         .set('Accept', 'application/json')
-        .send({ email: loggedInUser.email, password: loggedInUser.password })
+        .send({ email: loggedInUser.email, password: loggedInUser.password });
 
       cookie = res.headers['set-cookie'][0];
     });
@@ -291,7 +321,7 @@ describe('users', () => {
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
         code: 200,
-        status: "success",
+        status: 'success',
         message: 'Logout successfully',
       });
     });
@@ -300,10 +330,10 @@ describe('users', () => {
   describe('POST /v1/users/picture', () => {
     let cookie: string;
     const loggedInUser = {
-      name: "anjali",
-      email: "anjali@gmail.com",
-      password: "annu@2925"
-    }
+      name: 'anjali',
+      email: 'anjali@gmail.com',
+      password: 'annu@2925',
+    };
 
     beforeEach(async () => {
       await createUser(loggedInUser, db);
@@ -311,8 +341,8 @@ describe('users', () => {
       const res = await request(app)
         .post('/v1/users/login')
         .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
-        .send({ email: loggedInUser.email, password: loggedInUser.password })
+        .set('Content-Type', 'application/json')
+        .send({ email: loggedInUser.email, password: loggedInUser.password });
 
       cookie = res.headers['set-cookie'][0];
     });
@@ -332,15 +362,19 @@ describe('users', () => {
       });
     });
 
-    it("should return 400 bad request if profile image size exceeds 10MB", async () => {
+    it('should return 400 bad request if profile image size exceeds 10MB', async () => {
       const app = buildServer({ db });
       const res = await request(app)
         .post('/v1/users/picture')
         .set('Accept', 'application/json')
         .set('Cookie', [cookie])
-        .attach(UPLOADED_PROFILE_IMG_IDENTIFIER, Buffer.alloc(11 * 1024 * 1024), {
-          filename: "large.jpg"
-        });
+        .attach(
+          UPLOADED_PROFILE_IMG_IDENTIFIER,
+          Buffer.alloc(11 * 1024 * 1024),
+          {
+            filename: 'large.jpg',
+          },
+        );
 
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
@@ -366,7 +400,7 @@ describe('users', () => {
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
         code: 200,
-        status: "success",
+        status: 'success',
         message: 'Profile image uploaded successfully',
         data: {
           url: 'https://img-url.png',
@@ -379,10 +413,10 @@ describe('users', () => {
     let cookie: string;
 
     const loggedInUser = {
-      name: "anjali",
-      email: "anjali@gmail.com",
-      password: "annu@2925"
-    }
+      name: 'anjali',
+      email: 'anjali@gmail.com',
+      password: 'annu@2925',
+    };
 
     beforeEach(async () => {
       await createUser(loggedInUser, db);
@@ -391,8 +425,8 @@ describe('users', () => {
       const res = await request(app)
         .post('/v1/users/login')
         .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
-        .send({ email: loggedInUser.email, password: loggedInUser.password })
+        .set('Content-Type', 'application/json')
+        .send({ email: loggedInUser.email, password: loggedInUser.password });
 
       cookie = res.headers['set-cookie'][0];
     });
@@ -408,7 +442,7 @@ describe('users', () => {
         .patch('/v1/users/me')
         .send(invalidData)
         .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
+        .set('Content-Type', 'application/json')
         .set('Cookie', [cookie]);
       const userData = await getUserByEmail(loggedInUser.email, db);
 
@@ -416,7 +450,7 @@ describe('users', () => {
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 400,
-        status: "error",
+        status: 'error',
         message: 'Bad request',
       });
     });
@@ -431,7 +465,7 @@ describe('users', () => {
         .patch('/v1/users/me')
         .send(validData)
         .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
+        .set('Content-Type', 'application/json')
         .set('Cookie', [cookie]);
       const userData = await getUserByEmail(loggedInUser.email, db);
 
@@ -440,7 +474,7 @@ describe('users', () => {
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
         code: 200,
-        status: "success",
+        status: 'success',
         message: 'User data edited successfully',
       });
     });
@@ -449,10 +483,10 @@ describe('users', () => {
   describe('GET /users/me', () => {
     let cookie: string;
     const loggedInUser = {
-      name: "anjali",
-      email: "anjali@gmail.com",
-      password: "annu@2925"
-    }
+      name: 'anjali',
+      email: 'anjali@gmail.com',
+      password: 'annu@2925',
+    };
 
     beforeEach(async () => {
       await createUser(loggedInUser, db);
@@ -460,8 +494,8 @@ describe('users', () => {
       const res = await request(app)
         .post('/v1/users/login')
         .set('Accept', 'application/json')
-        .set("Content-Type", "application/json")
-        .send({ email: loggedInUser.email, password: loggedInUser.password })
+        .set('Content-Type', 'application/json')
+        .send({ email: loggedInUser.email, password: loggedInUser.password });
 
       cookie = res.headers['set-cookie'][0];
     });
@@ -477,7 +511,7 @@ describe('users', () => {
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
         code: 200,
-        status: "success",
+        status: 'success',
         message: 'User details fetched successfully',
         data: {
           _id: userData?._id.toString(),
@@ -485,7 +519,7 @@ describe('users', () => {
           email: userData?.email,
           createdAt: userData?.createdAt.toISOString(),
           updatedAt: userData?.updatedAt.toISOString(),
-          ...(userData?.profileImg && { profileImg: userData.profileImg })
+          ...(userData?.profileImg && { profileImg: userData.profileImg }),
         },
       });
     });

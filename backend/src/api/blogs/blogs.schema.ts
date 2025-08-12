@@ -4,26 +4,38 @@ import { z } from 'zod';
 export const createBlogSchema = z.object({
   body: z
     .object({
-      name: z.string().transform(val => val.trim()).refine(val => val.length >= 5 && val.length <= 30, {
-        message: "name should be greater than 5 characters and less than 30 characters"
-      }),
-      about: z.union([z.string(), z.undefined()]).transform(val => {
-        if (val === undefined) return null;
-        const trimmedValue = val.trim();
-        return trimmedValue === "" ? null : trimmedValue;
-      }).nullable(),
+      name: z
+        .string()
+        .transform((val) => val.trim())
+        .refine((val) => val.length >= 5 && val.length <= 30, {
+          message:
+            'name should be greater than 5 characters and less than 30 characters',
+        }),
+      about: z
+        .union([z.string(), z.undefined()])
+        .transform((val) => {
+          if (val === undefined) return null;
+          const trimmedValue = val.trim();
+          return trimmedValue === '' ? null : trimmedValue;
+        })
+        .nullable(),
       slug: z
         .string()
         .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, {
           message:
             'name should only contain lowercase characters, numbers and hyphens',
-        }).transform(val => val.trim()).refine(val => val.length >= 5 && val.length <= 30, {
-          message: "slug must be between 5 and 30 characters"
+        })
+        .transform((val) => val.trim())
+        .refine((val) => val.length >= 5 && val.length <= 30, {
+          message: 'slug must be between 5 and 30 characters',
         }),
-      logo: z.union([z.url(), z.undefined()]).transform(val => {
-        if (val === undefined) return null;
-        return val;
-      }).nullable()
+      logo: z
+        .union([z.url(), z.undefined()])
+        .transform((val) => {
+          if (val === undefined) return null;
+          return val;
+        })
+        .nullable(),
     })
     .strict(),
 });
@@ -41,9 +53,12 @@ export const getAllBlogsByUserSchema = z.object({
 export const getBlogByIdSchema = z.object({
   params: z
     .object({
-      blogId: z.string().trim().refine(val => ObjectId.isValid(val), {
-        message: "Invalid mongodb objectid"
-      }),
+      blogId: z
+        .string()
+        .trim()
+        .refine((val) => ObjectId.isValid(val), {
+          message: 'Invalid mongodb objectid',
+        }),
     })
     .strict(),
 });
@@ -51,29 +66,43 @@ export const getBlogByIdSchema = z.object({
 export const editBlogSchema = z.object({
   body: z
     .object({
-      name: z.union([z.string(), z.undefined()]).transform(val => {
-        if (val === undefined) return null;
-        const trimmedValue = val.trim();
-        return trimmedValue === "" ? null : trimmedValue;
-      }).refine(val => val && val.length >= 5 && val.length <= 30, {
-        message: "name should be greater than 5 characters and less than 30 characters"
-      }).nullable(),
-      about: z.union([z.string(), z.undefined()]).transform(val => {
-        if (val === undefined) return null;
-        const trimmedValue = val.trim();
-        return trimmedValue === "" ? null : trimmedValue;
-      }).nullable(),
-      logo: z.union([z.url(), z.undefined()]).transform(val => {
-        if (val === undefined) return null;
-        return val;
-      }).nullable()
+      name: z
+        .union([z.string(), z.undefined()])
+        .transform((val) => {
+          if (val === undefined) return null;
+          const trimmedValue = val.trim();
+          return trimmedValue === '' ? null : trimmedValue;
+        })
+        .refine((val) => val && val.length >= 5 && val.length <= 30, {
+          message:
+            'name should be greater than 5 characters and less than 30 characters',
+        })
+        .nullable(),
+      about: z
+        .union([z.string(), z.undefined()])
+        .transform((val) => {
+          if (val === undefined) return null;
+          const trimmedValue = val.trim();
+          return trimmedValue === '' ? null : trimmedValue;
+        })
+        .nullable(),
+      logo: z
+        .union([z.url(), z.undefined()])
+        .transform((val) => {
+          if (val === undefined) return null;
+          return val;
+        })
+        .nullable(),
     })
     .strict(),
   params: z
     .object({
-      blogId: z.string().trim().refine(val => ObjectId.isValid(val), {
-        message: "Invalid mongodb objectid"
-      }),
+      blogId: z
+        .string()
+        .trim()
+        .refine((val) => ObjectId.isValid(val), {
+          message: 'Invalid mongodb objectid',
+        }),
     })
     .strict(),
 });
@@ -81,15 +110,20 @@ export const editBlogSchema = z.object({
 export const deleteBlogSchema = z.object({
   params: z
     .object({
-      blogId: z.string().trim().refine(val => ObjectId.isValid(val), {
-        message: "Invalid mongodb objectid"
-      }),
+      blogId: z
+        .string()
+        .trim()
+        .refine((val) => ObjectId.isValid(val), {
+          message: 'Invalid mongodb objectid',
+        }),
     })
     .strict(),
 });
 
 export type TCreateBlogBody = z.infer<typeof createBlogSchema>['body'];
-export type TGetAllBlogsQuery = z.infer<typeof getAllBlogsByUserSchema>['query'];
+export type TGetAllBlogsQuery = z.infer<
+  typeof getAllBlogsByUserSchema
+>['query'];
 export type TGetBlogByIdParams = z.infer<typeof getBlogByIdSchema>['params'];
 export type TEditBlogBody = z.infer<typeof editBlogSchema>['body'];
 export type TEditBlogParams = z.infer<typeof editBlogSchema>['params'];

@@ -11,12 +11,11 @@ import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import type * as mongo from 'mongodb';
-
+import { MulterError } from 'multer';
 import { config } from './config';
 import { v1Routes } from './routes';
-import { AppError } from './utils/app-error';
-import { MulterError } from 'multer';
 import { APIResponse } from './utils/api-response';
+import { AppError } from './utils/app-error';
 import { logger } from './utils/logger';
 
 declare global {
@@ -92,13 +91,27 @@ export function buildServer({ db }: { db: mongo.Db }) {
 
   app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
     if (err instanceof MulterError) {
-      if (err.code === "LIMIT_FILE_SIZE") {
-        logger.error("FILE_LIMIT_ERROR: Allowed file size limit is 10MB");
-        res.status(StatusCodes.BAD_REQUEST).json(new APIResponse("error", StatusCodes.BAD_REQUEST, "Allowed file size limit is 10MB"));
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        logger.error('FILE_LIMIT_ERROR: Allowed file size limit is 10MB');
+        res
+          .status(StatusCodes.BAD_REQUEST)
+          .json(
+            new APIResponse(
+              'error',
+              StatusCodes.BAD_REQUEST,
+              'Allowed file size limit is 10MB',
+            ),
+          );
         return;
       }
 
-      next(new AppError({ status: StatusCodes.BAD_REQUEST, code: err.code, message: err.message }))
+      next(
+        new AppError({
+          status: StatusCodes.BAD_REQUEST,
+          code: err.code,
+          message: err.message,
+        }),
+      );
     }
 
     if (err instanceof AppError) {

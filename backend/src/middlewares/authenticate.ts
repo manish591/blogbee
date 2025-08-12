@@ -15,7 +15,11 @@ export async function authenticate(
 
     if (!sessionId) {
       logger.error('UNAUTHORIZED_ERROR: Invalid cookies found in the request');
-      res.status(StatusCodes.UNAUTHORIZED).json(new APIResponse("error", StatusCodes.UNAUTHORIZED, "Unauthorized"));
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
       return;
     }
 
@@ -23,7 +27,11 @@ export async function authenticate(
 
     if (!sessionData) {
       logger.error('UNAUTHORIZED_ERROR: Session not found');
-      res.status(StatusCodes.UNAUTHORIZED).json(new APIResponse("error", StatusCodes.UNAUTHORIZED, "Unauthorized"));
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json(
+          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+        );
       return;
     }
 
