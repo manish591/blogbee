@@ -5,8 +5,7 @@ import { db } from "../../../test/setup";
 import { buildServer } from "../../app";
 import { createUser } from "../users/users.services";
 import { createTag, getBlogTags, getTagById } from "./tags.services";
-import { nl } from "zod/v4/locales";
-import { addTagToPost, createPost, editPost, getPostById } from "../posts/posts.services";
+import { addTagToPost, createPost, getPostById } from "../posts/posts.services";
 
 describe("TAGS", () => {
   const loggedInUser = {
