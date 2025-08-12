@@ -14,7 +14,7 @@ export async function createTag(
   db: Db,
 ) {
   try {
-    await db.collection<Tags>(TAGS_COLLECTION).insertOne({
+    const res = await db.collection<Tags>(TAGS_COLLECTION).insertOne({
       posts: [],
       name: data.name,
       createdAt: new Date(),
@@ -23,6 +23,10 @@ export async function createTag(
       userId: new ObjectId(userId),
       blogId: new ObjectId(blogId),
     });
+    return {
+      success: res.acknowledged,
+      tagId: res.insertedId
+    }
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({

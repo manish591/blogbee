@@ -1,185 +1,433 @@
-import { describe } from "vitest";
+import request from "supertest";
+import { describe, beforeEach, it, expect } from "vitest";
+import { createBlog } from "../blogs/blogs.services";
+import { db } from "../../../test/setup";
+import { buildServer } from "../../app";
+import { createUser } from "../users/users.services";
+import { createTag, getBlogTags, getTagById } from "./tags.services";
+import { nl } from "zod/v4/locales";
+import { addTagToPost, createPost, editPost, getPostById } from "../posts/posts.services";
 
-describe.skip("TAGS", () => {
-  // describe('POST /blogs/:blogId/tags', () => {
-  //   const blogData = {
-  //     name: 'update blog title',
-  //     slug: 'update-blog-title',
-  //     about: 'This is a content.',
-  //   };
+describe("TAGS", () => {
+  const loggedInUser = {
+    name: 'manish',
+    email: 'manish@gmail.com',
+    password: '124578drd',
+  };
 
-  //   let blogId: string;
+  let cookie: string;
+  let userId: string;
 
-  //   beforeEach(async () => {
-  //     blogId = (await createBlog(userId, blogData, db)).blogId.toString();
-  //   });
+  beforeEach(async () => {
+    const createdUserResult = await createUser(loggedInUser, db);
+    userId = createdUserResult.userId.toString();
 
-  //   it('should return 400 bad request if invalid request body is provided', async () => {
-  //     const app = buildServer({ db });
-  //     const data = {};
-  //     const res = await request(app)
-  //       .post(`/api/v1/blogs/${blogId}/tags`)
-  //       .set('Accept', 'application/json')
-  //       .set('Cookie', [cookie])
-  //       .send(data);
+    const app = buildServer({ db });
+    const res = await request(app)
+      .post('/v1/users/login')
+      .set('Accept', 'application/json')
+      .set("Content-Type", "application/json")
+      .send({ email: loggedInUser.email, password: loggedInUser.password })
 
-  //     expect(res.status).toBe(400);
-  //     expect(res.body).toMatchObject({
-  //       code: 400,
-  //       status: 'error',
-  //       message: 'Bad request',
-  //     });
-  //   });
+    cookie = res.headers['set-cookie'][0];
+  });
 
-  //   it('should return 200 ok for successfully creating a new tag', async () => {
-  //     const app = buildServer({ db });
-  //     const data = {
-  //       name: 'Javascript',
-  //       description: 'Contains all the blogs of the javascript category.',
-  //     };
-  //     const res = await request(app)
-  //       .post(`/api/v1/blogs/${blogId}/tags`)
-  //       .set('Accept', 'application/json')
-  //       .set('Cookie', [cookie])
-  //       .send(data);
-  //     const createdTagData = await getAllTags(userId, blogId, db);
+  describe('POST /v1/tags', () => {
+    const blogData = {
+      name: 'blog title',
+      slug: 'blog-title',
+      about: 'This is a content.',
+      logo: null
+    };
 
-  //     expect(res.status).toBe(201);
-  //     expect(res.body).toMatchObject({
-  //       code: 201,
-  //       status: 'success',
-  //       message: 'Tags created successfully',
-  //     });
-  //     expect(createdTagData).toBeDefined();
-  //     expect(createdTagData.length).toBe(1);
-  //     expect(createdTagData[0].name).toBe('Javascript');
-  //   });
-  // });
+    let blogId: string;
 
-  // describe('GET /blogs/:blogId/tags', () => {
-  //   const blogData = {
-  //     name: 'update blog title',
-  //     slug: 'update-blog-title',
-  //     about: 'This is a content.',
-  //   };
+    beforeEach(async () => {
+      blogId = (await createBlog(userId, blogData, db)).blogId.toString();
+    });
 
-  //   let blogId: string;
+    const requiredFields = ["blogId", "name"];
 
-  //   beforeEach(async () => {
-  //     blogId = (await createBlog(userId, blogData, db)).blogId.toString();
-  //     await createTag(userId, blogId, { blogId: '', name: 'Typescript' }, db);
-  //     await createTag(userId, blogId, { blogId: '', name: 'Python' }, db);
-  //   });
+    requiredFields.forEach(field => {
+      it(`should return 400 bad request if ${field} field is not provided`, async () => {
+        const app = buildServer({ db });
+        const data = { name: "typescript", blogId };
+        delete data[field];
+        const res = await request(app)
+          .post(`/v1/tags`)
+          .set('Accept', 'application/json')
+          .set('Cookie', [cookie])
+          .send(data);
+        const allBlogTags = await getBlogTags(blogId, db);
 
-  //   it('should return 200 ok along with all the tags related to the blogId', async () => {
-  //     const app = buildServer({ db });
-  //     const res = await request(app)
-  //       .get(`/api/v1/blogs/${blogId}/tags`)
-  //       .set('Accept', 'application/json')
-  //       .set('Cookie', [cookie]);
+        expect(allBlogTags.length).toBe(0);
+        expect(res.status).toBe(400);
+        expect(res.body).toMatchObject({
+          code: 400,
+          status: 'error',
+          message: 'Bad request',
+        });
+      });
+    });
 
-  //     expect(res.status).toBe(200);
-  //     expect(res.body.data.length).toBe(2);
-  //   });
-  // });
+    it('should return 400 bad request if invalid request body is provided', async () => {
+      const app = buildServer({ db });
+      const data = { name: "typescript", blogId, invalidData: "" };
+      const res = await request(app)
+        .post('/v1/tags')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+      const allBlogTags = await getBlogTags(blogId, db);
 
-  // describe('PATCH /blogs/:blogId/tags/:tagId', () => {
-  //   const blogData = {
-  //     name: 'update blog title',
-  //     slug: 'update-blog-title',
-  //     about: 'This is a content.',
-  //   };
+      expect(allBlogTags.length).toBe(0);
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        code: 400,
+        status: 'error',
+        message: 'Bad request',
+      });
+    });
 
-  //   const tagData = {
-  //     name: 'javascript',
-  //     description: 'Contains all the blogs related to the javascript',
-  //   };
+    it("should return 404 not found if blog with blogId passed in body does not exists", async () => {
+      const nonExistentBlogId = "64d2f5b8e4a7c3f1b9a6d412";
+      const data = { name: "typescript", blogId: nonExistentBlogId };
+      const app = buildServer({ db });
+      const res = await request(app)
+        .post(`/v1/tags`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
 
-  //   let blogId: string;
-  //   let tagId: string;
+      expect(res.status).toBe(404);
+      expect(res.body).toMatchObject({
+        code: 404,
+        status: "error",
+        message: "Blog not found"
+      })
+    });
 
-  //   beforeEach(async () => {
-  //     blogId = (await createBlog(userId, blogData, db)).blogId.toString();
-  //     tagId = '';
-  //   });
+    it("should return 403 forbidden if user attempts to add create tag in blog they do not own", async () => {
+      const otherUserData = {
+        name: "virat",
+        email: "virat@gmail.com",
+        password: "4578222djjd"
+      };
+      const blogData = {
+        name: "other blog",
+        slug: "other-user-blog",
+        about: "",
+        logo: ""
+      };
+      const otherUser = await createUser(otherUserData, db);
+      const otherUserId = otherUser.userId.toString();
+      const otherUserBlog = await createBlog(otherUserId, blogData, db);
+      const otherUserBlogId = otherUserBlog.blogId.toString();
+      const data = { name: "typescript", blogId: otherUserBlogId };
+      const app = buildServer({ db });
+      const res = await request(app)
+        .post('/v1/tags')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+      const otherUserAllTags = await getBlogTags(otherUserBlogId, db);
 
-  //   it('should return 400 bad request if invalid request body is provided', async () => {
-  //     const app = buildServer({ db });
-  //     const data = {
-  //       invalidData: 'invalid',
-  //     };
-  //     const res = await request(app)
-  //       .patch(`/api/v1/blogs/${blogId}/tags/${tagId}`)
-  //       .set('Accept', 'application/json')
-  //       .set('Cookie', [cookie])
-  //       .send(data);
+      expect(otherUserAllTags.length).toBe(0);
+      expect(res.status).toBe(403);
+      expect(res.body).toMatchObject({
+        code: 403,
+        status: "error",
+        message: "You do not have permissions to create the tag in this blog"
+      });
+    });
 
-  //     expect(res.status).toBe(400);
-  //     expect(res.body).toMatchObject({
-  //       code: 400,
-  //       status: 'error',
-  //       message: 'Bad request',
-  //     });
-  //   });
+    it('should return 200 ok for successfully creating a new tag', async () => {
+      const app = buildServer({ db });
+      const data = {
+        blogId,
+        name: 'Javascript',
+        description: 'Contains all the blogs of the javascript category.',
+      };
+      const res = await request(app)
+        .post('/v1/tags')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+      const createdTagData = await getBlogTags(blogId, db);
 
-  //   it('should return 200 ok for successfully editing the tag', async () => {
-  //     const app = buildServer({ db });
-  //     const data = {
-  //       name: 'typescript',
-  //     };
-  //     const res = await request(app)
-  //       .patch(`/api/v1/blogs/${blogId}/tags/${tagId}`)
-  //       .set('Accept', 'application/json')
-  //       .set('Cookie', [cookie])
-  //       .send(data);
-  //     const editTagData = '';
+      expect(createdTagData).toBeDefined();
+      expect(createdTagData.length).toBe(1);
+      expect(createdTagData[0].name).toBe(data.name);
+      expect(res.status).toBe(201);
+      expect(res.body).toMatchObject({
+        code: 201,
+        status: 'success',
+        message: 'Tag created successfully',
+      });
+    });
+  });
 
-  //     expect(res.status).toBe(200);
-  //     expect(res.body).toMatchObject({
-  //       code: 200,
-  //       status: 'success',
-  //       message: 'Edited tag successfully',
-  //     });
-  //     expect(editTagData).toBeDefined();
-  //     expect(editTagData).toBe('typescript');
-  //   });
-  // });
+  describe('GET /v1/tags', () => {
+    const blogData = {
+      name: 'update blog title',
+      slug: 'update-blog-title',
+      about: 'This is a content.',
+      logo: null,
+    };
 
-  // describe('DELETE /blogs/:blogId/tags/:tagId', () => {
-  //   const blogData = {
-  //     name: 'update blog title',
-  //     slug: 'update-blog-title',
-  //     about: 'This is a content.',
-  //   };
+    let blogId: string;
 
-  //   const tagData = {
-  //     name: 'javascript',
-  //     description: 'Contains all the blogs related to the javascript',
-  //   };
+    beforeEach(async () => {
+      blogId = (await createBlog(userId, blogData, db)).blogId.toString();
+      await createTag(userId, blogId, { blogId, name: 'Typescript', description: "" }, db);
+      await createTag(userId, blogId, { blogId, name: 'Python', description: "" }, db);
+    });
 
-  //   let blogId: string;
-  //   let tagId: string;
+    it("should return 400 bad request if blogId is not passed in query params", async () => {
+      const app = buildServer({ db });
+      const res = await request(app)
+        .get('/v1/tags')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
 
-  //   beforeEach(async () => {
-  //     blogId = (await createBlog(userId, blogData, db)).blogId.toString();
-  //     tagId = '';
-  //   });
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        code: 400,
+        status: "error",
+        message: "Bad request"
+      });
+    });
 
-  //   it('should return 200 ok for successfully deleting the tag data', async () => {
-  //     const app = buildServer({ db });
-  //     const res = await request(app)
-  //       .delete(`/api/v1/blogs/${blogId}/tags/${tagId}`)
-  //       .set('Accept', 'application/json')
-  //       .set('Cookie', [cookie]);
-  //     const deletedTagData = '';
+    it("should return 403 forbidden if user attempts to add read the content of tag in the blog they do not own", async () => {
+      const otherUserData = {
+        name: "virat",
+        email: "virat@gmail.com",
+        password: "4578222djjd"
+      };
+      const blogData = {
+        name: "other blog",
+        slug: "other-user-blog",
+        about: "",
+        logo: ""
+      };
+      const otherUser = await createUser(otherUserData, db);
+      const otherUserId = otherUser.userId.toString();
+      const otherUserBlog = await createBlog(otherUserId, blogData, db);
+      const otherUserBlogId = otherUserBlog.blogId.toString();
+      const app = buildServer({ db });
+      const res = await request(app)
+        .get(`/v1/tags?blogId=${otherUserBlogId}`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
 
-  //     expect(res.status).toBe(200);
-  //     expect(res.body).toMatchObject({
-  //       code: 200,
-  //       status: 'success',
-  //       message: 'Deleted tag successfully',
-  //     });
-  //     expect(deletedTagData).toBe(null);
-  //   });
-  // });
+      expect(res.status).toBe(403);
+      expect(res.body).toMatchObject({
+        code: 403,
+        status: "error",
+        message: "You do not have permissions to read the content of the tags"
+      });
+    });
+
+    it('should return 200 ok along with all the tags related to the blogId', async () => {
+      const app = buildServer({ db });
+      const res = await request(app)
+        .get(`/v1/tags?blogId=${blogId}`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.length).toBe(2);
+    });
+  });
+
+  describe('PATCH /v1/tags/:tagId', () => {
+    let tagId: string;
+
+    beforeEach(async () => {
+      const blogData = {
+        name: 'update blog title',
+        slug: 'update-blog-title',
+        about: 'This is a content.',
+        logo: null
+      };
+      const blogId = (await createBlog(userId, blogData, db)).blogId.toString();
+      const tagData = {
+        name: 'javascript',
+        description: 'Contains all the blogs related to the javascript',
+        blogId
+      };
+      tagId = (await createTag(userId, blogId, tagData, db)).tagId.toString();
+    });
+
+    it('should return 400 bad request if invalid request body is provided', async () => {
+      const app = buildServer({ db });
+      const data = {
+        invalidData: 'invalid',
+      };
+      const res = await request(app)
+        .patch(`/v1/tags/${tagId}`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        code: 400,
+        status: 'error',
+        message: 'Bad request',
+      });
+    });
+
+    it("should return 403 forbidden if user attempts to edit the content of tag in the they do not own", async () => {
+      const otherUserData = {
+        name: "virat",
+        email: "virat@gmail.com",
+        password: "4578222djjd"
+      };
+      const blogData = {
+        name: "other blog",
+        slug: "other-user-blog",
+        about: "",
+        logo: ""
+      };
+      const otherUser = await createUser(otherUserData, db);
+      const otherUserId = otherUser.userId.toString();
+      const otherUserBlog = await createBlog(otherUserId, blogData, db);
+      const otherUserBlogId = otherUserBlog.blogId.toString();
+      const tagData = {
+        name: "typescript",
+        description: null,
+        blogId: otherUserBlogId
+      }
+      const otherUserTagId = (await createTag(otherUserId, otherUserBlogId, tagData, db)).tagId.toString();
+      const editTagContent = {
+        name: "javascript"
+      }
+      const app = buildServer({ db });
+      const res = await request(app)
+        .patch(`/v1/tags/${otherUserTagId}`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .send(editTagContent);
+      const editedTagData = await getTagById(otherUserTagId, db)
+
+      expect(editedTagData?.name).not.toBe(editTagContent.name);
+      expect(res.status).toBe(403);
+      expect(res.body).toMatchObject({
+        code: 403,
+        status: "error",
+        message: "You do not have permissions to edit the content of the tags"
+      });
+    });
+
+    it('should return 200 ok for successfully editing the tag content', async () => {
+      const app = buildServer({ db });
+      const data = {
+        name: 'typescript',
+      };
+      const res = await request(app)
+        .patch(`/v1/tags/${tagId}`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+      const editTagData = await getTagById(tagId, db);
+
+      expect(editTagData).toBeDefined();
+      expect(editTagData?.name).toBe(data.name);
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        code: 200,
+        status: 'success',
+        message: 'Edited tag successfully',
+      });
+    });
+  });
+
+  describe('DELETE /v1/tags/:tagId', () => {
+    let tagId: string;
+
+    beforeEach(async () => {
+      const blogData = {
+        name: 'update blog title',
+        slug: 'update-blog-title',
+        about: 'This is a content.',
+        logo: null
+      };
+      const blogId = (await createBlog(userId, blogData, db)).blogId.toString();
+      const tagData = {
+        name: 'javascript',
+        description: 'Contains all the blogs related to the javascript',
+        blogId
+      };
+      tagId = (await createTag(userId, blogId, tagData, db)).tagId.toString();
+    });
+
+    it("should return 403 forbidden if user attempts to edit the content of tag in the they do not own", async () => {
+      const otherUserData = {
+        name: "virat",
+        email: "virat@gmail.com",
+        password: "4578222djjd"
+      };
+      const blogData = {
+        name: "other blog",
+        slug: "other-user-blog",
+        about: "",
+        logo: ""
+      };
+      const otherUser = await createUser(otherUserData, db);
+      const otherUserId = otherUser.userId.toString();
+      const otherUserBlog = await createBlog(otherUserId, blogData, db);
+      const otherUserBlogId = otherUserBlog.blogId.toString();
+      const tagData = {
+        name: "typescript",
+        description: null,
+        blogId: otherUserBlogId
+      }
+      const otherUserTagId = (await createTag(otherUserId, otherUserBlogId, tagData, db)).tagId.toString();
+      const app = buildServer({ db });
+      const res = await request(app)
+        .delete(`/v1/tags/${otherUserTagId}`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+      const editedTagData = await getTagById(otherUserTagId, db)
+
+      expect(editedTagData).toBeDefined();
+      expect(res.status).toBe(403);
+      expect(res.body).toMatchObject({
+        code: 403,
+        status: "error",
+        message: "You do not have permissions to delete the content of the tags"
+      });
+    });
+
+    it('should return 200 ok for successfully deleting the tag data and removing corresponding reference in posts', async () => {
+      const blogData = {
+        name: "other blog",
+        slug: "other-user-blog",
+        about: "",
+        logo: ""
+      };
+      const createdBlog = await createBlog(userId, blogData, db);
+      const createdBlogId = createdBlog.blogId.toString();
+      const createdPost = await createPost(userId, createdBlogId, db);
+      const createdPostId = createdPost.postId.toString();
+      await addTagToPost(createdPostId, tagId, db);
+      const app = buildServer({ db });
+      const res = await request(app)
+        .delete(`/v1/tags/${tagId}`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+      const deletedTag = await getTagById(tagId, db);
+      const postData = await getPostById(createdPostId, db);
+
+      expect(deletedTag).toBeNull();
+      expect(postData?.tags).not.include(tagId);
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        code: 200,
+        status: 'success',
+        message: 'Deleted tag successfully',
+      });
+    });
+  });
 });
