@@ -37,8 +37,8 @@ export async function createBlog(
       userId: new ObjectId(userId),
       name: data.name,
       slug: data.slug,
-      about: data.about,
-      logo: data.logo,
+      about: data.about ? data.about : null,
+      logo: data.logo ? data.logo : null,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -126,7 +126,7 @@ export async function getAllBlogsByUser(
 export async function editBlog(blogId: string, data: TEditBlogBody, db: Db) {
   try {
     const cleanUpdates = Object.fromEntries(
-      Object.entries(data).filter(([_, value]) => value !== null),
+      Object.entries(data).filter(([_, value]) => !!value),
     );
     const res = await db.collection<Blogs>(BLOG_COLLECTION).updateOne(
       {

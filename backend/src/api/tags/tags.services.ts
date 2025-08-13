@@ -19,7 +19,7 @@ export async function createTag(
       name: data.name,
       createdAt: new Date(),
       updatedAt: new Date(),
-      description: data.description,
+      description: data.description ? data.description : null,
       userId: new ObjectId(userId),
       blogId: new ObjectId(blogId),
     });
@@ -53,26 +53,6 @@ export async function getTagById(tagId: string, db: Db) {
   }
 }
 
-export async function getAllUserTags(userId: string, db: Db) {
-  try {
-    const res = await db
-      .collection<Tags>(TAGS_COLLECTION)
-      .find({
-        userId: new ObjectId(userId),
-      })
-      .limit(10)
-      .toArray();
-    return res;
-  } catch (err) {
-    logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
-  }
-}
-
 export async function getBlogTags(blogId: string, db: Db) {
   try {
     const allTagsData = await db
@@ -95,7 +75,7 @@ export async function getBlogTags(blogId: string, db: Db) {
 export async function editTag(tagId: string, data: TEditTagBody, db: Db) {
   try {
     const cleanUpdates = Object.fromEntries(
-      Object.entries(data).filter(([_, value]) => value != null),
+      Object.entries(data).filter(([_, value]) => !!value),
     );
     await db.collection<Tags>(TAGS_COLLECTION).updateOne(
       {

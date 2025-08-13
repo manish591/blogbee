@@ -36,7 +36,6 @@ describe('TAGS', () => {
       name: 'blog title',
       slug: 'blog-title',
       about: 'This is a content.',
-      logo: null,
     };
 
     let blogId: string;
@@ -115,8 +114,6 @@ describe('TAGS', () => {
       const blogData = {
         name: 'other blog',
         slug: 'other-user-blog',
-        about: '',
-        logo: '',
       };
       const otherUser = await createUser(otherUserData, db);
       const otherUserId = otherUser.userId.toString();
@@ -171,7 +168,6 @@ describe('TAGS', () => {
       name: 'update blog title',
       slug: 'update-blog-title',
       about: 'This is a content.',
-      logo: null,
     };
 
     let blogId: string;
@@ -181,13 +177,13 @@ describe('TAGS', () => {
       await createTag(
         userId,
         blogId,
-        { blogId, name: 'Typescript', description: '' },
+        { blogId, name: 'Typescript' },
         db,
       );
       await createTag(
         userId,
         blogId,
-        { blogId, name: 'Python', description: '' },
+        { blogId, name: 'Python' },
         db,
       );
     });
@@ -216,8 +212,6 @@ describe('TAGS', () => {
       const blogData = {
         name: 'other blog',
         slug: 'other-user-blog',
-        about: '',
-        logo: '',
       };
       const otherUser = await createUser(otherUserData, db);
       const otherUserId = otherUser.userId.toString();
@@ -257,7 +251,6 @@ describe('TAGS', () => {
         name: 'update blog title',
         slug: 'update-blog-title',
         about: 'This is a content.',
-        logo: null,
       };
       const blogId = (await createBlog(userId, blogData, db)).blogId.toString();
       const tagData = {
@@ -296,8 +289,6 @@ describe('TAGS', () => {
       const blogData = {
         name: 'other blog',
         slug: 'other-user-blog',
-        about: '',
-        logo: '',
       };
       const otherUser = await createUser(otherUserData, db);
       const otherUserId = otherUser.userId.toString();
@@ -305,7 +296,6 @@ describe('TAGS', () => {
       const otherUserBlogId = otherUserBlog.blogId.toString();
       const tagData = {
         name: 'typescript',
-        description: null,
         blogId: otherUserBlogId,
       };
       const otherUserTagId = (
@@ -362,7 +352,6 @@ describe('TAGS', () => {
         name: 'update blog title',
         slug: 'update-blog-title',
         about: 'This is a content.',
-        logo: null,
       };
       const blogId = (await createBlog(userId, blogData, db)).blogId.toString();
       const tagData = {
@@ -382,8 +371,6 @@ describe('TAGS', () => {
       const blogData = {
         name: 'other blog',
         slug: 'other-user-blog',
-        about: '',
-        logo: '',
       };
       const otherUser = await createUser(otherUserData, db);
       const otherUserId = otherUser.userId.toString();
@@ -391,7 +378,6 @@ describe('TAGS', () => {
       const otherUserBlogId = otherUserBlog.blogId.toString();
       const tagData = {
         name: 'typescript',
-        description: null,
         blogId: otherUserBlogId,
       };
       const otherUserTagId = (
@@ -418,8 +404,6 @@ describe('TAGS', () => {
       const blogData = {
         name: 'other blog',
         slug: 'other-user-blog',
-        about: '',
-        logo: '',
       };
       const createdBlog = await createBlog(userId, blogData, db);
       const createdBlogId = createdBlog.blogId.toString();

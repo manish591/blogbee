@@ -48,15 +48,11 @@ export async function getPostById(postId: string, db: Db) {
   }
 }
 
-export async function getAllUserPosts(userId: string, db: Db) {
+export async function getPostBySlug(postSlug: string, db: Db) {
   try {
-    const res = await db
-      .collection<Posts>(POSTS_COLLECTION)
-      .find({
-        userId: new ObjectId(userId),
-      })
-      .limit(10)
-      .toArray();
+    const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
+      slug: postSlug,
+    });
     return res;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
@@ -106,10 +102,10 @@ export async function getAllPosts(
 export async function editPost(postId: string, data: TEditPostBody, db: Db) {
   try {
     const cleanUpdates = Object.fromEntries(
-      Object.entries(data).filter(([_, value]) => value !== null),
+      Object.entries(data).filter(([_, value]) => !!value),
     );
 
-    await db.collection<Posts>(POSTS_COLLECTION).updateOne(
+    const res = await db.collection<Posts>(POSTS_COLLECTION).updateOne(
       {
         _id: new ObjectId(postId),
       },
@@ -120,6 +116,11 @@ export async function editPost(postId: string, data: TEditPostBody, db: Db) {
         },
       },
     );
+
+    return {
+      success: res.acknowledged,
+      editPostCount: res.modifiedCount
+    }
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({

@@ -3,7 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import { APIResponse } from "../../utils/api-response";
 import { logger } from "../../utils/logger";
 import { getBlogBySlug } from "../blogs/blogs.services";
-import { getAllPosts } from "../posts/posts.services";
+import { getAllPosts, getPostBySlug } from "../posts/posts.services";
 import { getBlogTags } from "../tags/tags.services";
 
 export async function embedBlogHandler(req: Request, res: Response) {
@@ -18,7 +18,7 @@ export async function embedBlogHandler(req: Request, res: Response) {
     }
 
     const blogId = blogData._id.toString();
-    const allblogPosts = await getAllPosts(blogId, req.db);
+    const allBlogPosts = await getAllPosts(blogId, req.db);
     const allBlogTags = await getBlogTags(blogId, req.db);
 
     logger.info("EMBED_BLOG_SUCCESS: Blog data retrieved successfully");
@@ -26,7 +26,7 @@ export async function embedBlogHandler(req: Request, res: Response) {
     res.status(StatusCodes.OK).json(
       new APIResponse("success", StatusCodes.OK, "Blog data retrieved successfully", {
         blog: blogData,
-        posts: allblogPosts,
+        posts: allBlogPosts,
         tags: allBlogTags,
       })
     );
@@ -48,20 +48,25 @@ export async function embedPostHandler(req: Request, res: Response) {
   try {
     const blogSlug = req.params.blogSlug;
     const postSlug = req.params.postSlug;
-    const blogData = await getBlogBySlug(blogSlug, req.db);
 
+    const blogData = await getBlogBySlug(blogSlug, req.db);
     if (!blogData) {
       logger.error("NOT_FOUND_ERROR: Blog not found");
       res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Blog not found"));
       return;
     }
 
-    const blogId = blogData._id.toString();
-    const postData = await getAllPosts(blogId, req.db, postSlug);
-
+    const postData = await getPostBySlug(postSlug, req.db);
     if (!postData) {
       logger.error("NOT_FOUND_ERROR: Post not found");
       res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Post not found"));
+      return;
+    }
+
+    const isPostBelongsToBlog = postData.blogId.toString() === blogData._id.toString();
+    if (!isPostBelongsToBlog) {
+      logger.error("FORBIDDEN_ERROR: Post does not belong to the blog");
+      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Post does not belong to the blog"));
       return;
     }
 

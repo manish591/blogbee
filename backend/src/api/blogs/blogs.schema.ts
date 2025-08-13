@@ -14,11 +14,11 @@ export const createBlogSchema = z.object({
       about: z
         .union([z.string(), z.undefined()])
         .transform((val) => {
-          if (val === undefined) return null;
+          if (val === undefined) return undefined;
           const trimmedValue = val.trim();
-          return trimmedValue === '' ? null : trimmedValue;
+          return trimmedValue === '' ? undefined : trimmedValue;
         })
-        .nullable(),
+        .optional(),
       slug: z
         .string()
         .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, {
@@ -32,10 +32,10 @@ export const createBlogSchema = z.object({
       logo: z
         .union([z.url(), z.undefined()])
         .transform((val) => {
-          if (val === undefined) return null;
-          return val;
+          if (val === undefined) return undefined;
+          return val.trim();
         })
-        .nullable(),
+        .optional(),
     })
     .strict(),
 });
@@ -67,32 +67,31 @@ export const editBlogSchema = z.object({
   body: z
     .object({
       name: z
-        .union([z.string(), z.undefined()])
-        .transform((val) => {
-          if (val === undefined) return null;
-          const trimmedValue = val.trim();
-          return trimmedValue === '' ? null : trimmedValue;
-        })
-        .refine((val) => val && val.length >= 5 && val.length <= 30, {
+        .union([z.string().refine((val) => val && val.length >= 5 && val.length <= 30, {
           message:
             'name should be greater than 5 characters and less than 30 characters',
+        }), z.undefined()])
+        .transform((val) => {
+          if (val === undefined) return undefined;
+          const trimmedValue = val.trim();
+          return trimmedValue === '' ? undefined : trimmedValue;
         })
-        .nullable(),
+        .optional(),
       about: z
         .union([z.string(), z.undefined()])
         .transform((val) => {
-          if (val === undefined) return null;
+          if (val === undefined) return undefined;
           const trimmedValue = val.trim();
-          return trimmedValue === '' ? null : trimmedValue;
+          return trimmedValue === '' ? undefined : trimmedValue;
         })
-        .nullable(),
+        .optional(),
       logo: z
         .union([z.url(), z.undefined()])
         .transform((val) => {
-          if (val === undefined) return null;
-          return val;
+          if (val === undefined) return undefined;
+          return val.trim();
         })
-        .nullable(),
+        .optional(),
     })
     .strict(),
   params: z

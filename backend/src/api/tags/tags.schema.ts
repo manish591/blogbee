@@ -16,11 +16,11 @@ export const createTagSchema = z.object({
       description: z
         .union([z.string(), z.undefined()])
         .transform((val) => {
-          if (val === undefined) return null;
+          if (val === undefined) return undefined;
           const trimmedValue = val.trim();
-          return trimmedValue === '' ? null : trimmedValue;
+          return trimmedValue === '' ? undefined : trimmedValue;
         })
-        .nullable(),
+        .optional(),
     })
     .strict(),
 });
@@ -44,19 +44,19 @@ export const editTagSchema = z.object({
       name: z
         .union([z.string(), z.undefined()])
         .transform((val) => {
-          if (val === undefined) return null;
+          if (val === undefined) return undefined;
           const trimmedValue = val.trim();
-          return trimmedValue === '' ? null : trimmedValue;
+          return trimmedValue === '' ? undefined : trimmedValue;
         })
-        .nullable(),
+        .optional(),
       description: z
         .union([z.string(), z.undefined()])
         .transform((val) => {
-          if (val === undefined) return null;
+          if (val === undefined) return undefined;
           const trimmedValue = val.trim();
-          return trimmedValue === '' ? null : trimmedValue;
+          return trimmedValue === '' ? undefined : trimmedValue;
         })
-        .nullable(),
+        .optional(),
     })
     .strict(),
   params: z

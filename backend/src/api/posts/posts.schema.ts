@@ -50,49 +50,49 @@ export const editPostSchema = z.object({
       title: z
         .union([z.string(), z.undefined()])
         .transform((val) => {
-          if (val === undefined) return null;
+          if (val === undefined) return undefined;
           const trimmedValue = val.trim();
-          return trimmedValue === '' ? null : trimmedValue;
+          return trimmedValue === '' ? undefined : trimmedValue;
         })
-        .nullable(),
+        .optional(),
       subTitle: z
         .union([z.string(), z.undefined()])
         .transform((val) => {
-          if (val === undefined) return null;
+          if (val === undefined) return undefined;
           const trimmedValue = val.trim();
-          return trimmedValue === '' ? null : trimmedValue;
+          return trimmedValue === '' ? undefined : trimmedValue;
         })
-        .nullable(),
+        .optional(),
       content: z
         .union([z.string(), z.undefined()])
         .transform((val) => {
-          if (val === undefined) return null;
+          if (val === undefined) return undefined;
           const trimmedValue = val.trim();
-          return trimmedValue === '' ? null : trimmedValue;
+          return trimmedValue === '' ? undefined : trimmedValue;
         })
-        .nullable(),
+        .optional(),
       coverImg: z
         .union([z.url(), z.undefined()])
         .transform((val) => {
-          if (val === undefined) return null;
-          return val;
+          if (val === undefined) return undefined;
+          return val.trim();
         })
-        .nullable(),
+        .optional(),
       slug: z
         .union([z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/), z.undefined()])
         .transform((val) => {
-          if (val === undefined) return null;
+          if (val === undefined) return undefined;
           const trimmedValue = val.trim();
-          return trimmedValue === '' ? null : trimmedValue;
+          return trimmedValue === '' ? undefined : trimmedValue;
         })
-        .nullable(),
+        .optional(),
       postStatus: z
         .union([z.undefined(), z.enum(PostStatus)])
         .transform((val) => {
-          if (val === undefined) return null;
+          if (val === undefined) return undefined;
           return val;
         })
-        .nullable(),
+        .optional(),
     })
     .strict(),
   params: z
