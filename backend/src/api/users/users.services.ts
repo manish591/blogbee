@@ -134,7 +134,7 @@ export async function editUserProfile(
 ) {
   try {
     const cleanUpdates = Object.fromEntries(
-      Object.entries(data).filter(([_, val]) => val !== null),
+      Object.entries(data).filter(([_, val]) => !!val),
     );
     const res = await db.collection<Users>(USERS_COLLECTION).updateOne(
       { _id: new ObjectId(userId) },

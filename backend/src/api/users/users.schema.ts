@@ -25,21 +25,21 @@ export const editUserProfileSchema = z.object({
       name: z
         .union([z.string(), z.undefined()])
         .transform((val) => {
-          if (val === undefined) return null;
+          if (val === undefined) return undefined;
           const trimmedValue = val.trim();
-          return trimmedValue === '' ? null : trimmedValue;
+          return trimmedValue === '' ? undefined : trimmedValue;
         })
         .refine((val) => val && val.length >= 6 && val.length <= 30, {
           message: 'name should be between 6 and 30 characters long',
         })
-        .nullable(),
+        .optional(),
       profileImg: z
         .union([z.undefined(), z.url()])
         .transform((val) => {
-          if (val === undefined) return null;
+          if (val === undefined) return undefined;
           return val.trim();
         })
-        .nullable(),
+        .optional(),
     })
     .strict(),
 });
