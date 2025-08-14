@@ -1,7 +1,16 @@
+import { Header } from '@/components/header';
+
 export default function Page() {
   return (
-    <div>
-      <h1>Get started here</h1>
+    <div className="min-h-screen">
+      <Header />
+      <main>
+        {/* <Hero />
+        <Features />
+        <HowItWorks />
+        <SocialProof /> */}
+      </main>
+      {/* <Footer /> */}
     </div>
   );
 }
