@@ -26,7 +26,7 @@ export async function getPublicBlogDetailsHandler(req: Request, res: Response) {
     res.status(StatusCodes.OK).json(
       new APIResponse("success", StatusCodes.OK, "Blog data retrieved successfully", {
         blog: blogData,
-        posts: topBlogPosts,
+        posts: topBlogPosts.items,
         tags: allBlogTags
       })
     );
@@ -55,11 +55,11 @@ export async function getPublicPostsListHandler(req: Request, res: Response) {
       return;
     }
 
-    const limit = req.query.limit as string;
-    const page = req.query.page as string;
-    const q = req.query.q as string;
     const blogId = blogData._id.toString();
-    const postsData = await getAllPosts(blogId, req.db, q, Number(page), Number(limit));
+    const q = req.query.q as string ?? "";
+    const limit = req.query.limit as string ? Number(req.query.limit) : 10;
+    const page = req.query.page as string ? Number(req.query.page) : 1;
+    const postsData = await getAllPosts(blogId, req.db, q, page, limit);
 
     logger.info("GET_POSTS_LIST_SUCCESS: Fetching posts list for blog");
 

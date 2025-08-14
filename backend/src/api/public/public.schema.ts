@@ -9,9 +9,9 @@ export const getPublicBlogDetailsSchema = z.object({
 export const getPublicPostsListSchema = z.object({
   query: z.object({
     blog: z.string().trim(),
-    limit: z.coerce.number().optional().default(10),
-    page: z.coerce.number().optional().default(1),
-    q: z.string().optional().default("")
+    limit: z.coerce.number().optional(),
+    page: z.coerce.number().optional(),
+    q: z.string().optional()
   }).strict()
 });
 

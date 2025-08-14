@@ -78,7 +78,7 @@ export async function getAllPosts(
     const totalPages = Math.ceil(totalItems / limit);
     const currentPage = page;
 
-    const res = db
+    const res = await db
       .collection<Posts>(POSTS_COLLECTION)
       .find({
         blogId: new ObjectId(blogId),
