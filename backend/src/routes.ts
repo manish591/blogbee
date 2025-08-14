@@ -8,7 +8,7 @@ import { usersRoutes } from './api/users/users.routes';
 
 const router = Router();
 
-router.use("/public", publiRoutes);
+router.use('/public', publiRoutes);
 router.use('/users', usersRoutes);
 router.use('/blogs', blogsRoutes);
 router.use('/posts', postsRouter);

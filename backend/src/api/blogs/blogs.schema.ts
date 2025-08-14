@@ -67,10 +67,15 @@ export const editBlogSchema = z.object({
   body: z
     .object({
       name: z
-        .union([z.string().refine((val) => val && val.length >= 5 && val.length <= 30, {
-          message:
-            'name should be greater than 5 characters and less than 30 characters',
-        }), z.undefined()])
+        .union([
+          z
+            .string()
+            .refine((val) => val && val.length >= 5 && val.length <= 30, {
+              message:
+                'name should be greater than 5 characters and less than 30 characters',
+            }),
+          z.undefined(),
+        ])
         .transform((val) => {
           if (val === undefined) return undefined;
           const trimmedValue = val.trim();

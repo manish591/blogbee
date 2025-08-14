@@ -1,10 +1,10 @@
-import type { Request, Response } from "express";
-import { StatusCodes } from "http-status-codes";
-import { APIResponse } from "../../utils/api-response";
-import { logger } from "../../utils/logger";
-import { getBlogBySlug } from "../blogs/blogs.services";
-import { getAllPosts, getPostBySlug } from "../posts/posts.services";
-import { getBlogTags } from "../tags/tags.services";
+import type { Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
+import { APIResponse } from '../../utils/api-response';
+import { logger } from '../../utils/logger';
+import { getBlogBySlug } from '../blogs/blogs.services';
+import { getAllPosts, getPostBySlug } from '../posts/posts.services';
+import { getBlogTags } from '../tags/tags.services';
 
 export async function getPublicBlogDetailsHandler(req: Request, res: Response) {
   try {
@@ -12,8 +12,12 @@ export async function getPublicBlogDetailsHandler(req: Request, res: Response) {
     const blogData = await getBlogBySlug(blogSlug, req.db);
 
     if (!blogData) {
-      logger.error("NOT_FOUND_ERROR: Blog not found");
-      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Blog not found"));
+      logger.error('NOT_FOUND_ERROR: Blog not found');
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json(
+          new APIResponse('error', StatusCodes.NOT_FOUND, 'Blog not found'),
+        );
       return;
     }
 
@@ -21,14 +25,19 @@ export async function getPublicBlogDetailsHandler(req: Request, res: Response) {
     const topBlogPosts = await getAllPosts(blogId, req.db);
     const allBlogTags = await getBlogTags(blogId, req.db);
 
-    logger.info("EMBED_BLOG_SUCCESS: Blog data retrieved successfully");
+    logger.info('EMBED_BLOG_SUCCESS: Blog data retrieved successfully');
 
     res.status(StatusCodes.OK).json(
-      new APIResponse("success", StatusCodes.OK, "Blog data retrieved successfully", {
-        blog: blogData,
-        posts: topBlogPosts.items,
-        tags: allBlogTags
-      })
+      new APIResponse(
+        'success',
+        StatusCodes.OK,
+        'Blog data retrieved successfully',
+        {
+          blog: blogData,
+          posts: topBlogPosts.items,
+          tags: allBlogTags,
+        },
+      ),
     );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
@@ -50,23 +59,34 @@ export async function getPublicPostsListHandler(req: Request, res: Response) {
     const blogData = await getBlogBySlug(blogSlug, req.db);
 
     if (!blogData) {
-      logger.error("NOT_FOUND_ERROR: Blog not found");
-      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Blog not found"));
+      logger.error('NOT_FOUND_ERROR: Blog not found');
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json(
+          new APIResponse('error', StatusCodes.NOT_FOUND, 'Blog not found'),
+        );
       return;
     }
 
     const blogId = blogData._id.toString();
-    const q = req.query.q as string ?? "";
-    const limit = req.query.limit as string ? Number(req.query.limit) : 10;
-    const page = req.query.page as string ? Number(req.query.page) : 1;
+    const q = (req.query.q as string) ?? '';
+    const limit = (req.query.limit as string) ? Number(req.query.limit) : 10;
+    const page = (req.query.page as string) ? Number(req.query.page) : 1;
     const postsData = await getAllPosts(blogId, req.db, q, page, limit);
 
-    logger.info("GET_POSTS_LIST_SUCCESS: Fetching posts list for blog");
+    logger.info('GET_POSTS_LIST_SUCCESS: Fetching posts list for blog');
 
-    res.status(StatusCodes.OK).json(new APIResponse("success", StatusCodes.OK, "Posts list fetched successfully", {
-      blog: blogData,
-      posts: postsData
-    }));
+    res.status(StatusCodes.OK).json(
+      new APIResponse(
+        'success',
+        StatusCodes.OK,
+        'Posts list fetched successfully',
+        {
+          blog: blogData,
+          posts: postsData,
+        },
+      ),
+    );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
@@ -87,8 +107,12 @@ export async function getPublicPostDetailsHandler(req: Request, res: Response) {
     const blogData = await getBlogBySlug(blogSlug, req.db);
 
     if (!blogData) {
-      logger.error("NOT_FOUND_ERROR: Blog not found");
-      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Blog not found"));
+      logger.error('NOT_FOUND_ERROR: Blog not found');
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json(
+          new APIResponse('error', StatusCodes.NOT_FOUND, 'Blog not found'),
+        );
       return;
     }
 
@@ -97,23 +121,44 @@ export async function getPublicPostDetailsHandler(req: Request, res: Response) {
     const postData = await getPostBySlug(postSlug, req.db);
 
     if (!postData) {
-      logger.error("NOT_FOUND_ERROR: Post not found");
-      res.status(StatusCodes.NOT_FOUND).json(new APIResponse("error", StatusCodes.NOT_FOUND, "Post not found"));
+      logger.error('NOT_FOUND_ERROR: Post not found');
+      res
+        .status(StatusCodes.NOT_FOUND)
+        .json(
+          new APIResponse('error', StatusCodes.NOT_FOUND, 'Post not found'),
+        );
       return;
     }
 
     const isPostBelongsToBlog = postData.blogId.toString() === blogId;
 
     if (!isPostBelongsToBlog) {
-      logger.error("FORBIDDEN_ERROR: Post does not belong to the specified blog");
-      res.status(StatusCodes.FORBIDDEN).json(new APIResponse("error", StatusCodes.FORBIDDEN, "Post does not belong to the specified blog"));
+      logger.error(
+        'FORBIDDEN_ERROR: Post does not belong to the specified blog',
+      );
+      res
+        .status(StatusCodes.FORBIDDEN)
+        .json(
+          new APIResponse(
+            'error',
+            StatusCodes.FORBIDDEN,
+            'Post does not belong to the specified blog',
+          ),
+        );
       return;
     }
 
-    res.status(StatusCodes.OK).json(new APIResponse("success", StatusCodes.OK, "Post details fetched successfully", {
-      blog: blogData,
-      post: postData
-    }));
+    res.status(StatusCodes.OK).json(
+      new APIResponse(
+        'success',
+        StatusCodes.OK,
+        'Post details fetched successfully',
+        {
+          blog: blogData,
+          post: postData,
+        },
+      ),
+    );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res

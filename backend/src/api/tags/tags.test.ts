@@ -174,18 +174,8 @@ describe('TAGS', () => {
 
     beforeEach(async () => {
       blogId = (await createBlog(userId, blogData, db)).blogId.toString();
-      await createTag(
-        userId,
-        blogId,
-        { blogId, name: 'Typescript' },
-        db,
-      );
-      await createTag(
-        userId,
-        blogId,
-        { blogId, name: 'Python' },
-        db,
-      );
+      await createTag(userId, blogId, { blogId, name: 'Typescript' }, db);
+      await createTag(userId, blogId, { blogId, name: 'Python' }, db);
     });
 
     it('should return 400 bad request if blogId is not passed in query params', async () => {

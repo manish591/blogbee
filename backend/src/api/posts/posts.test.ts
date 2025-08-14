@@ -663,12 +663,7 @@ describe('POSTS', () => {
       const createdPost = await createPost(userId, blogId, db);
       const createdPostId = createdPost.postId.toString();
       const tagId = (
-        await createTag(
-          userId,
-          blogId,
-          { name: 'new tag', blogId },
-          db,
-        )
+        await createTag(userId, blogId, { name: 'new tag', blogId }, db)
       ).tagId.toString();
       const app = buildServer({ db });
       const res = await request(app)
@@ -693,7 +688,7 @@ describe('POSTS', () => {
     const blogData = {
       name: 'update blog title',
       slug: 'update-blog-title',
-      about: 'This is a content.'
+      about: 'This is a content.',
     };
 
     let blogId: string;
@@ -811,12 +806,7 @@ describe('POSTS', () => {
       const createdPost = await createPost(userId, blogId, db);
       const createdPostId = createdPost.postId.toString();
       const tagId = (
-        await createTag(
-          userId,
-          blogId,
-          { name: 'new tag', blogId },
-          db,
-        )
+        await createTag(userId, blogId, { name: 'new tag', blogId }, db)
       ).tagId.toString();
       const app = buildServer({ db });
       const res = await request(app)

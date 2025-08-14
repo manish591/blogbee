@@ -74,7 +74,9 @@ export async function getAllPosts(
   try {
     const docsToSkip = (page - 1) * limit;
     const numDocsToReturn = limit;
-    const totalItems = await db.collection<Posts>(POSTS_COLLECTION).countDocuments({ blogId: new ObjectId(blogId) });
+    const totalItems = await db
+      .collection<Posts>(POSTS_COLLECTION)
+      .countDocuments({ blogId: new ObjectId(blogId) });
     const totalPages = Math.ceil(totalItems / limit);
     const currentPage = page;
 
@@ -99,7 +101,7 @@ export async function getAllPosts(
       totalPages,
       hasNext: currentPage < totalPages,
       hasPrevious: currentPage > 1,
-      items: res
+      items: res,
     };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
@@ -131,8 +133,8 @@ export async function editPost(postId: string, data: TEditPostBody, db: Db) {
 
     return {
       success: res.acknowledged,
-      editPostCount: res.modifiedCount
-    }
+      editPostCount: res.modifiedCount,
+    };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
