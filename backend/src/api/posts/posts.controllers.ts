@@ -130,9 +130,9 @@ export async function getAllPostsHandler(req: Request, res: Response) {
       return;
     }
 
-    const q = req.query.q as string;
-    const limit = req.query.limit as string;
-    const page = req.query.page as string;
+    const q = req.query.q as string ?? "";
+    const limit = req.query.limit as string ? Number(req.query.limit) : 10;
+    const page = req.query.page as string ? Number(req.query.page) : 1;
     const postsData = await getAllPosts(
       blogId,
       req.db,

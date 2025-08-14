@@ -116,7 +116,7 @@ describe('blogs', () => {
     it('should return 409 conflict if blog with slug already exists', async () => {
       await createBlog(
         userId,
-        { name: blogData.name, slug: blogData.slug, about: null, logo: null },
+        { name: blogData.name, slug: blogData.slug },
         db,
       );
       const app = buildServer({ db });
@@ -170,36 +170,26 @@ describe('blogs', () => {
     const blogData1 = {
       name: 'first blog',
       slug: 'first-blog',
-      about: null,
-      logo: null,
     };
 
     const blogData2 = {
       name: 'Second blog',
       slug: 'second-blog',
-      about: null,
-      logo: null,
     };
 
     const blogData3 = {
       name: 'Third blog',
       slug: 'third-blog',
-      about: null,
-      logo: null,
     };
 
     const blogData4 = {
       name: 'Fourth blog',
       slug: 'fourth-blog',
-      about: null,
-      logo: null,
     };
 
     const blogData5 = {
       name: 'fifth blog',
       slug: 'fifth-blog',
-      about: null,
-      logo: null,
     };
 
     const userData = {
@@ -334,8 +324,6 @@ describe('blogs', () => {
       const blogData = {
         name: 'fifth blog',
         slug: 'fifth-blog',
-        about: null,
-        logo: null,
       };
       const createdBlogResult = await createBlog(userId, blogData, db);
       const blogId = createdBlogResult.blogId.toString();
@@ -416,8 +404,6 @@ describe('blogs', () => {
     const blogData = {
       name: 'fifth blog',
       slug: 'fifth-blog',
-      about: null,
-      logo: null,
     };
 
     let blogId: string;
@@ -513,8 +499,6 @@ describe('blogs', () => {
     const blogData = {
       name: 'fifth blog',
       slug: 'fifth-blog',
-      about: null,
-      logo: null,
     };
 
     let blogId: string;
@@ -578,7 +562,6 @@ describe('blogs', () => {
       const newTagData = {
         blogId,
         name: 'typescript',
-        description: null,
       };
       const newPostId = (
         await createPost(userId, blogId, db)

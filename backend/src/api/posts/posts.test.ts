@@ -63,7 +63,7 @@ describe('POSTS', () => {
         .send(data);
       const allBlogPosts = await getAllPosts(blogId, db);
 
-      expect(allBlogPosts.length).toBe(0);
+      expect(allBlogPosts.items.length).toBe(0);
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 400,
@@ -85,7 +85,7 @@ describe('POSTS', () => {
         .send(data);
       const allBlogPosts = await getAllPosts(blogId, db);
 
-      expect(allBlogPosts.length).toBe(0);
+      expect(allBlogPosts.items.length).toBe(0);
       expect(res.status).toBe(400);
       expect(res.body).toMatchObject({
         code: 400,
@@ -107,7 +107,7 @@ describe('POSTS', () => {
         .send(data);
       const allBlogPosts = await getAllPosts(blogId, db);
 
-      expect(allBlogPosts.length).toBe(0);
+      expect(allBlogPosts.items.length).toBe(0);
       expect(res.status).toBe(404);
       expect(res.body).toMatchObject({
         code: 404,
@@ -146,7 +146,7 @@ describe('POSTS', () => {
         .send(data);
       const allOtherUserBlogPosts = await getAllPosts(blogId, db);
 
-      expect(allOtherUserBlogPosts.length).toBe(0);
+      expect(allOtherUserBlogPosts.items.length).toBe(0);
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
         code: 403,
@@ -168,7 +168,7 @@ describe('POSTS', () => {
         .send(data);
       const allBlogPosts = await getAllPosts(blogId, db);
 
-      expect(allBlogPosts.length).toBe(1);
+      expect(allBlogPosts.items.length).toBe(1);
       expect(res.status).toBe(201);
       expect(res.body).toMatchObject({
         code: 201,
@@ -263,7 +263,7 @@ describe('POSTS', () => {
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
-      expect(res.body.data.length).toBe(2);
+      expect(res.body.data.items.length).toBe(2);
     });
 
     it('should return 200 ok along with posts of blog with blogId, limit results to 2', async () => {
@@ -277,7 +277,7 @@ describe('POSTS', () => {
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
-      expect(res.body.data.length).toBe(2);
+      expect(res.body.data.items.length).toBe(2);
     });
 
     it('should return 200 ok along with posts of blog with blogId, return page 2 results with limit 3', async () => {
@@ -293,7 +293,7 @@ describe('POSTS', () => {
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
-      expect(res.body.data.length).toBe(2);
+      expect(res.body.data.items.length).toBe(2);
     });
 
     it('should return 200 ok along with posts of blog with blogId, return result for search query updated', async () => {
@@ -312,7 +312,7 @@ describe('POSTS', () => {
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
-      expect(res.body.data.length).toBe(1);
+      expect(res.body.data.items.length).toBe(1);
     });
   });
 
