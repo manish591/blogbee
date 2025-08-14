@@ -15,8 +15,8 @@ export function Hero() {
       <div className="border-t border-b">
         <div className="max-w-[1080px] mx-auto flex items-center border-l border-r justify-between">
           <div className="grid grid-cols-[45%_minmax(0,1fr)]">
-            <div className="p-8 h-96">
-              <div className="bg-accent h-full"></div>
+            <div className="h-96">
+              <div className="bg-muted/40 h-full"></div>
             </div>
             <div className="flex border-l">
               <div className="mt-auto mb-auto px-16">
@@ -25,10 +25,12 @@ export function Hero() {
                   publish with ease, without the hassle of switching accounts.
                 </p>
                 <div className="mt-8">
-                  <Button size="lg" className="h-12 px-8 text-base">
-                    Get Started
-                    <ChevronRight />
-                  </Button>
+                  <Link href="/signup">
+                    <Button size="lg" className="h-12 px-8 text-base">
+                      Get Started
+                      <ChevronRight />
+                    </Button>
+                  </Link>
                 </div>
                 <div className="mt-6">
                   or{' '}

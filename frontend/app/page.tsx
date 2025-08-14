@@ -7,11 +7,7 @@ export default function Page() {
       <Header />
       <main>
         <Hero />
-        {/* <Features />
-        <HowItWorks />
-        <SocialProof /> */}
       </main>
-      {/* <Footer /> */}
     </div>
   );
 }
