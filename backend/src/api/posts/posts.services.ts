@@ -74,6 +74,9 @@ export async function getAllPosts(
   try {
     const docsToSkip = (page - 1) * limit;
     const numDocsToReturn = limit;
+    const totalItems = await db.collection<Posts>(POSTS_COLLECTION).countDocuments({ blogId: new ObjectId(blogId) });
+    const totalPages = Math.ceil(totalItems / limit);
+    const currentPage = page;
 
     const res = db
       .collection<Posts>(POSTS_COLLECTION)
@@ -85,10 +88,19 @@ export async function getAllPosts(
           },
         }),
       })
+      .sort({ updatedAt: -1 })
       .skip(docsToSkip)
       .limit(numDocsToReturn)
       .toArray();
-    return res;
+    return {
+      currentPage,
+      limit,
+      totalItems,
+      totalPages,
+      hasNext: currentPage < totalPages,
+      hasPrevious: currentPage > 1,
+      items: res
+    };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new AppError({
