@@ -5,7 +5,7 @@ import { buildServer } from "../../app";
 import { createBlog } from "../blogs/blogs.services";
 import { beforeEach } from "node:test";
 import { createUser } from "../users/users.services";
-import { createPost } from "../posts/posts.services";
+import { createPost, editPost } from "../posts/posts.services";
 import { createTag } from "../tags/tags.services";
 
 describe("EMBED API", () => {
@@ -131,6 +131,78 @@ describe("EMBED API", () => {
               })
             ]
           }
+        }
+      });
+    });
+  });
+
+  describe("GET /v1/public/posts/:postSlug", () => {
+    it("should return 404 not found if blog with blogSlug does not exists", async () => {
+      const nonExistingBlogSlug = "non-existing-blog-slug";
+      const postSlug = "some-post-slug";
+      const app = buildServer({ db });
+      const res = await request(app).get(`/v1/public/posts/${postSlug}?blog=${nonExistingBlogSlug}`);
+
+      expect(res.status).toBe(404);
+      expect(res.body).toMatchObject({
+        code: 404,
+        status: "error",
+        message: "Blog not found"
+      });
+    });
+
+    it("should return 404 not found if post with postSlug does not exists", async () => {
+      const blogData = {
+        name: 'update blog title',
+        slug: 'update-blog-title',
+        about: 'This is a content.',
+      };
+      await createBlog(userId, blogData, db);
+      const nonExistingPostSlug = "non-existing-post-slug";
+      const app = buildServer({ db });
+      const res = await request(app).get(`/v1/public/posts/${nonExistingPostSlug}?blog=${blogData.slug}`);
+
+      expect(res.status).toBe(404);
+      expect(res.body).toMatchObject({
+        code: 404,
+        status: "error",
+        message: "Post not found"
+      });
+    });
+
+    it("should return 200 ok with post data and blog data", async () => {
+      const blogData = {
+        name: 'update blog title',
+        slug: 'update-blog-title',
+        about: 'This is a content.',
+      };
+      const createdBlog = await createBlog(userId, blogData, db);
+      const createdBlogId = createdBlog.blogId.toString();
+      const createdPost = await createPost(userId, createdBlogId, db);
+      const createdPostId = createdPost.postId.toString();
+      const postSlug = "new-slug";
+      editPost(createdPostId, {
+        slug: postSlug
+      }, db);
+      const app = buildServer({ db });
+      const res = await request(app).get(`/v1/public/posts/${postSlug}?blog=${blogData.slug}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        code: 200,
+        status: "success",
+        message: "Post details fetched successfully",
+        data: {
+          post: expect.objectContaining({
+            title: "untitled",
+            slug: postSlug,
+            tags: []
+          }),
+          blog: expect.objectContaining({
+            name: blogData.name,
+            slug: blogData.slug,
+            about: blogData.about,
+          })
         }
       });
     });
