@@ -4,6 +4,7 @@ import './globals.css';
 
 const sora = Sora({
   variable: '--font-sora-sans',
+  weight: ['400', '500', '600', '700'],
   subsets: ['latin'],
 });
 
@@ -18,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${sora.variable} antialiased`}>{children}</body>
+    <html lang="en" className={sora.className}>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

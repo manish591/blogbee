@@ -4,7 +4,7 @@ import Link from 'next/link';
 export function Header() {
   return (
     <header className="border-b">
-      <nav className="max-w-[1080px] px-4 h-16 mx-auto flex items-center justify-between">
+      <nav className="max-w-[1080px] h-16 mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="flex items-center justify-center rounded-md">
             <FileText className="h-5 w-5 rotate-6" />
