@@ -15,6 +15,7 @@ export function createDatabaseClient(
   databaseUri: string,
   options: mongoDB.MongoClientOptions = dbClientOptions,
 ) {
+  logger.info("CREATE_DATABASE_CLIENT", databaseUri);
   return new mongoDB.MongoClient(databaseUri, options);
 }
 
