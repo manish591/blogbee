@@ -5,15 +5,6 @@
     "clientKind": "git",
     "useIgnoreFile": false
   },
-  "files": {
-    "ignoreUnknown": false,
-    "includes": [
-      "./backend/src/**/*.ts",
-      "./backend/test/**/*.ts",
-      "./backend/src/**/*.test.ts",
-      "./frontend/**/*.{ts,tsx}"
-    ]
-  },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",

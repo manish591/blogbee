@@ -2,14 +2,21 @@
   "name": "writely",
   "version": "1.0.0",
   "description": "",
+  "packageManager": "pnpm@10.0.0",
   "scripts": {
-    "biome:check": "pnpm exec biome check",
-    "biome:fix": "pnpm exec biome check --write"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "format": "@biomejs/biome check --write"
   },
   "keywords": [],
   "author": "manish591",
   "license": "ISC",
   "devDependencies": {
-    "@biomejs/biome": "2.1.2"
+    "@biomejs/biome": "2.1.2",
+    "turbo": "^2.5.5",
+    "typescript": "^5.9.2"
   }
 }

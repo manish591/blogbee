@@ -18,3 +18,5 @@ build/
 .settings/
 Thumbs.db
 dist
+.turbo
+out
