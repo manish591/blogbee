@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Header } from '@/components/header';
 
 const sites = [
   {
@@ -92,10 +93,10 @@ const sites = [
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+    <div className="min-h-screen">
+      <Header />
+      <div className="border-l border-r border-neutral-300 mx-auto max-w-[1080px] space-y-8">
+        <div className="py-4 px-8 border-b border-neutral-300 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">My Sites</h1>
             <p className="text-sm text-gray-600">
@@ -107,10 +108,7 @@ export default function DashboardPage() {
             <Input placeholder="Search sites" className="w-64 pl-10" />
           </div>
         </div>
-
-        {/* Sites Grid */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Create New Site Card */}
+        <div className="px-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           <Card className="border-2 border-dashed border-gray-300 bg-white hover:border-gray-400 transition-colors cursor-pointer">
             <CardContent className="flex flex-col items-center justify-center p-8 text-center">
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border-2 border-dashed border-gray-300">

@@ -38,7 +38,7 @@ export function Header() {
             >
               <span>Login</span>
               <span>
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-3 w-3" />
               </span>
             </Button>
           </Link>

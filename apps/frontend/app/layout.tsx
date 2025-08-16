@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import { Sora } from 'next/font/google';
+import { Bricolage_Grotesque } from 'next/font/google';
 import './globals.css';
 
-const sora = Sora({
-  variable: '--font-sora-sans',
+const grostsque = Bricolage_Grotesque({
+  variable: '--font-syne-sans',
   weight: ['400', '500', '600', '700'],
   subsets: ['latin'],
 });
@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={sora.className}>
+    <html lang="en" className={grostsque.className}>
       <body className="antialiased">{children}</body>
     </html>
   );
