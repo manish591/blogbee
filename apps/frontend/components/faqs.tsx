@@ -59,7 +59,7 @@ export function FaqSection() {
   ];
 
   return (
-    <section className="border-b">
+    <section className="border-b bg-accent/20">
       <div>
         <div className="border-b">
           <div className="max-w-[1080px] mx-auto border-r border-l py-16">

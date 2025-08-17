@@ -4,8 +4,8 @@ export async function Footer() {
   return (
     <footer className="w-full dark bg-background py-8">
       <div className="max-w-[1080px] mx-auto">
-        <div className="w-full border-b">
-          <div className="pb-4">
+        <div className="w-full">
+          <div className="pb-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-8">
                 <p className="text-foreground text-xl">Writely</p>

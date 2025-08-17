@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { HeroMarquee } from './hero-marquee';
 
 export function Hero() {
   return (
@@ -16,14 +16,8 @@ export function Hero() {
       <div className="border-t border-b">
         <div className="max-w-[1080px] mx-auto flex items-center border-l border-r justify-between">
           <div className="grid grid-cols-[40%_minmax(0,1fr)]">
-            <div className="h-96">
-              <Image
-                src="/placeholder.png"
-                width={400}
-                height={400}
-                alt="hero"
-                className="cover w-full h-full"
-              />
+            <div className="select-none h-96 bg-secondary/40">
+              <HeroMarquee />
             </div>
             <div className="flex border-l">
               <div className="mt-auto mb-auto px-24">

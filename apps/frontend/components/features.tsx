@@ -10,11 +10,11 @@ export function Features() {
             <div className="lg:order-1">
               <div className="absolute left-[-8%] top-[-10%]">
                 <Image
-                  src="/placeholder.png"
-                  height={800}
-                  width={600}
+                  src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1755436453/Screenshot_2025-08-17_184238_zsimzi.png"
+                  height={1080}
+                  width={800}
                   alt="blog-dashboard"
-                  className="cover -rotate-6"
+                  className="rounded-md object-cover -rotate-4 border h-[350px] w-[600px] bg-background object-left"
                 />
               </div>
             </div>

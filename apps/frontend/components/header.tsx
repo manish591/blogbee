@@ -34,7 +34,7 @@ export function Header() {
             <Button
               size="sm"
               variant="secondary"
-              className="border border-neutral-200 shadow-none cursor-pointer text-[0.85rem] h-7"
+              className="border shadow-none cursor-pointer text-[0.85rem] h-7"
             >
               <span>Login</span>
               <span>
