@@ -9,7 +9,7 @@ import {
   Search,
   Slash,
 } from 'lucide-react';
-import { FooterSection } from '@/components/footer-section';
+import { Footer } from '@/components/footer';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,11 +17,16 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import {
+  Header,
+  Logo,
+  Navbar,
+  ProfileAvatar,
+  ProfileDropdown,
+} from '@/components/header';
 
 const sites = [
   {
@@ -93,145 +98,129 @@ const sites = [
 export default function AllBlogPage() {
   return (
     <div className="flex flex-col min-h-screen bg-secondary/20">
-      <header className="border-b sticky top-0 z-10 bg-background">
-        <nav className="h-16 px-6 flex items-center justify-between">
+      <Header>
+        <Navbar className="px-6">
           <div className="flex items-center space-x-2">
-            <span className="text-xl font-bold">Writely</span>
+            <Logo />
             <span>
               <Slash className="w-4 h-4 text-foreground/10 rotate-[-16deg]" />
             </span>
             <div className="flex items-center gap-2">
-              <Avatar className="h-6 w-6">
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback className="text-sm">CN</AvatarFallback>
-              </Avatar>
-              <span className="text-lg">My Blogs</span>
+              <ProfileAvatar />
+              <span className="text-lg font-medium">My Blogs</span>
             </div>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="mr-6">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Billing</DropdownMenuItem>
-              <DropdownMenuItem>Team</DropdownMenuItem>
-              <DropdownMenuItem>Subscription</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </nav>
-      </header>
-      <div className="space-y-8 py-6 pb-16">
-        <div className="max-w-[1080px] mx-auto space-y-8">
-          <section className="flex items-center gap-4">
-            <div className="flex flex-1 items-center">
-              <div className="flex-1 relative w-full border rounded-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Search Projects..."
-                  className="h-10 pl-10 bg-background border-none w-full shadow-none"
-                />
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" className="h-10 w-10">
-                <ListFilter className="h-4 w-4" />
-              </Button>
-              <div className="border p-1 flex items-center h-10 rounded-md">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="bg-secondary h-8 w-8"
-                >
-                  <LayoutGrid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 hover:bg-transparent"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 h-10">
-                    Add New...
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>New Project</DropdownMenuItem>
-                  <DropdownMenuItem>New Folder</DropdownMenuItem>
-                  <DropdownMenuItem>Import Project</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </section>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="border-2 border-dashed bg-background hover:border-gray-400 transition-colors cursor-pointer shadow-none">
-              <CardContent className="flex flex-col items-center justify-center p-6 text-center">
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full border-2 border-dashed">
-                  <Plus className="h-6 w-6 text-foreground/40" />
+          <ProfileDropdown />
+        </Navbar>
+      </Header>
+      <main>
+        <div className="space-y-8 py-6 pb-16">
+          <div className="max-w-[1080px] mx-auto space-y-8">
+            <section className="flex items-center gap-4">
+              <div className="flex flex-1 items-center">
+                <div className="flex-1 relative w-full border rounded-md">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Search Blogs..."
+                    className="h-10 pl-10 bg-background border-none w-full shadow-none"
+                  />
                 </div>
-                <h3 className="font-medium">Create new blog</h3>
-                <p className="text-sm text-foreground/70">
-                  Give your blog editor and start creating
-                </p>
-              </CardContent>
-            </Card>
-            {sites.map((site) => (
-              <Card key={site.id} className="bg-background shadow-none">
-                <CardContent className="px-6">
-                  <div className="flex items-center justify-between">
-                    <div className="mb-4">
-                      <h3 className="font-medium">{site.name}</h3>
-                      <p className="text-sm text-foreground/50">{site.url}</p>
-                    </div>
-                    <div className="mb-4 flex items-start justify-between">
-                      <Avatar>
-                        <AvatarImage src="" />
-                        <AvatarFallback className="bg-secondary">
-                          {site.name[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                    </div>
-                  </div>
-                  <div className="mb-8 text-sm text-foreground/70">
-                    <p>{site.posts} posts</p>
-                    <p>Last updated on {site.lastUpdated}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 bg-transparent"
-                    >
-                      <ExternalLink className="mr-2 h-3 w-3" />
-                      Go to blog
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="icon" className="h-10 w-10">
+                  <ListFilter className="h-4 w-4" />
+                </Button>
+                <div className="border p-1 flex items-center h-10 rounded-md">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="bg-secondary h-8 w-8"
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 hover:bg-transparent"
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 h-10">
+                      Add New...
+                      <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 bg-transparent"
-                    >
-                      <BarChart3 className="mr-2 h-3 w-3" />
-                      Blog dashboard
-                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>New Project</DropdownMenuItem>
+                    <DropdownMenuItem>New Folder</DropdownMenuItem>
+                    <DropdownMenuItem>Import Project</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </section>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <Card className="border-2 border-dashed bg-background hover:border-gray-400 transition-colors cursor-pointer shadow-none">
+                <CardContent className="flex flex-col items-center justify-center p-6 text-center">
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full border-2 border-dashed">
+                    <Plus className="h-6 w-6 text-foreground/40" />
                   </div>
+                  <h3 className="font-medium">Create new blog</h3>
+                  <p className="text-sm text-foreground/70">
+                    Give your blog editor and start creating
+                  </p>
                 </CardContent>
               </Card>
-            ))}
+              {sites.map((site) => (
+                <Card key={site.id} className="bg-background shadow-none">
+                  <CardContent className="px-6">
+                    <div className="flex items-center justify-between">
+                      <div className="mb-4">
+                        <h3 className="font-medium">{site.name}</h3>
+                        <p className="text-sm text-foreground/50">{site.url}</p>
+                      </div>
+                      <div className="mb-4 flex items-start justify-between">
+                        <Avatar>
+                          <AvatarImage src="" />
+                          <AvatarFallback className="bg-secondary">
+                            {site.name[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                    </div>
+                    <div className="mb-8 text-sm text-foreground/70">
+                      <p>{site.posts} posts</p>
+                      <p>Last updated on {site.lastUpdated}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 bg-transparent"
+                      >
+                        <ExternalLink className="mr-2 h-3 w-3" />
+                        Go to blog
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 bg-transparent"
+                      >
+                        <BarChart3 className="mr-2 h-3 w-3" />
+                        Blog dashboard
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-      <FooterSection />
+      </main>
+      <Footer />
     </div>
   );
 }

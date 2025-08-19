@@ -1,7 +1,8 @@
 import Link from 'next/link';
+import { Logo } from '@/components/header';
 import { APP_NAME } from '@/constants';
 
-export async function FooterSection() {
+export async function Footer() {
   return (
     <footer className="w-full dark bg-background py-8">
       <div className="max-w-[1080px] mx-auto">
@@ -9,11 +10,7 @@ export async function FooterSection() {
           <div className="pb-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-8">
-                <Link href="/">
-                  <p className="text-foreground text-xl capitalize">
-                    {APP_NAME}
-                  </p>
-                </Link>
+                <Logo className="text-foreground" />
                 <nav className="flex items-center space-x-6">
                   <Link
                     href="/"

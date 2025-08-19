@@ -1,7 +1,7 @@
 import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 import { SignupForm } from '@/components/signup-form';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 
 export default function SignupPage() {
   return (
