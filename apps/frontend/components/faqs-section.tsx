@@ -1,57 +1,43 @@
 import Link from 'next/link';
+import { APP_NAME } from '@/constants';
 
 const faqs = [
   {
-    question: 'How many team member seats do I need?',
+    question: 'Can I create multiple blogs under one account?',
     answer: (
       <>
-        Each team member who accesses our software via the Streamline web app,
-        plugins, desktop app should have their own license.{' '}
-        <Link href="#" className="underline hover:no-underline">
-          Read more about the pricing here
-        </Link>
-        . Additional seats can be added at checkout or later from your account
-        page.
+        Yes! You can create and manage multiple blogs from a single account.
+        Each blog gets its own unique subdomain so you can separate your content
+        while keeping everything managed in one place.
       </>
     ),
   },
   {
-    question: 'Can I use them for unlimited projects?',
+    question: 'Do I need coding skills to write or publish posts?',
     answer: (
       <>
-        Yes. You can use them for all personal and commercial projects. You are
-        allowed to use up to 100 icons (or 50 illustrations) per project. For
-        example, you can include 100 icons in a pitch deck, and 100 different
-        icons in a marketing website.{' '}
-        <Link href="#" className="underline hover:no-underline">
-          Read our full license
-        </Link>
-        .
+        Not at all. Our editor works just like Notion — intuitive,
+        drag-and-drop, and distraction-free. You can format, add media, and
+        organize your posts without touching a line of code.
       </>
     ),
   },
   {
-    question: 'Can I try out before I buy?',
+    question: 'Can I organize my posts into categories?',
     answer: (
       <>
-        Yes, you can access our free and open-source content on{' '}
-        <Link href="#" className="underline hover:no-underline">
-          streamlinehq.com/freebies
-        </Link>
-        .
+        Absolutely! You can create and manage categories for each blog, making
+        it easy to group related posts and help readers discover content.
       </>
     ),
   },
   {
-    question: 'Can I make a one-time purchase for individual sets?',
+    question: 'Will my blog have its own subdomain?',
     answer: (
       <>
-        Yes. We offer{' '}
-        <Link href="#" className="underline hover:no-underline">
-          one-time purchase for the icons families here
-        </Link>
-        . You can conveniently download specific Streamline sets directly to
-        your computer. No subscriptions required!
+        Yes, every blog you create comes with a free subdomain (like{' '}
+        <code className="font-medium">yourblog.{APP_NAME}.site</code>). This
+        makes it easy to share and build a unique identity for each blog.
       </>
     ),
   },
@@ -59,11 +45,11 @@ const faqs = [
 
 export function FaqsSection() {
   return (
-    <section className="border-b bg-accent/20">
+    <section className="border-b bg-accent/30">
       <div>
         <div className="border-b">
-          <div className="max-w-[1080px] mx-auto border-r border-l py-16">
-            <h2 className="text-4xl font-bold text-center">
+          <div className="max-w-[1080px] mx-auto border-r border-l py-20">
+            <h2 className="text-5xl font-bold text-center">
               Frequently asked questions
             </h2>
           </div>
@@ -76,7 +62,7 @@ export function FaqsSection() {
                 className="py-8 border-b last:border-0 px-20"
               >
                 <h3 className="text-lg font-semibold mb-3">{faq.question}</h3>
-                <p className="text-foreground/70 leading-relaxed">
+                <p className="text-foreground/70 leading-relaxed max-w-[90%]">
                   {faq.answer}
                 </p>
               </div>

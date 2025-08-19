@@ -9,8 +9,8 @@ const grostsque = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: 'Writely',
-  description: 'Craft blogs seamlessly',
+  title: 'Blogbee',
+  description: 'Manage multiple blog effortlessly',
 };
 
 export default function RootLayout({

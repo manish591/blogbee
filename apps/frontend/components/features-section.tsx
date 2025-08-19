@@ -1,9 +1,10 @@
 import { Gift, Globe, Settings } from 'lucide-react';
 import Image from 'next/image';
+import { APP_NAME } from '@/constants';
 
 export function FeaturesSection() {
   return (
-    <div>
+    <div id="features">
       <section className="py-36 border-b px-6 bg-accent/20">
         <div className="max-w-[1080px] mx-auto">
           <div className="relative grid lg:grid-cols-2 gap-20 items-center">
@@ -60,7 +61,7 @@ export function FeaturesSection() {
                 <div className="flex-1">
                   <span className="font-medium">Free Subdomain</span>
                   <div className="text-sm font-mono text-primary">
-                    yourblog.bloghub.app
+                    yourblog.{APP_NAME}.site
                   </div>
                 </div>
               </div>
@@ -81,7 +82,7 @@ export function FeaturesSection() {
                   <span className="text-foreground/80">
                     Subdirectory Hosting
                   </span>
-                  <span className="text-xs text-foreground/40 ml-auto">
+                  <span className="text-xs text-foreground/50 ml-auto">
                     yourdomain.com/blog
                   </span>
                 </div>
@@ -129,17 +130,19 @@ export function FeaturesSection() {
                   <h3 className="text-5xl font-semibold leading-[1.2]">
                     Lightning-Fast
                   </h3>
-                  <p className="text-lg mt-8">
+                  <p className="text-xl text-foreground/70 mt-8">
                     A platform that gets out of your way so you can
                   </p>
-                  <p className="text-lg">focus on your words, not the setup.</p>
+                  <p className="text-xl text-foreground/70">
+                    focus on your words, not the setup.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-      <div className="dark bg-background py-24">
+      <section className="dark bg-background py-24">
         <div className="max-w-[1080px] mx-auto flex items-center gap-12">
           <div className="flex flex-col gap-8 w-max">
             <div className="h-[1.5px] bg-primary w-full"></div>
@@ -213,7 +216,7 @@ export function FeaturesSection() {
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

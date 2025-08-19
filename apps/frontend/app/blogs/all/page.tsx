@@ -9,6 +9,8 @@ import {
   Search,
   Slash,
 } from 'lucide-react';
+import { FooterSection } from '@/components/footer-section';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -20,9 +22,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { Footer } from '@/components/footer';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import Link from 'next/link';
 
 const sites = [
   {
@@ -91,17 +90,23 @@ const sites = [
   },
 ];
 
-export default function DashboardPage() {
+export default function AllBlogPage() {
   return (
     <div className="flex flex-col min-h-screen bg-secondary/20">
       <header className="border-b sticky top-0 z-10 bg-background">
-        <nav className="h-16 px-8 flex items-center justify-between">
+        <nav className="h-16 px-6 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <span className="text-xl font-bold">Writely</span>
             <span>
               <Slash className="w-4 h-4 text-foreground/10 rotate-[-16deg]" />
             </span>
-            <span className="text-base font-medium">My Sites</span>
+            <div className="flex items-center gap-2">
+              <Avatar className="h-6 w-6">
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback className="text-sm">CN</AvatarFallback>
+              </Avatar>
+              <span className="text-lg">My Blogs</span>
+            </div>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger>
@@ -226,7 +231,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-      <Footer />
+      <FooterSection />
     </div>
   );
 }

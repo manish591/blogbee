@@ -1,6 +1,7 @@
 import { ArrowRight, FileText, Home } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { APP_NAME } from '@/constants';
 
 export function HeaderSection() {
   return (
@@ -8,13 +9,13 @@ export function HeaderSection() {
       <nav className="max-w-[1080px] h-16 mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Link href="/">
-            <span className="text-xl font-bold">Writely</span>
+            <span className="text-xl font-bold capitalize">{APP_NAME}</span>
           </Link>
         </div>
         <div className="flex gap-8 items-center font-medium">
           <div className="flex gap-6 items-center">
             <Link
-              href="#"
+              href="/"
               className="text-foreground/80 hover:text-foreground transition-colors"
             >
               <span className="inline-flex items-center gap-2">
@@ -23,7 +24,7 @@ export function HeaderSection() {
               </span>
             </Link>
             <Link
-              href="#"
+              href="/blog"
               className="text-foreground/80 hover:text-foreground transition-colors"
             >
               <span className="inline-flex items-center gap-2">
@@ -36,7 +37,7 @@ export function HeaderSection() {
             <Button
               size="sm"
               variant="secondary"
-              className="border shadow-none cursor-pointer text-[0.85rem] h-7"
+              className="border shadow-none cursor-pointer text-[0.8rem] h-7"
             >
               <span>Login</span>
               <span>
@@ -48,7 +49,7 @@ export function HeaderSection() {
             <Button
               size="sm"
               variant="default"
-              className="border shadow-none cursor-pointer text-[0.85rem] h-7"
+              className="border shadow-none cursor-pointer text-[0.8rem] h-7"
             >
               <span>Dashboard</span>
               <span>

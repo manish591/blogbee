@@ -1,21 +1,21 @@
-import { FaqSection } from '@/components/faqs';
-import { Features } from '@/components/features';
-import { Footer } from '@/components/footer';
-import { Header } from '@/components/header';
-import { Hero } from '@/components/hero';
-import { HowItWorks } from '@/components/how-it-works';
+import { FaqsSection } from '@/components/faqs-section';
+import { FeaturesSection } from '@/components/features-section';
+import { FooterSection } from '@/components/footer-section';
+import { HeaderSection } from '@/components/header-section';
+import { HeroSection } from '@/components/hero-section';
+import { HowItWorksSection } from '@/components/how-it-works-section';
 
 export default function Page() {
   return (
     <div className="min-h-screen">
-      <Header />
+      <HeaderSection />
       <main>
-        <Hero />
-        <Features />
-        <HowItWorks />
-        <FaqSection />
+        <HeroSection />
+        <FeaturesSection />
+        <HowItWorksSection />
+        <FaqsSection />
       </main>
-      <Footer />
+      <FooterSection />
     </div>
   );
 }

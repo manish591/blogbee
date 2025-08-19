@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { APP_NAME } from '@/constants';
 
 export async function FooterSection() {
   return (
@@ -8,16 +9,20 @@ export async function FooterSection() {
           <div className="pb-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-8">
-                <p className="text-foreground text-xl">Writely</p>
+                <Link href="/">
+                  <p className="text-foreground text-xl capitalize">
+                    {APP_NAME}
+                  </p>
+                </Link>
                 <nav className="flex items-center space-x-6">
                   <Link
-                    href="#"
+                    href="/"
                     className="text-foreground/70 hover:text-foreground transition-colors text-sm"
                   >
                     Home
                   </Link>
                   <Link
-                    href="#"
+                    href="/blog"
                     className="text-foreground/70 hover:text-foreground transition-colors text-sm"
                   >
                     Blog
@@ -29,12 +34,18 @@ export async function FooterSection() {
         </div>
         <div className="pt-6">
           <div className="flex items-center justify-between text-sm text-foreground/40">
-            <div>© Writely 2025 — All Rights Reserved.</div>
+            <div>© {APP_NAME} 2025 — All Rights Reserved.</div>
             <div className="flex items-center gap-4">
-              <Link href="#" className="hover:text-gray-700 transition-colors">
+              <Link
+                href="/privacy-policy"
+                className="hover:text-foreground transition-colors"
+              >
                 Privacy Policy
               </Link>
-              <Link href="#" className="hover:text-gray-700 transition-colors">
+              <Link
+                href="/terms-and-conditions"
+                className="hover:text-foreground transition-colors"
+              >
                 Terms & Conditions
               </Link>
             </div>
