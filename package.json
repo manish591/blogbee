@@ -9,7 +9,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch",
-    "format": "@biomejs/biome check --write"
+    "format": "npx @biomejs/biome check --write"
   },
   "keywords": [],
   "author": "manish591",
