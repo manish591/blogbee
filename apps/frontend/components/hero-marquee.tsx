@@ -1,10 +1,10 @@
-import { ExternalLink, BarChart3 } from 'lucide-react';
+import { BarChart3, ExternalLink } from 'lucide-react';
 import { Marquee } from '@/components/magicui/marquee';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
-const sites = [
+const DUMMY_SITE_DATA = [
   {
     id: 1,
     name: 'Personal blog',
@@ -75,7 +75,7 @@ export function HeroMarquee() {
   return (
     <div className="relative flex h-full w-full flex-row items-center justify-center overflow-hidden">
       <Marquee pauseOnHover vertical className="[--duration:30s]">
-        {sites.map((site) => (
+        {DUMMY_SITE_DATA.map((site) => (
           <Card key={site.id} className="bg-background shadow-none">
             <CardContent className="px-6">
               <div className="flex items-center justify-between">

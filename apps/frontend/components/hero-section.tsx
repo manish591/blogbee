@@ -1,11 +1,11 @@
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { HeroMarquee } from '@/components/hero-marquee';
 import { Button } from '@/components/ui/button';
-import { HeroMarquee } from './hero-marquee';
 
-export function Hero() {
+export function HeroSection() {
   return (
-    <section>
+    <section id="hero">
       <div className="max-w-[1080px] mx-auto flex items-center border-l border-r justify-between">
         <div className="px-8 py-12">
           <h1 className="text-6xl max-w-2xl leading-[1.2] font-bold">
@@ -27,7 +27,10 @@ export function Hero() {
                 </p>
                 <div className="mt-8">
                   <Link href="/signup">
-                    <Button size="lg" className="h-11 px-5 text-lg">
+                    <Button
+                      size="lg"
+                      className="cursor-pointer h-11 px-5 text-lg"
+                    >
                       Get Started{' '}
                       <span>
                         <ArrowRight strokeWidth={2} />
@@ -37,8 +40,8 @@ export function Hero() {
                 </div>
                 <div className="mt-6">
                   or{' '}
-                  <Link href="#" className="underline">
-                    View examples
+                  <Link href="#features" className="underline">
+                    Learn More
                   </Link>
                 </div>
               </div>
