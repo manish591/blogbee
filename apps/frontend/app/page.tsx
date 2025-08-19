@@ -1,8 +1,8 @@
-import { Home, FileText } from 'lucide-react';
+import { FileText, Home } from 'lucide-react';
 import Link from 'next/link';
+import { FaqsSection } from '@/components/faqs-section';
 import { FeaturesSection } from '@/components/features-section';
 import { Footer } from '@/components/footer';
-import { FaqsSection } from '@/components/faqs-section';
 import { Header, HeaderCTA, Logo, Navbar } from '@/components/header';
 import { HeroSection } from '@/components/hero-section';
 import { HowItWorksSection } from '@/components/how-it-works-section';

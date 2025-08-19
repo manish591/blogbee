@@ -1,1 +1,1 @@
-export const APP_NAME = "blogbee";
+export const APP_NAME = 'blogbee';
