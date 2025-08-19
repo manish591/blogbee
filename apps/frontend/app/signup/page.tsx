@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react';
 import { SignupForm } from '@/components/signup-form';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function SignupPage() {
   return (
@@ -8,16 +9,18 @@ export default function SignupPage() {
       <div className="w-full max-w-sm md:max-w-3xl">
         <SignupForm />
       </div>
-      <Button
-        size="sm"
-        variant="outline"
-        className="border absolute top-[5%] left-[3%] px-4 shadow-none"
-      >
-        <span>
-          <ArrowLeft className="w-4 h-4" />
-        </span>{' '}
-        Back
-      </Button>
+      <Link href="/">
+        <Button
+          size="sm"
+          variant="outline"
+          className="border absolute top-[5%] left-[3%] px-4 shadow-none cursor-pointer"
+        >
+          <span>
+            <ArrowLeft className="w-4 h-4" />
+          </span>{' '}
+          Back
+        </Button>
+      </Link>
     </div>
   );
 }

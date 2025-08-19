@@ -1,4 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 import { LoginForm } from '@/components/login-form';
 import { Button } from '@/components/ui/button';
 
@@ -8,16 +9,18 @@ export default function LoginPage() {
       <div className="w-full max-w-sm md:max-w-3xl">
         <LoginForm />
       </div>
-      <Button
-        size="sm"
-        variant="outline"
-        className="border absolute top-[5%] left-[3%] px-4 shadow-none"
-      >
-        <span>
-          <ArrowLeft className="w-4 h-4" />
-        </span>{' '}
-        Back
-      </Button>
+      <Link href="/">
+        <Button
+          size="sm"
+          variant="outline"
+          className="border absolute top-[5%] left-[3%] px-4 shadow-none cursor-pointer"
+        >
+          <span>
+            <ArrowLeft className="w-4 h-4" />
+          </span>{' '}
+          Back
+        </Button>
+      </Link>
     </div>
   );
 }
