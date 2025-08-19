@@ -1,11 +1,10 @@
-import { Home, FileText, ArrowRight } from 'lucide-react';
+import { Home, FileText } from 'lucide-react';
 import Link from 'next/link';
-import { FaqsSection } from '@/components/faqs-section';
 import { FeaturesSection } from '@/components/features-section';
-import { FooterSection } from '@/components/footer';
-import { Header, Logo, Navbar } from '@/components/header';
+import { Footer } from '@/components/footer';
+import { FaqsSection } from '@/components/faqs-section';
+import { Header, HeaderCTA, Logo, Navbar } from '@/components/header';
 import { HeroSection } from '@/components/hero-section';
-import { Button } from '@/components/ui/button';
 import { HowItWorksSection } from '@/components/how-it-works-section';
 
 export default function Page() {
@@ -35,30 +34,7 @@ export default function Page() {
                 </span>
               </Link>
             </div>
-            <Link href="/login" className="cursor-pointer">
-              <Button
-                size="sm"
-                variant="secondary"
-                className="border shadow-none cursor-pointer text-[0.8rem] h-7"
-              >
-                <span>Login</span>
-                <span>
-                  <ArrowRight className="h-3 w-3" />
-                </span>
-              </Button>
-            </Link>
-            <Link href="/login" className="cursor-pointer hidden">
-              <Button
-                size="sm"
-                variant="default"
-                className="border shadow-none cursor-pointer text-[0.8rem] h-7"
-              >
-                <span>Dashboard</span>
-                <span>
-                  <ArrowRight className="h-3 w-3" />
-                </span>
-              </Button>
-            </Link>
+            <HeaderCTA />
           </div>
         </Navbar>
       </Header>
@@ -68,7 +44,7 @@ export default function Page() {
         <HowItWorksSection />
         <FaqsSection />
       </main>
-      <FooterSection />
+      <Footer />
     </div>
   );
 }

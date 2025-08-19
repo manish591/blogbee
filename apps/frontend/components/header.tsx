@@ -11,12 +11,14 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import {
+  ArrowRight,
   CircleHelp,
   LayoutDashboard,
   LogOut,
   Settings,
   User,
 } from 'lucide-react';
+import { Button } from './ui/button';
 
 export function Header({
   children,
@@ -96,5 +98,41 @@ export function ProfileDropdown() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+export function HeaderCTA() {
+  const isAuthenticated = false;
+
+  return (
+    <>
+      {!isAuthenticated ? (
+        <Link href="/login" className="cursor-pointer">
+          <Button
+            size="sm"
+            variant="secondary"
+            className="border shadow-none cursor-pointer text-[0.8rem] h-7"
+          >
+            <span>Login</span>
+            <span>
+              <ArrowRight className="h-3 w-3" />
+            </span>
+          </Button>
+        </Link>
+      ) : (
+        <Link href="/login" className="cursor-pointer hidden">
+          <Button
+            size="sm"
+            variant="default"
+            className="border shadow-none cursor-pointer text-[0.8rem] h-7"
+          >
+            <span>Dashboard</span>
+            <span>
+              <ArrowRight className="h-3 w-3" />
+            </span>
+          </Button>
+        </Link>
+      )}
+    </>
   );
 }
