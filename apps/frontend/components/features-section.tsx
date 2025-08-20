@@ -11,7 +11,7 @@ export function FeaturesSection() {
             <div className="lg:order-1">
               <div className="absolute left-[-8%] top-[-10%]">
                 <Image
-                  src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1755436453/Screenshot_2025-08-17_184238_zsimzi.png"
+                  src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1755642724/Screenshot_2025-08-20_040019_f5dvff.png"
                   height={1080}
                   width={800}
                   alt="blog-dashboard"

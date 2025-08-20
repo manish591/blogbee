@@ -52,9 +52,9 @@ export function Logo({ className }: Readonly<{ className?: string }>) {
   );
 }
 
-export function ProfileAvatar() {
+export function ProfileAvatar({ className }: Readonly<{ className?: string }>) {
   return (
-    <Avatar className="h-6 w-6">
+    <Avatar className={cn('h-6 w-6', className)}>
       <AvatarImage src="https://github.com/shadcn.png" />
       <AvatarFallback className="text-sm">CN</AvatarFallback>
     </Avatar>
@@ -65,7 +65,7 @@ export function ProfileDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <ProfileAvatar />
+        <ProfileAvatar className="w-8 h-8" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="shadow-sm w-56 mr-[-8px]">
         <DropdownMenuLabel className="px-3">
