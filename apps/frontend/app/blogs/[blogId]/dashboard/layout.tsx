@@ -1,5 +1,5 @@
 import { ChevronsUpDown, Slash } from 'lucide-react';
-import { DashboardSidebar } from '@/app/blogs/[blogId]/dashboard/dashboard-sidebar';
+import { BlogDashboardSidebar } from '@/app/blogs/[blogId]/dashboard/blog-dashboard-sidebar';
 import { Header, Logo, Navbar, ProfileDropdown } from '@/components/header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -11,9 +11,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export default function BlogDashboardLayout({
+export default async function BlogDashboardLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+  params,
+}: Readonly<{
+  children: React.ReactNode;
+  params: Promise<{ blogId: string }>;
+}>) {
+  const blogId = (await params).blogId;
+
   return (
     <div className="flex flex-col min-h-screen bg-secondary/20">
       <Header>
@@ -74,7 +80,7 @@ export default function BlogDashboardLayout({
       </Header>
       <main>
         <div className="grid grid-cols-[280px_minmax(0,1fr)]">
-          <DashboardSidebar />
+          <BlogDashboardSidebar blogId={blogId} />
           <div>{children}</div>
         </div>
       </main>
