@@ -53,7 +53,7 @@ export default function ArticlesPage() {
           </Button>
           <Button className="ml-auto">
             <PlusCircle />
-            New Post
+            New Draft
           </Button>
         </div>
         <div className="bg-card rounded-lg border">

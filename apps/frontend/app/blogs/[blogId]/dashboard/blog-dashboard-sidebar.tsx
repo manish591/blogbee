@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 
 export function BlogDashboardSidebar({ blogId }: Readonly<{ blogId: string }>) {
   return (
-    <aside className="h-[calc(100svh-70px)] bg-background border-r overflow-auto py-4 flex flex-col">
+    <aside className="sticky top-[70px] h-[calc(100svh-70px)] bg-background border-r overflow-auto py-4 flex flex-col">
       <div className="px-6">
         <p className="uppercase text-sm">Blog Dashboard</p>
       </div>
