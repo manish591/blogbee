@@ -20,6 +20,7 @@ const timeout = 60_000;
 
 beforeAll(async () => {
   mongodbContainer = await new MongoDBContainer('mongo:8.0.12').start();
+  console.log("the container", mongodbContainer);
   dbClient = createDatabaseClient(
     `${mongodbContainer.getConnectionString()}/?directConnection=true`,
     {
