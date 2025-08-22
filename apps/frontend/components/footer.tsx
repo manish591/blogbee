@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Logo } from '@/components/header';
 import { APP_NAME } from '@/constants';
 
-export async function Footer() {
+export function Footer() {
   return (
     <footer className="w-full dark bg-background py-8">
       <div className="max-w-[1080px] mx-auto">
