@@ -1,11 +1,10 @@
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { APIResponse } from '../../utils/api-response';
+import { BlogbeeResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
 import {
   uploadFileToCloudinary,
-  uploadSingleFile,
-} from '../../utils/upload-files';
+} from '../../utils/upload';
 import type {
   TCreateBlogBody,
   TEditBlogBody,
@@ -37,34 +36,32 @@ export async function createBlogHandler(
       res
         .status(StatusCodes.UNAUTHORIZED)
         .json(
-          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+          new BlogbeeResponse('Unauthorized'),
         );
       return;
     }
 
     const { slug } = req.body;
-    const isTaken = await isSlugTaken(slug, req.db);
+    const isTaken = await isSlugTaken(slug);
 
     if (isTaken) {
       logger.error('SLUG_CONFLICT_ERROR: Slug not available');
       res
         .status(StatusCodes.CONFLICT)
         .json(
-          new APIResponse('error', StatusCodes.CONFLICT, 'Slug not available'),
+          new BlogbeeResponse('Slug not available'),
         );
       return;
     }
 
     const userId = userData.userId;
-    await createBlog(userId, req.body, req.db);
+    await createBlog(userId, req.body);
     logger.info('CREATE_USER_BLOG_SUCCESS: Created the blog successfully');
 
     res
       .status(StatusCodes.CREATED)
       .json(
-        new APIResponse(
-          'success',
-          StatusCodes.CREATED,
+        new BlogbeeResponse(
           'Created the blog successfully',
         ),
       );
@@ -73,9 +70,7 @@ export async function createBlogHandler(
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        new BlogbeeResponse(
           'Internal server error occured',
         ),
       );
@@ -91,7 +86,7 @@ export async function getAllBlogsByUserHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.UNAUTHORIZED)
         .json(
-          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+          new BlogbeeResponse('Unauthorized'),
         );
       return;
     }
@@ -101,7 +96,6 @@ export async function getAllBlogsByUserHandler(req: Request, res: Response) {
     const page = req.query.page as string;
     const allUserBlogsData = await getAllBlogsByUser(
       userData.userId,
-      req.db,
       q,
       Number(page),
       Number(limit),
@@ -111,21 +105,17 @@ export async function getAllBlogsByUserHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.OK)
       .json(
-        new APIResponse(
-          'success',
-          StatusCodes.OK,
+        new BlogbeeResponse(
           'Blogs fetched successfully',
           allUserBlogsData,
         ),
       );
   } catch (err) {
-    logger.error('Internal server error', err);
+    logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        new BlogbeeResponse(
           'Internal server error occured',
         ),
       );
@@ -141,26 +131,26 @@ export async function getBlogByIdHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.UNAUTHORIZED)
         .json(
-          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+          new BlogbeeResponse('Unauthorized'),
         );
       return;
     }
 
     const userId = userData.userId;
     const blogId = req.params.blogId;
-    const blogData = await getBlogById(blogId, req.db);
+    const blogData = await getBlogById(blogId);
 
     if (!blogData) {
       logger.error('NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
         .json(
-          new APIResponse('error', StatusCodes.NOT_FOUND, 'Blog not found'),
+          new BlogbeeResponse('Blog not found'),
         );
       return;
     }
 
-    const ownsBlog = await isBlogOwnedByUser(userId, blogId, req.db);
+    const ownsBlog = await isBlogOwnedByUser(userId, blogId);
 
     if (!ownsBlog) {
       logger.error(
@@ -169,9 +159,7 @@ export async function getBlogByIdHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.FORBIDDEN,
+          new BlogbeeResponse(
             'You do not have permission to read the content of the blog',
           ),
         );
@@ -183,21 +171,17 @@ export async function getBlogByIdHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.OK)
       .json(
-        new APIResponse(
-          'success',
-          StatusCodes.OK,
+        new BlogbeeResponse(
           'Blog data returned successfully',
           blogData,
         ),
       );
   } catch (err) {
-    logger.error('Internal server error', err);
+    logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        new BlogbeeResponse(
           'Internal server error occured',
         ),
       );
@@ -213,21 +197,16 @@ export async function uploadBlogLogoHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.BAD_REQUEST)
         .json(
-          new APIResponse('error', StatusCodes.BAD_REQUEST, 'File not found'),
+          new BlogbeeResponse('File not found'),
         );
       return;
     }
 
-    const profileImageUrl = await uploadSingleFile(
-      uploadedFile,
-      uploadFileToCloudinary,
-    );
+    const profileImageUrl = await uploadFileToCloudinary(uploadedFile);
     logger.info('BLOG_LOGO_UPLOAD_SUCCESS: Blog logo uploaded successfully');
 
     res.status(StatusCodes.OK).json(
-      new APIResponse(
-        'success',
-        StatusCodes.OK,
+      new BlogbeeResponse(
         'Blog logo uploaded successfully',
         {
           url: profileImageUrl,
@@ -239,9 +218,7 @@ export async function uploadBlogLogoHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        new BlogbeeResponse(
           'Internal server error occured',
         ),
       );
@@ -260,50 +237,46 @@ export async function editBlogHandler(
       res
         .status(StatusCodes.UNAUTHORIZED)
         .json(
-          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+          new BlogbeeResponse('Unauthorized'),
         );
       return;
     }
 
     const blogId = req.params.blogId;
-    const blogData = await getBlogById(blogId, req.db);
+    const blogData = await getBlogById(blogId);
 
     if (!blogData) {
       logger.error('NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
         .json(
-          new APIResponse('error', StatusCodes.NOT_FOUND, 'Blog not found'),
+          new BlogbeeResponse('Blog not found'),
         );
       return;
     }
 
     const userId = userData.userId;
-    const isUserOwner = await isBlogOwnedByUser(userId, blogId, req.db);
+    const isUserOwner = await isBlogOwnedByUser(userId, blogId);
 
     if (!isUserOwner) {
       logger.error('FORBIDDEN_ERROR: Blog does not belog to user');
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.FORBIDDEN,
+          new BlogbeeResponse(
             'You do not have permissions to edit the blog',
           ),
         );
       return;
     }
 
-    await editBlog(blogId, req.body, req.db);
+    await editBlog(blogId, req.body);
     logger.info('EDIT_BLOG_SUCCESS: Edited the blog successfully');
 
     res
       .status(StatusCodes.OK)
       .json(
-        new APIResponse(
-          'success',
-          StatusCodes.OK,
+        new BlogbeeResponse(
           'Edited the blog successfully',
         ),
       );
@@ -312,9 +285,7 @@ export async function editBlogHandler(
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        new BlogbeeResponse(
           'Internal server error occured',
         ),
       );
@@ -330,50 +301,46 @@ export async function deleteBlogHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.UNAUTHORIZED)
         .json(
-          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+          new BlogbeeResponse('Unauthorized'),
         );
       return;
     }
 
     const blogId = req.params.blogId;
-    const blogData = await getBlogById(blogId, req.db);
+    const blogData = await getBlogById(blogId);
 
     if (!blogData) {
       logger.error('NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
         .json(
-          new APIResponse('error', StatusCodes.NOT_FOUND, 'Blog not found'),
+          new BlogbeeResponse('Blog not found'),
         );
       return;
     }
 
     const userId = userData.userId;
-    const isUserOwner = await isBlogOwnedByUser(userId, blogId, req.db);
+    const isUserOwner = await isBlogOwnedByUser(userId, blogId);
 
     if (!isUserOwner) {
       logger.error('FORBIDDEN_ERROR: Blog does not belog to user');
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.FORBIDDEN,
+          new BlogbeeResponse(
             'You do not have permissions to delete the blog',
           ),
         );
       return;
     }
 
-    await deleteBlog(blogId, req.db);
+    await deleteBlog(blogId);
     logger.info('DELETE_BLOG_SUCCESS: Deleted the blog successfully');
 
     res
       .status(StatusCodes.OK)
       .json(
-        new APIResponse(
-          'success',
-          StatusCodes.OK,
+        new BlogbeeResponse(
           'Deleted the blog successfully',
         ),
       );
@@ -382,10 +349,8 @@ export async function deleteBlogHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
-          'Internal Server error occured',
+        new BlogbeeResponse(
+          'Internal server error occured',
         ),
       );
   }

@@ -1,29 +1,32 @@
-import * as mongoDB from 'mongodb';
-import { BLOG_COLLECTION, POSTS_COLLECTION } from '../utils/constants';
+import { type Collection, type Db, MongoClient, type MongoClientOptions, ServerApiVersion, type WithId } from 'mongodb';
+import { config } from '../config';
 import { logger } from '../utils/logger';
+import { BlogbeeError } from '../utils/app-error';
+import { POSTS_COLLECTION } from '../api/posts/posts.services';
+import { BLOG_COLLECTION } from '../api/blogs/blogs.services';
 
-export const dbClientOptions: mongoDB.MongoClientOptions = {
-  serverApi: {
-    version: mongoDB.ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-};
-
-export function createDatabaseClient(
-  databaseUri: string,
-  options: mongoDB.MongoClientOptions = dbClientOptions,
-) {
-  return new mongoDB.MongoClient(databaseUri, options);
-}
+let db: Db;
+let mongoClient: MongoClient;
 
 export async function connectToDatabase(
-  client: mongoDB.MongoClient,
-  databaseName: string,
 ) {
   try {
-    await client.connect();
-    const db: mongoDB.Db = client.db(databaseName);
+    const dbClientOptions: MongoClientOptions = {
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+      serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+      },
+    };
+
+    mongoClient = new MongoClient(config.DB_URL, dbClientOptions);
+
+    await mongoClient.connect();
+
+    db = mongoClient.db(config.DB_NAME);
+
     await db.collection(BLOG_COLLECTION).createIndex({
       name: 'text',
       slug: 'text',
@@ -35,8 +38,6 @@ export async function connectToDatabase(
     logger.info(
       'DB_CONNECTION_SUCCESS: Successfully connected to the database',
     );
-
-    return db;
   } catch (err) {
     logger.error(
       'DB_CONNECTION_FAILED: Failed to connect to the database',
@@ -46,9 +47,9 @@ export async function connectToDatabase(
   }
 }
 
-export async function disconnectFromDatabase(client: mongoDB.MongoClient) {
+export async function disconnectFromDatabase() {
   try {
-    await client.close();
+    await mongoClient.close();
     logger.warn(
       'DB_DISCONNECT_SUCCESS: Successfully disconnected from the database',
     );
@@ -58,4 +59,28 @@ export async function disconnectFromDatabase(client: mongoDB.MongoClient) {
       err,
     );
   }
+}
+
+export function getDB(): Db {
+  if (!db) {
+    throw new BlogbeeError(500, "Database not initialised");
+  }
+
+  return db;
+}
+
+export function getDBClient(): MongoClient {
+  if (!mongoClient || !db) {
+    throw new BlogbeeError(500, "Database not initialised");
+  }
+
+  return mongoClient;
+}
+
+export function collection<T>(collectionName: string): Collection<WithId<T>> {
+  if (!db) {
+    throw new BlogbeeError(500, "Database not initialised");
+  }
+
+  return db.collection<WithId<T>>(collectionName);
 }

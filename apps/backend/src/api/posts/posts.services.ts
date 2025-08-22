@@ -1,15 +1,18 @@
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-import { type Db, ObjectId } from 'mongodb';
-import { dbClient } from '../../server';
+import * as db from "../../db";
+import { StatusCodes } from 'http-status-codes';
+import { ObjectId } from 'mongodb';
 import { PostStatus, type Posts, type Tags } from '../../db/schema';
-import { AppError } from '../../utils/app-error';
-import { POSTS_COLLECTION, TAGS_COLLECTION } from '../../utils/constants';
+import { BlogbeeError } from '../../utils/app-error';
 import { logger } from '../../utils/logger';
 import type { TEditPostBody } from './posts.schema';
+import { TAGS_COLLECTION } from "../tags/tags.services";
 
-export async function createPost(userId: string, blogId: string, db: Db) {
+export const POSTS_COLLECTION = "posts";
+
+export async function createPost(userId: string, blogId: string) {
   try {
     const res = await db.collection<Posts>(POSTS_COLLECTION).insertOne({
+      _id: new ObjectId(),
       title: 'untitled',
       userId: new ObjectId(userId),
       blogId: new ObjectId(blogId),
@@ -24,15 +27,14 @@ export async function createPost(userId: string, blogId: string, db: Db) {
     };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
   }
 }
 
-export async function getPostById(postId: string, db: Db) {
+export async function getPostById(postId: string) {
   try {
     const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
       _id: new ObjectId(postId),
@@ -40,15 +42,14 @@ export async function getPostById(postId: string, db: Db) {
     return res;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
   }
 }
 
-export async function getPostBySlug(postSlug: string, db: Db) {
+export async function getPostBySlug(postSlug: string) {
   try {
     const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
       slug: postSlug,
@@ -56,17 +57,15 @@ export async function getPostBySlug(postSlug: string, db: Db) {
     return res;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
   }
 }
 
 export async function getAllPosts(
   blogId: string,
-  db: Db,
   q: string = '',
   page: number = 1,
   limit: number = 10,
@@ -105,15 +104,14 @@ export async function getAllPosts(
     };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
   }
 }
 
-export async function editPost(postId: string, data: TEditPostBody, db: Db) {
+export async function editPost(postId: string, data: TEditPostBody) {
   try {
     const cleanUpdates = Object.fromEntries(
       Object.entries(data).filter(([_, value]) => !!value),
@@ -137,15 +135,14 @@ export async function editPost(postId: string, data: TEditPostBody, db: Db) {
     };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
   }
 }
 
-export async function deletePost(postId: string, db: Db) {
+export async function deletePost(postId: string) {
   try {
     await db.collection<Posts>(POSTS_COLLECTION).updateOne(
       {
@@ -159,11 +156,10 @@ export async function deletePost(postId: string, db: Db) {
     );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
   }
 }
 
@@ -171,7 +167,6 @@ export async function isPostSlugAvailable(
   userId: string,
   blogId: string,
   slug: string,
-  db: Db,
 ) {
   try {
     const data = await db.collection<Posts>(POSTS_COLLECTION).findOne({
@@ -182,18 +177,16 @@ export async function isPostSlugAvailable(
     return data != null;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
   }
 }
 
 export async function isPostOwnedByUser(
   userId: string,
   postId: string,
-  db: Db,
 ) {
   try {
     const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
@@ -203,15 +196,15 @@ export async function isPostOwnedByUser(
     return res != null;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
   }
 }
 
-export async function addTagToPost(postId: string, tagId: string, db: Db) {
+export async function addTagToPost(postId: string, tagId: string) {
+  const dbClient = db.getDBClient();
   const session = dbClient.startSession();
   try {
     session.startTransaction();
@@ -242,17 +235,17 @@ export async function addTagToPost(postId: string, tagId: string, db: Db) {
   } catch (err) {
     await session.abortTransaction();
     logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
   } finally {
     await session.endSession();
   }
 }
 
-export async function removeTagFromPost(postId: string, tagId: string, db: Db) {
+export async function removeTagFromPost(postId: string, tagId: string) {
+  const dbClient = db.getDBClient();
   const session = dbClient.startSession();
   try {
     session.startTransaction();
@@ -283,17 +276,16 @@ export async function removeTagFromPost(postId: string, tagId: string, db: Db) {
   } catch (err) {
     await session.abortTransaction();
     logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
   } finally {
     await session.endSession();
   }
 }
 
-export async function isPostContainsTag(postId: string, tagId: string, db: Db) {
+export async function isPostContainsTag(postId: string, tagId: string,) {
   try {
     const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
       _id: new ObjectId(postId),
@@ -302,10 +294,9 @@ export async function isPostContainsTag(postId: string, tagId: string, db: Db) {
     return res != null;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new AppError({
-      status: StatusCodes.INTERNAL_SERVER_ERROR,
-      code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error occured',
-    });
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
   }
 }

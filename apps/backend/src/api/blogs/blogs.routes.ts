@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate';
 import { validateRequest } from '../../middlewares/validate-request';
-import { UPLOADED_BLOG_LOGO_IDENTIFIER } from '../../utils/constants';
-import { upload } from '../../utils/upload-files';
+import { upload } from '../../utils/upload';
 import {
   createBlogHandler,
   deleteBlogHandler,
@@ -20,6 +19,8 @@ import {
 } from './blogs.schema';
 
 const router = Router();
+
+export const UPLOADED_BLOG_LOGO_IDENTIFIER = 'blog-logo';
 
 router.post(
   '/',

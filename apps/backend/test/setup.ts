@@ -2,33 +2,33 @@ import {
   MongoDBContainer,
   type StartedMongoDBContainer,
 } from '@testcontainers/mongodb';
-import type * as mongo from 'mongodb';
-import { afterAll, beforeAll, beforeEach } from 'vitest';
+import { afterAll, beforeAll, beforeEach, vi } from 'vitest';
+import { type Collection, type Db, MongoClient, type WithId } from "mongodb";
 import { config } from '../src/config';
-import {
-  connectToDatabase,
-  createDatabaseClient,
-  disconnectFromDatabase,
-} from '../src/db';
-import { BLOG_COLLECTION, POSTS_COLLECTION } from '../src/utils/constants';
-import { logger } from '../src/utils/logger';
+import { BLOG_COLLECTION } from '../src/api/blogs/blogs.services';
+import { POSTS_COLLECTION } from '../src/api/posts/posts.services';
 
-let db: mongo.Db;
-let dbClient: mongo.MongoClient;
 let mongodbContainer: StartedMongoDBContainer;
+let db: Db;
+let dbClient: MongoClient;
 
 const timeout = 60_000;
 
 beforeAll(async () => {
   mongodbContainer = await new MongoDBContainer('mongo:8.0.12').start();
-  dbClient = createDatabaseClient(
-    `${mongodbContainer.getConnectionString()}/?directConnection=true`,
-    {
-      serverSelectionTimeoutMS: 10000,
-      connectTimeoutMS: 10000,
-    },
-  );
-  db = await connectToDatabase(dbClient, config.TEST_DATABASE_NAME);
+  const connectionStr = `${mongodbContainer.getConnectionString()}/?directConnection=true`;
+  process.env.TEST_DB_URL = connectionStr;
+  config.TEST_DB_URL = connectionStr;
+
+  dbClient = new MongoClient(config.TEST_DB_URL);
+  await dbClient.connect();
+  db = dbClient.db(config.TEST_DB_NAME);
+
+  vi.mock("../src/db", () => ({
+    getDB: (): Db => db,
+    getDBClient: (): MongoClient => dbClient,
+    collection: <T>(collectionName: string): Collection<WithId<T>> => db.collection<WithId<T>>(collectionName)
+  }));
 }, timeout);
 
 beforeEach(async () => {
@@ -46,8 +46,6 @@ beforeEach(async () => {
 
 afterAll(async () => {
   // close the db connections
-  await disconnectFromDatabase(dbClient);
+  await dbClient.close();
   await mongodbContainer?.stop();
 }, timeout);
-
-export { db };

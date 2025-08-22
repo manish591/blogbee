@@ -9,24 +9,15 @@ import express, {
 } from 'express';
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
-import type * as mongo from 'mongodb';
+import { StatusCodes } from 'http-status-codes';
 import { MulterError } from 'multer';
 import { config } from './config';
 import { v1Routes } from './routes';
-import { APIResponse } from './utils/api-response';
-import { AppError } from './utils/app-error';
+import { BlogbeeResponse } from './utils/api-response';
+import { BlogbeeError } from './utils/app-error';
 import { logger } from './utils/logger';
 
-declare global {
-  namespace Express {
-    interface Request {
-      db: mongo.Db;
-    }
-  }
-}
-
-export function buildServer({ db }: { db: mongo.Db }) {
+export function buildServer() {
   const app = express();
 
   const corsOptions: CorsOptions = {
@@ -72,20 +63,14 @@ export function buildServer({ db }: { db: mongo.Db }) {
   );
   app.use(limiter);
 
-  app.use((req, _res, next) => {
-    req.db = db;
-    next();
-  });
-
   app.use('/v1', v1Routes);
 
   app.use((_req, _res, next) => {
     next(
-      new AppError({
-        status: StatusCodes.NOT_FOUND,
-        code: ReasonPhrases.NOT_FOUND,
-        message: '404 not found',
-      }),
+      new BlogbeeError(
+        StatusCodes.NOT_FOUND,
+        'Not found',
+      ),
     );
   });
 
@@ -96,9 +81,7 @@ export function buildServer({ db }: { db: mongo.Db }) {
         res
           .status(StatusCodes.BAD_REQUEST)
           .json(
-            new APIResponse(
-              'error',
-              StatusCodes.BAD_REQUEST,
+            new BlogbeeResponse(
               'Allowed file size limit is 10MB',
             ),
           );
@@ -106,20 +89,17 @@ export function buildServer({ db }: { db: mongo.Db }) {
       }
 
       next(
-        new AppError({
-          status: StatusCodes.BAD_REQUEST,
-          code: err.code,
-          message: err.message,
-        }),
+        new BlogbeeError(
+          StatusCodes.BAD_REQUEST,
+          err.message,
+        ),
       );
     }
 
-    if (err instanceof AppError) {
-      res.status(err.status).json({
-        status: err.status,
-        code: err.code,
-        message: err.message,
-      });
+    if (err instanceof BlogbeeError) {
+      res.status(err.status).json(
+        new BlogbeeResponse(err.message)
+      );
 
       return;
     }

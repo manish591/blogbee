@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from 'express';
-import { ReasonPhrases, StatusCodes } from 'http-status-codes';
+import { StatusCodes } from 'http-status-codes';
 import { ZodError, type ZodObject, z } from 'zod';
-import { APIResponse } from '../utils/api-response';
-import { AppError } from '../utils/app-error';
+import { BlogbeeResponse } from '../utils/api-response';
+import { BlogbeeError } from '../utils/app-error';
 import { logger } from '../utils/logger';
 
 export function validateRequest(schema: ZodObject) {
@@ -26,18 +26,17 @@ export function validateRequest(schema: ZodObject) {
         res
           .status(StatusCodes.BAD_REQUEST)
           .json(
-            new APIResponse('error', StatusCodes.BAD_REQUEST, 'Bad request'),
+            new BlogbeeResponse('Bad request'),
           );
         return;
       }
 
       logger.error('SERVER_ERROR: Internal Server Error occured', err);
       next(
-        new AppError({
-          status: StatusCodes.INTERNAL_SERVER_ERROR,
-          code: ReasonPhrases.INTERNAL_SERVER_ERROR,
-          message: 'Internal server error occured',
-        }),
+        new BlogbeeError(
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'Internal server error occured',
+        ),
       );
     }
   };

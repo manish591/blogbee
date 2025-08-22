@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate';
 import { validateRequest } from '../../middlewares/validate-request';
-import { UPLOADED_PROFILE_IMG_IDENTIFIER } from '../../utils/constants';
-import { upload } from '../../utils/upload-files';
+import { upload } from '../../utils/upload';
 import {
   createUserHandler,
   editProfileHandler,
@@ -18,6 +17,8 @@ import {
 } from './users.schema';
 
 const router = Router();
+
+export const UPLOADED_PROFILE_IMG_IDENTIFIER = 'profile-img';
 
 router.post('/', validateRequest(createUserSchema), createUserHandler);
 router.post('/login', validateRequest(loginUserSchema), loginUserHandler);

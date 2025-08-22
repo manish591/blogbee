@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { APIResponse } from '../../utils/api-response';
+import { BlogbeeResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
 import { getBlogById, isBlogOwnedByUser } from '../blogs/blogs.services';
 import { getTagById } from '../tags/tags.services';
@@ -25,50 +25,46 @@ export async function createPostHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.UNAUTHORIZED)
         .json(
-          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+          new BlogbeeResponse('Unauthorized'),
         );
       return;
     }
 
     const userId = userData.userId;
     const blogId = req.body.blogId;
-    const isBlogExists = await getBlogById(blogId, req.db);
+    const isBlogExists = await getBlogById(blogId);
 
     if (!isBlogExists) {
       logger.error('BLOG_NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
         .json(
-          new APIResponse('error', StatusCodes.NOT_FOUND, 'Blog not found'),
+          new BlogbeeResponse('Blog not found'),
         );
       return;
     }
 
-    const isUserOwner = await isBlogOwnedByUser(userId, blogId, req.db);
+    const isUserOwner = await isBlogOwnedByUser(userId, blogId);
 
     if (!isUserOwner) {
       logger.error('FORBIDDEN_ERROR: Blog does not belong to user');
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.FORBIDDEN,
+          new BlogbeeResponse(
             'You do not have permission to add post in this blog',
           ),
         );
       return;
     }
 
-    await createPost(userId, blogId, req.db);
+    await createPost(userId, blogId);
     logger.info('CREATE_POST_SUCCESS: Post created successfully');
 
     res
       .status(StatusCodes.CREATED)
       .json(
-        new APIResponse(
-          'success',
-          StatusCodes.CREATED,
+        new BlogbeeResponse(
           'Post created successfully',
         ),
       );
@@ -77,9 +73,7 @@ export async function createPostHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        new BlogbeeResponse(
           'Internal server error occured',
         ),
       );
@@ -95,35 +89,33 @@ export async function getAllPostsHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.UNAUTHORIZED)
         .json(
-          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+          new BlogbeeResponse('Unauthorized'),
         );
       return;
     }
 
     const blogId = req.query.blogId as string;
-    const isBlogExists = await getBlogById(blogId, req.db);
+    const isBlogExists = await getBlogById(blogId);
 
     if (!isBlogExists) {
       logger.error('BLOG_NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
         .json(
-          new APIResponse('error', StatusCodes.NOT_FOUND, 'Blog not found'),
+          new BlogbeeResponse('Blog not found'),
         );
       return;
     }
 
     const userId = userData.userId;
-    const ownsBlog = await isBlogOwnedByUser(userId, blogId, req.db);
+    const ownsBlog = await isBlogOwnedByUser(userId, blogId);
 
     if (!ownsBlog) {
       logger.error('FORBIDDEN_ERROR: Blog does not belog to user');
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.FORBIDDEN,
+          new BlogbeeResponse(
             'You do not have permissions to read the posts content',
           ),
         );
@@ -135,7 +127,6 @@ export async function getAllPostsHandler(req: Request, res: Response) {
     const page = (req.query.page as string) ? Number(req.query.page) : 1;
     const postsData = await getAllPosts(
       blogId,
-      req.db,
       q,
       Number(page),
       Number(limit),
@@ -145,9 +136,7 @@ export async function getAllPostsHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.OK)
       .json(
-        new APIResponse(
-          'success',
-          StatusCodes.OK,
+        new BlogbeeResponse(
           'Posts fetched successfully',
           postsData,
         ),
@@ -157,9 +146,7 @@ export async function getAllPostsHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        new BlogbeeResponse(
           'Internal server error occured',
         ),
       );
@@ -175,35 +162,33 @@ export async function getPostByIdHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.UNAUTHORIZED)
         .json(
-          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+          new BlogbeeResponse('Unauthorized'),
         );
       return;
     }
 
     const postId = req.params.postId;
-    const postData = await getPostById(postId, req.db);
+    const postData = await getPostById(postId);
 
     if (!postData) {
       logger.error('POST_NOT_FOUND_ERROR: Post not found');
       res
         .status(StatusCodes.NOT_FOUND)
         .json(
-          new APIResponse('error', StatusCodes.NOT_FOUND, 'Post not found'),
+          new BlogbeeResponse('Post not found'),
         );
       return;
     }
 
     const userId = userData.userId;
-    const ownsPost = await isPostOwnedByUser(userId, postId, req.db);
+    const ownsPost = await isPostOwnedByUser(userId, postId);
 
     if (!ownsPost) {
       logger.error('FORBIDDEN_ERROR: Post does not belog to user');
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.FORBIDDEN,
+          new BlogbeeResponse(
             'You do not have permissions to read the post content',
           ),
         );
@@ -215,9 +200,7 @@ export async function getPostByIdHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.OK)
       .json(
-        new APIResponse(
-          'success',
-          StatusCodes.OK,
+        new BlogbeeResponse(
           'Post data returned successfully',
           postData,
         ),
@@ -227,9 +210,7 @@ export async function getPostByIdHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        new BlogbeeResponse(
           'Internal server error occured',
         ),
       );
@@ -245,57 +226,53 @@ export async function editPostHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.UNAUTHORIZED)
         .json(
-          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+          new BlogbeeResponse('Unauthorized'),
         );
       return;
     }
 
     const postId = req.params.postId;
-    const postData = await getPostById(postId, req.db);
+    const postData = await getPostById(postId);
 
     if (!postData) {
       logger.error('POST_NOT_FOUND_ERROR: Post not found');
       res
         .status(StatusCodes.NOT_FOUND)
         .json(
-          new APIResponse('error', StatusCodes.NOT_FOUND, 'Post not found'),
+          new BlogbeeResponse('Post not found'),
         );
       return;
     }
 
     const userId = userData.userId;
-    const ownsPost = await isPostOwnedByUser(userId, postId, req.db);
+    const ownsPost = await isPostOwnedByUser(userId, postId);
 
     if (!ownsPost) {
       logger.error('FORBIDDEN_ERROR: Post does not belog to user');
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.FORBIDDEN,
+          new BlogbeeResponse(
             'You do not have permissions to edit the post',
           ),
         );
       return;
     }
 
-    await editPost(postId, req.body, req.db);
+    await editPost(postId, req.body);
     logger.info('EDIT_POST_SUCCESS: Posts edited successfully');
 
     res
       .status(StatusCodes.OK)
       .json(
-        new APIResponse('success', StatusCodes.OK, 'Posts edited successfully'),
+        new BlogbeeResponse('Posts edited successfully'),
       );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        new BlogbeeResponse(
           'Internal server error occured',
         ),
       );
@@ -311,50 +288,46 @@ export async function deletePostHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.UNAUTHORIZED)
         .json(
-          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+          new BlogbeeResponse('Unauthorized'),
         );
       return;
     }
 
     const postId = req.params.postId;
-    const postData = await getPostById(postId, req.db);
+    const postData = await getPostById(postId);
 
     if (!postData) {
       logger.error('POST_NOT_FOUND_ERROR: Post not found');
       res
         .status(StatusCodes.NOT_FOUND)
         .json(
-          new APIResponse('error', StatusCodes.NOT_FOUND, 'Post not found'),
+          new BlogbeeResponse('Post not found'),
         );
       return;
     }
 
     const userId = userData.userId;
-    const ownsPost = await isPostOwnedByUser(userId, postId, req.db);
+    const ownsPost = await isPostOwnedByUser(userId, postId);
 
     if (!ownsPost) {
       logger.error('FORBIDDEN_ERROR: Post does not belog to user');
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.FORBIDDEN,
+          new BlogbeeResponse(
             'You do not have permissions to delete the post',
           ),
         );
       return;
     }
 
-    await deletePost(postId, req.db);
+    await deletePost(postId);
     logger.info('DELETE_POST_SUCCESS: Posts deleted successfully');
 
     res
       .status(StatusCodes.OK)
       .json(
-        new APIResponse(
-          'success',
-          StatusCodes.OK,
+        new BlogbeeResponse(
           'Posts deleted successfully',
         ),
       );
@@ -363,9 +336,7 @@ export async function deletePostHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        new BlogbeeResponse(
           'Internal server error occured',
         ),
       );
@@ -381,7 +352,7 @@ export async function addTagToPostHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.UNAUTHORIZED)
         .json(
-          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+          new BlogbeeResponse('Unauthorized'),
         );
       return;
     }
@@ -390,50 +361,46 @@ export async function addTagToPostHandler(req: Request, res: Response) {
     const tagId = req.params.tagId;
     const userId = userData.userId;
 
-    const postData = await getPostById(postId, req.db);
+    const postData = await getPostById(postId);
     if (!postData) {
       logger.error('POST_NOT_FOUND_ERROR: Post not found');
       res
         .status(StatusCodes.NOT_FOUND)
         .json(
-          new APIResponse('error', StatusCodes.NOT_FOUND, 'Post not found'),
+          new BlogbeeResponse('Post not found'),
         );
       return;
     }
 
-    const tagData = await getTagById(tagId, req.db);
+    const tagData = await getTagById(tagId);
     if (!tagData) {
       logger.error('NOT_FOUND_ERROR: Tag not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(new APIResponse('error', StatusCodes.NOT_FOUND, 'Tag not found'));
+        .json(new BlogbeeResponse('Tag not found'));
       return;
     }
 
-    const userOwnsPost = await isPostOwnedByUser(userId, postId, req.db);
+    const userOwnsPost = await isPostOwnedByUser(userId, postId);
     if (!userOwnsPost) {
       logger.error('FORBIDDEN_ERROR: Post does not belog to user');
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.FORBIDDEN,
+          new BlogbeeResponse(
             'You do not have permissions to add tag to this post',
           ),
         );
       return;
     }
 
-    const containsTag = await isPostContainsTag(postId, tagId, req.db);
+    const containsTag = await isPostContainsTag(postId, tagId);
     if (containsTag) {
       logger.error('CONFLICT_ERROR: Post already contains this tag');
       res
         .status(StatusCodes.CONFLICT)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.CONFLICT,
+          new BlogbeeResponse(
             'Post already contains this tag',
           ),
         );
@@ -449,24 +416,20 @@ export async function addTagToPostHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.FORBIDDEN,
+          new BlogbeeResponse(
             'The post and tag must belong to the same blog',
           ),
         );
       return;
     }
 
-    await addTagToPost(postId, tagId, req.db);
+    await addTagToPost(postId, tagId);
     logger.info('ADD_TAG_TO_POST_SUCCESS: Tag added to post successfully');
 
     res
       .status(StatusCodes.OK)
       .json(
-        new APIResponse(
-          'success',
-          StatusCodes.OK,
+        new BlogbeeResponse(
           'Tag added to post successfully',
         ),
       );
@@ -475,9 +438,7 @@ export async function addTagToPostHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        new BlogbeeResponse(
           'Internal server error occured',
         ),
       );
@@ -493,7 +454,7 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.UNAUTHORIZED)
         .json(
-          new APIResponse('error', StatusCodes.UNAUTHORIZED, 'Unauthorized'),
+          new BlogbeeResponse('Unauthorized'),
         );
       return;
     }
@@ -502,50 +463,46 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
     const tagId = req.params.tagId;
     const userId = userData.userId;
 
-    const postData = await getPostById(postId, req.db);
+    const postData = await getPostById(postId);
     if (!postData) {
       logger.error('POST_NOT_FOUND_ERROR: Post not found');
       res
         .status(StatusCodes.NOT_FOUND)
         .json(
-          new APIResponse('error', StatusCodes.NOT_FOUND, 'Post not found'),
+          new BlogbeeResponse('Post not found'),
         );
       return;
     }
 
-    const tagData = await getTagById(tagId, req.db);
+    const tagData = await getTagById(tagId);
     if (!tagData) {
       logger.error('NOT_FOUND_ERROR: Tag not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(new APIResponse('error', StatusCodes.NOT_FOUND, 'Tag not found'));
+        .json(new BlogbeeResponse('Tag not found'));
       return;
     }
 
-    const userOwnsPost = await isPostOwnedByUser(userId, postId, req.db);
+    const userOwnsPost = await isPostOwnedByUser(userId, postId);
     if (!userOwnsPost) {
       logger.error('FORBIDDEN_ERROR: Post does not belog to user');
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.FORBIDDEN,
+          new BlogbeeResponse(
             'You do not have permissions to delete the tag from this post',
           ),
         );
       return;
     }
 
-    const containsTag = await isPostContainsTag(postId, tagId, req.db);
+    const containsTag = await isPostContainsTag(postId, tagId);
     if (!containsTag) {
       logger.error('NOT_FOUND_ERROR: Post does not contains this tag');
       res
         .status(StatusCodes.NOT_FOUND)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.NOT_FOUND,
+          new BlogbeeResponse(
             'Post does not contains this tag',
           ),
         );
@@ -561,16 +518,14 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new APIResponse(
-            'error',
-            StatusCodes.FORBIDDEN,
+          new BlogbeeResponse(
             'The post and tag must belong to the same blog',
           ),
         );
       return;
     }
 
-    await removeTagFromPost(postId, tagId, req.db);
+    await removeTagFromPost(postId, tagId);
     logger.info(
       'REMOVE_TAG_FROM_POST_SUCCESS: Tag removed from post successfully',
     );
@@ -578,9 +533,7 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.OK)
       .json(
-        new APIResponse(
-          'success',
-          StatusCodes.OK,
+        new BlogbeeResponse(
           'Tag removed from post successfully',
         ),
       );
@@ -589,9 +542,7 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(
-        new APIResponse(
-          'error',
-          StatusCodes.INTERNAL_SERVER_ERROR,
+        new BlogbeeResponse(
           'Internal server error occured',
         ),
       );
