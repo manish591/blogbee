@@ -5,10 +5,12 @@ export default function BlogRootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main>{children}</main>
-      <Footer />
+      <div className="mt-auto">
+        <Footer />
+      </div>
     </div>
   );
 }
