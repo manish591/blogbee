@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 
 export function Header() {
   return (
-    <header className="sticky top-0 w-full bg-background px-12">
+    <header className="z-10 sticky top-0 w-full bg-background px-12">
       <div className="h-16 flex items-center justify-between">
         <div className="flex items-center gap-12">
           <div className="flex items-center gap-2">
