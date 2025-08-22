@@ -1,5 +1,4 @@
 import * as mongoDB from 'mongodb';
-import { config } from '../config';
 import { BLOG_COLLECTION, POSTS_COLLECTION } from '../utils/constants';
 import { logger } from '../utils/logger';
 
@@ -15,7 +14,6 @@ export function createDatabaseClient(
   databaseUri: string,
   options: mongoDB.MongoClientOptions = dbClientOptions,
 ) {
-  logger.info(`CREATE_DATABASE_CLIENT: ${databaseUri}`);
   return new mongoDB.MongoClient(databaseUri, options);
 }
 
@@ -61,5 +59,3 @@ export async function disconnectFromDatabase(client: mongoDB.MongoClient) {
     );
   }
 }
-
-export const dbClient = createDatabaseClient(config.DATABASE_URL);

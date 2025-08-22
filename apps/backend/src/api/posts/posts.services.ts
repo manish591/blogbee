@@ -1,6 +1,6 @@
 import { ReasonPhrases, StatusCodes } from 'http-status-codes';
 import { type Db, ObjectId } from 'mongodb';
-import { dbClient } from '../../db';
+import { dbClient } from '../../server';
 import { PostStatus, type Posts, type Tags } from '../../db/schema';
 import { AppError } from '../../utils/app-error';
 import { POSTS_COLLECTION, TAGS_COLLECTION } from '../../utils/constants';

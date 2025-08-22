@@ -1,7 +1,9 @@
 import { buildServer } from './app';
 import { config } from './config';
-import { connectToDatabase, dbClient, disconnectFromDatabase } from './db';
+import { connectToDatabase, createDatabaseClient, disconnectFromDatabase } from './db';
 import { logger } from './utils/logger';
+
+export const dbClient = createDatabaseClient(config.DATABASE_URL);
 
 (async () => {
   try {
