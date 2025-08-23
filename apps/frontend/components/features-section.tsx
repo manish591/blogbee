@@ -66,7 +66,7 @@ export function FeaturesSection() {
                 </div>
               </div>
             </div>
-            <div className="px-8">
+            <div className="px-8 pb-8">
               <div className="flex items-center gap-3 text-foreground/80">
                 <span className="text-sm">Coming Soon</span>
               </div>
@@ -91,11 +91,11 @@ export function FeaturesSection() {
           </div>
           <div className="max-h-80 border-l">
             <Image
-              src="/placeholder.png"
+              src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1755965750/Screenshot_2025-08-23_214449_wxatr3.png"
               width={1080}
               height={320}
               alt="domain"
-              className="cover w-full h-full"
+              className="border-r blur-[2px] object-cover object-left w-full h-full"
             />
           </div>
         </div>

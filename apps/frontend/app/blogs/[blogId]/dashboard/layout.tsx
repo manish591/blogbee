@@ -1,6 +1,6 @@
 import { ChevronsUpDown, Slash } from 'lucide-react';
 import { BlogDashboardSidebar } from '@/app/blogs/[blogId]/dashboard/blog-dashboard-sidebar';
-import { Header, Logo, Navbar, ProfileDropdown } from '@/components/header';
+import { Header } from '@/components/header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -10,6 +10,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Logo } from '@/components/logo';
+import { ProfileDropdown } from '@/components/profile-dropdown';
 
 export default async function BlogDashboardLayout({
   children,
@@ -23,7 +25,7 @@ export default async function BlogDashboardLayout({
   return (
     <div className="flex flex-col min-h-screen bg-secondary/20">
       <Header>
-        <Navbar className="px-6">
+        <div className="px-6">
           <div className="flex items-center space-x-2">
             <Logo />
             <span>
@@ -75,8 +77,13 @@ export default async function BlogDashboardLayout({
               </DropdownMenu>
             </div>
           </div>
-          <ProfileDropdown />
-        </Navbar>
+          <ProfileDropdown
+            user={{
+              email: 'manishdevrani777@gmail.com',
+              name: 'manish',
+            }}
+          />
+        </div>
       </Header>
       <main>
         <div className="grid grid-cols-[280px_minmax(0,1fr)]">
