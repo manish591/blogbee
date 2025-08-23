@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Logo } from '@/components/header';
 import { APP_NAME } from '@/constants';
 
 export function Footer() {
@@ -10,7 +9,12 @@ export function Footer() {
           <div className="pb-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-8">
-                <Logo className="text-foreground" />
+                <Link
+                  href="/"
+                  className="text-xl font-bold capitalize text-foreground"
+                >
+                  {APP_NAME}
+                </Link>
                 <nav className="flex items-center space-x-6">
                   <Link
                     href="/"
