@@ -16,7 +16,6 @@ export async function connectToDatabase(
       connectTimeoutMS: 10000,
       serverApi: {
         version: ServerApiVersion.v1,
-        strict: true,
         deprecationErrors: true,
       },
     };
