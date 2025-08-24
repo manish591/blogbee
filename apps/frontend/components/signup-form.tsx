@@ -81,7 +81,7 @@ export function SignupForm() {
           />
           <div className="flex flex-col gap-4">
             <Button type="submit" className="w-full cursor-pointer">
-              Login
+              Signup
             </Button>
             <div className="flex">
               <Button
@@ -96,7 +96,7 @@ export function SignupForm() {
                     fill="currentColor"
                   />
                 </svg>
-                <span>Login with Google</span>
+                <span>Signup with Google</span>
               </Button>
             </div>
           </div>

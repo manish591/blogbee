@@ -1,4 +1,6 @@
 import { ArrowLeft } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { BackButton } from '@/components/back-button';
 import { LoginForm } from '@/components/login-form';
@@ -12,16 +14,51 @@ export default async function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm md:max-w-3xl">
-        <LoginForm />
+    <div className="h-screen grid grid-cols-2">
+      <div className="w-full h-full flex justify-center items-center">
+        <BackButton className="border absolute top-[30px] left-[30px] px-4 shadow-none cursor-pointer">
+          <span>
+            <ArrowLeft className="w-4 h-4" />
+          </span>{' '}
+          Back
+        </BackButton>
+        <div className="w-full">
+          <div className="max-w-sm mx-auto">
+            <section className="mb-6">
+              <h1 className="text-2xl font-medium">Welcome to Blogbee</h1>
+              <p className="text-muted-foreground text-balance">
+                Enter your details to access your account
+              </p>
+            </section>
+            <LoginForm />
+            <div className="text-center text-sm mt-4">
+              Don't have an account?{' '}
+              <Link
+                href="/signup"
+                className="underline underline-offset-4 hover:text-primary"
+              >
+                Signup
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
-      <BackButton className="border absolute top-[5%] left-[3%] px-4 shadow-none cursor-pointer">
-        <span>
-          <ArrowLeft className="w-4 h-4" />
-        </span>{' '}
-        Back
-      </BackButton>
+      <div className="w-full h-full p-2 overflow-hidden">
+        <div
+          className="h-full rounded-md overflow-hidden"
+          style={{
+            background: `linear-gradient(135deg, rgba(255, 255, 196, 1.000) 0.000%, rgba(255, 97, 100, 1.000) 50.000%, rgba(176, 0, 18, 1.000) 100.000%)`,
+          }}
+        >
+          <Image
+            src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1755607989/krisjanis-kazaks-bRB_9zllVN4-unsplash_fov1wv.jpg"
+            alt=""
+            width={1080}
+            height={960}
+            className="w-full h-full object-cover blur-xs saturate-0"
+          />
+        </div>
+      </div>
     </div>
   );
 }

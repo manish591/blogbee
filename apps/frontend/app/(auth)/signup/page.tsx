@@ -1,10 +1,10 @@
 import { ArrowLeft } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { BackButton } from '@/components/back-button';
 import { SignupForm } from '@/components/signup-form';
 import { verifySession } from '@/lib/dal';
-import Image from 'next/image';
 
 export default async function SignupPage() {
   const session = await verifySession();

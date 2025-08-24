@@ -1,93 +1,92 @@
 'use client';
 
-import Image from 'next/image';
-import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { APP_NAME } from '@/constants';
-import { cn } from '@/lib/utils';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<'div'>) {
+const formSchema = z.object({
+  email: z.email().trim(),
+  password: z.string().min(6).max(30),
+});
+
+export type LoginFormData = z.infer<typeof formSchema>;
+
+export function LoginForm() {
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  function onSubmit(values: LoginFormData) {
+    console.log('values', values);
+  }
+
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
-      <Card className="overflow-hidden p-0 rounded-md shadow-none">
-        <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col items-center text-center">
-                <h1 className="text-2xl font-bold">Welcome back</h1>
-                <p className="text-muted-foreground text-balance">
-                  Login to your {APP_NAME} account
-                </p>
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                />
-              </div>
-              <div className="grid gap-3">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
-                <Input id="password" type="password" required />
-              </div>
-              <div className="flex flex-col gap-4">
-                <Button type="submit" className="w-full cursor-pointer">
-                  Login
-                </Button>
-                <div className="flex">
-                  <Button
-                    variant="outline"
-                    type="button"
-                    className="w-full cursor-pointer"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                      <title>google</title>
-                      <path
-                        d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                        fill="currentColor"
-                      />
-                    </svg>
-                    <span>Login with Google</span>
-                  </Button>
-                </div>
-              </div>
-              <div className="text-center text-sm">
-                Don&apos;t have an account?{' '}
-                <Link
-                  href="/signup"
-                  className="underline underline-offset-4 hover:text-primary"
-                >
-                  Sign up
-                </Link>
-              </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="flex flex-col gap-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder="Email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="Password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex flex-col gap-4">
+            <Button type="submit" className="w-full cursor-pointer">
+              Login
+            </Button>
+            <div className="flex">
+              <Button
+                variant="outline"
+                type="button"
+                className="w-full cursor-pointer"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <title>google</title>
+                  <path
+                    d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+                    fill="currentColor"
+                  />
+                </svg>
+                <span>Login with Google</span>
+              </Button>
             </div>
-          </form>
-          <div className="bg-muted relative hidden md:block">
-            <Image
-              width={400}
-              height={800}
-              src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1755610019/pxArt_npztjj.png"
-              alt="Image"
-              className="absolute inset-0 h-full w-full object-cover blur-[1px] brightness-75 grayscale-75"
-            />
           </div>
-        </CardContent>
-      </Card>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By continuing, you agree to our{' '}
-        <Link href="/terms-and-conditions">Terms & Conditions</Link> and{' '}
-        <Link href="/privacy-policy">Privacy Policy</Link>.
-      </div>
-    </div>
+        </div>
+      </form>
+    </Form>
   );
 }
