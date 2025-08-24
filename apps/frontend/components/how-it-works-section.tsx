@@ -25,7 +25,7 @@ export function HowItWorksSection() {
             </div>
           </div>
           <div className="px-8 py-8">
-            <h3 className="text-3xl">Create your account</h3>
+            <h3 className="text-[28px]">Create your account</h3>
             <p className="text-base mt-3 leading-[1.4] text-foreground/70">
               Start by signing up{' '}
               <Link href="/signup" className="underline">
@@ -42,7 +42,7 @@ export function HowItWorksSection() {
             </div>
           </div>
           <div className="px-8 py-8">
-            <h3 className="text-3xl">Write & Organize</h3>
+            <h3 className="text-[28px]">Write & Organize</h3>
             <p className="text-base mt-4 leading-[1.4] text-foreground/70">
               Add as many blogs as you like, all under one roof.
             </p>
@@ -55,7 +55,7 @@ export function HowItWorksSection() {
             </div>
           </div>
           <div className="px-8 py-8">
-            <h3 className="text-3xl">Publish & Share</h3>
+            <h3 className="text-[28px]">Publish & Share</h3>
             <p className="text-base mt-4 leading-[1.4] text-foreground/70">
               We host it for you, SEO-ready out of the box.
             </p>
@@ -69,7 +69,7 @@ export function HowItWorksSection() {
             </h3>
             <div className="mt-8">
               <Link href="/signup">
-                <Button size="lg" className="h-11 px-5 text-lg cursor-pointer">
+                <Button size="lg" className="cursor-pointer">
                   Get Started{' '}
                   <span>
                     <ArrowRight strokeWidth={2} />

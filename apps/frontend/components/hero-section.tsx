@@ -27,10 +27,7 @@ export function HeroSection() {
                 </p>
                 <div className="mt-8">
                   <Link href="/signup">
-                    <Button
-                      size="lg"
-                      className="cursor-pointer h-11 px-5 text-lg"
-                    >
+                    <Button size="lg" className="cursor-pointer">
                       Get Started{' '}
                       <span>
                         <ArrowRight strokeWidth={2} />

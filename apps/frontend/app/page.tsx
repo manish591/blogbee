@@ -44,7 +44,7 @@ export default async function Page() {
               <Button
                 size="sm"
                 variant="secondary"
-                className="border shadow-none cursor-pointer text-[0.8rem] h-7"
+                className="border shadow-none cursor-pointer"
               >
                 <span>Login</span>
                 <span>
