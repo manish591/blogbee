@@ -41,6 +41,7 @@ export function Marquee({
   repeat = 4,
   ...props
 }: Readonly<MarqueeProps>) {
+  const repeatArray = Array.from({ length: repeat }, (_, i) => i + 1);
   return (
     <div
       {...props}
@@ -53,22 +54,19 @@ export function Marquee({
         className,
       )}
     >
-      {Array(repeat)
-        .fill(0)
-        .map((_, i) => (
-          <div
-            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-            key={i}
-            className={cn('flex shrink-0 justify-around [gap:var(--gap)]', {
-              'animate-marquee flex-row': !vertical,
-              'animate-marquee-vertical flex-col': vertical,
-              'group-hover:[animation-play-state:paused]': pauseOnHover,
-              '[animation-direction:reverse]': reverse,
-            })}
-          >
-            {children}
-          </div>
-        ))}
+      {repeatArray.map((val) => (
+        <div
+          key={val}
+          className={cn('flex shrink-0 justify-around [gap:var(--gap)]', {
+            'animate-marquee flex-row': !vertical,
+            'animate-marquee-vertical flex-col': vertical,
+            'group-hover:[animation-play-state:paused]': pauseOnHover,
+            '[animation-direction:reverse]': reverse,
+          })}
+        >
+          {children}
+        </div>
+      ))}
     </div>
   );
 }

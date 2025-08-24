@@ -1,13 +1,13 @@
-import * as db from "../../db";
 import { StatusCodes } from 'http-status-codes';
 import { ObjectId } from 'mongodb';
+import * as db from '../../db';
 import type { Posts, Tags } from '../../db/schema';
 import { BlogbeeError } from '../../utils/app-error';
 import { logger } from '../../utils/logger';
+import { POSTS_COLLECTION } from '../posts/posts.services';
 import type { TCreateTagBody, TEditTagBody } from './tags.schema';
-import { POSTS_COLLECTION } from "../posts/posts.services";
 
-export const TAGS_COLLECTION = "tags";
+export const TAGS_COLLECTION = 'tags';
 
 export async function createTag(
   userId: string,

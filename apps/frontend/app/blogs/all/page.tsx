@@ -1,4 +1,5 @@
 import { Slash } from 'lucide-react';
+import { redirect } from 'next/navigation';
 import { BlogsManager } from '@/app/blogs/all/blogs-manager';
 import { Footer } from '@/components/footer';
 import { Header } from '@/components/header';
@@ -6,7 +7,6 @@ import { Logo } from '@/components/logo';
 import { ProfileAvatar } from '@/components/profile-avatar';
 import { ProfileDropdown } from '@/components/profile-dropdown';
 import { verifySession } from '@/lib/dal';
-import { redirect } from 'next/navigation';
 
 export default async function AllBlogsPage() {
   const session = await verifySession();

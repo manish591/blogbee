@@ -1,14 +1,14 @@
-import * as db from "../../db";
 import { StatusCodes } from 'http-status-codes';
 import { ObjectId } from 'mongodb';
+import * as db from '../../db';
 import type { Blogs, Posts, Tags } from '../../db/schema';
 import { BlogbeeError } from '../../utils/app-error';
 import { logger } from '../../utils/logger';
+import { POSTS_COLLECTION } from '../posts/posts.services';
+import { TAGS_COLLECTION } from '../tags/tags.services';
 import type { TCreateBlogBody, TEditBlogBody } from './blogs.schema';
-import { TAGS_COLLECTION } from "../tags/tags.services";
-import { POSTS_COLLECTION } from "../posts/posts.services";
 
-export const BLOG_COLLECTION = "blogs";
+export const BLOG_COLLECTION = 'blogs';
 
 export async function isSlugTaken(slug: string) {
   try {
@@ -25,10 +25,7 @@ export async function isSlugTaken(slug: string) {
   }
 }
 
-export async function createBlog(
-  userId: string,
-  data: TCreateBlogBody,
-) {
+export async function createBlog(userId: string, data: TCreateBlogBody) {
   try {
     const res = await db.collection<Blogs>(BLOG_COLLECTION).insertOne({
       _id: new ObjectId(),
@@ -145,7 +142,7 @@ export async function editBlog(blogId: string, data: TEditBlogBody) {
   }
 }
 
-export async function deleteBlog(blogId: string,) {
+export async function deleteBlog(blogId: string) {
   const dbClient = db.getDBClient();
   const session = dbClient.startSession();
 
@@ -187,10 +184,7 @@ export async function deleteBlog(blogId: string,) {
   }
 }
 
-export async function isBlogOwnedByUser(
-  userId: string,
-  blogId: string
-) {
+export async function isBlogOwnedByUser(userId: string, blogId: string) {
   try {
     const res = await db.collection<Blogs>(BLOG_COLLECTION).findOne({
       _id: new ObjectId(blogId),

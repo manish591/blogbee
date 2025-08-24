@@ -9,7 +9,7 @@ export const config = {
   ALLOWED_ORIGINS: ['http://localhost:3000'],
   DB_URL: process.env.DB_URL ?? '',
   DB_NAME: process.env.DB_NAME ?? 'blogbee-dev',
-  TEST_DB_URL: process.env.TEST_DB_URL ?? "",
+  TEST_DB_URL: process.env.TEST_DB_URL ?? '',
   TEST_DB_NAME: process.env.TEST_DB_NAME ?? 'blogbee-test',
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,

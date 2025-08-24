@@ -24,9 +24,7 @@ export async function createPostHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -38,9 +36,7 @@ export async function createPostHandler(req: Request, res: Response) {
       logger.error('BLOG_NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Blog not found'),
-        );
+        .json(new BlogbeeResponse('Blog not found'));
       return;
     }
 
@@ -63,20 +59,12 @@ export async function createPostHandler(req: Request, res: Response) {
 
     res
       .status(StatusCodes.CREATED)
-      .json(
-        new BlogbeeResponse(
-          'Post created successfully',
-        ),
-      );
+      .json(new BlogbeeResponse('Post created successfully'));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -88,9 +76,7 @@ export async function getAllPostsHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -101,9 +87,7 @@ export async function getAllPostsHandler(req: Request, res: Response) {
       logger.error('BLOG_NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Blog not found'),
-        );
+        .json(new BlogbeeResponse('Blog not found'));
       return;
     }
 
@@ -125,31 +109,17 @@ export async function getAllPostsHandler(req: Request, res: Response) {
     const q = (req.query.q as string) ?? '';
     const limit = (req.query.limit as string) ? Number(req.query.limit) : 10;
     const page = (req.query.page as string) ? Number(req.query.page) : 1;
-    const postsData = await getAllPosts(
-      blogId,
-      q,
-      Number(page),
-      Number(limit),
-    );
+    const postsData = await getAllPosts(blogId, q, Number(page), Number(limit));
     logger.info('GET_POST_SUCCESS: Posts fetched successfully');
 
     res
       .status(StatusCodes.OK)
-      .json(
-        new BlogbeeResponse(
-          'Posts fetched successfully',
-          postsData,
-        ),
-      );
+      .json(new BlogbeeResponse('Posts fetched successfully', postsData));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -161,9 +131,7 @@ export async function getPostByIdHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -174,9 +142,7 @@ export async function getPostByIdHandler(req: Request, res: Response) {
       logger.error('POST_NOT_FOUND_ERROR: Post not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Post not found'),
-        );
+        .json(new BlogbeeResponse('Post not found'));
       return;
     }
 
@@ -199,21 +165,12 @@ export async function getPostByIdHandler(req: Request, res: Response) {
 
     res
       .status(StatusCodes.OK)
-      .json(
-        new BlogbeeResponse(
-          'Post data returned successfully',
-          postData,
-        ),
-      );
+      .json(new BlogbeeResponse('Post data returned successfully', postData));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -225,9 +182,7 @@ export async function editPostHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -238,9 +193,7 @@ export async function editPostHandler(req: Request, res: Response) {
       logger.error('POST_NOT_FOUND_ERROR: Post not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Post not found'),
-        );
+        .json(new BlogbeeResponse('Post not found'));
       return;
     }
 
@@ -252,9 +205,7 @@ export async function editPostHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new BlogbeeResponse(
-            'You do not have permissions to edit the post',
-          ),
+          new BlogbeeResponse('You do not have permissions to edit the post'),
         );
       return;
     }
@@ -264,18 +215,12 @@ export async function editPostHandler(req: Request, res: Response) {
 
     res
       .status(StatusCodes.OK)
-      .json(
-        new BlogbeeResponse('Posts edited successfully'),
-      );
+      .json(new BlogbeeResponse('Posts edited successfully'));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -287,9 +232,7 @@ export async function deletePostHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -300,9 +243,7 @@ export async function deletePostHandler(req: Request, res: Response) {
       logger.error('POST_NOT_FOUND_ERROR: Post not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Post not found'),
-        );
+        .json(new BlogbeeResponse('Post not found'));
       return;
     }
 
@@ -314,9 +255,7 @@ export async function deletePostHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new BlogbeeResponse(
-            'You do not have permissions to delete the post',
-          ),
+          new BlogbeeResponse('You do not have permissions to delete the post'),
         );
       return;
     }
@@ -326,20 +265,12 @@ export async function deletePostHandler(req: Request, res: Response) {
 
     res
       .status(StatusCodes.OK)
-      .json(
-        new BlogbeeResponse(
-          'Posts deleted successfully',
-        ),
-      );
+      .json(new BlogbeeResponse('Posts deleted successfully'));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -351,9 +282,7 @@ export async function addTagToPostHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -366,9 +295,7 @@ export async function addTagToPostHandler(req: Request, res: Response) {
       logger.error('POST_NOT_FOUND_ERROR: Post not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Post not found'),
-        );
+        .json(new BlogbeeResponse('Post not found'));
       return;
     }
 
@@ -399,11 +326,7 @@ export async function addTagToPostHandler(req: Request, res: Response) {
       logger.error('CONFLICT_ERROR: Post already contains this tag');
       res
         .status(StatusCodes.CONFLICT)
-        .json(
-          new BlogbeeResponse(
-            'Post already contains this tag',
-          ),
-        );
+        .json(new BlogbeeResponse('Post already contains this tag'));
       return;
     }
 
@@ -416,9 +339,7 @@ export async function addTagToPostHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new BlogbeeResponse(
-            'The post and tag must belong to the same blog',
-          ),
+          new BlogbeeResponse('The post and tag must belong to the same blog'),
         );
       return;
     }
@@ -428,20 +349,12 @@ export async function addTagToPostHandler(req: Request, res: Response) {
 
     res
       .status(StatusCodes.OK)
-      .json(
-        new BlogbeeResponse(
-          'Tag added to post successfully',
-        ),
-      );
+      .json(new BlogbeeResponse('Tag added to post successfully'));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -453,9 +366,7 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -468,9 +379,7 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
       logger.error('POST_NOT_FOUND_ERROR: Post not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Post not found'),
-        );
+        .json(new BlogbeeResponse('Post not found'));
       return;
     }
 
@@ -501,11 +410,7 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
       logger.error('NOT_FOUND_ERROR: Post does not contains this tag');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse(
-            'Post does not contains this tag',
-          ),
-        );
+        .json(new BlogbeeResponse('Post does not contains this tag'));
       return;
     }
 
@@ -518,9 +423,7 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new BlogbeeResponse(
-            'The post and tag must belong to the same blog',
-          ),
+          new BlogbeeResponse('The post and tag must belong to the same blog'),
         );
       return;
     }
@@ -532,19 +435,11 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
 
     res
       .status(StatusCodes.OK)
-      .json(
-        new BlogbeeResponse(
-          'Tag removed from post successfully',
-        ),
-      );
+      .json(new BlogbeeResponse('Tag removed from post successfully'));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }

@@ -15,9 +15,7 @@ export async function getPublicBlogDetailsHandler(req: Request, res: Response) {
       logger.error('NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Blog not found'),
-        );
+        .json(new BlogbeeResponse('Blog not found'));
       return;
     }
 
@@ -28,24 +26,17 @@ export async function getPublicBlogDetailsHandler(req: Request, res: Response) {
     logger.info('EMBED_BLOG_SUCCESS: Blog data retrieved successfully');
 
     res.status(StatusCodes.OK).json(
-      new BlogbeeResponse(
-        'Blog data retrieved successfully',
-        {
-          blog: blogData,
-          posts: topBlogPosts.items,
-          tags: allBlogTags,
-        },
-      ),
+      new BlogbeeResponse('Blog data retrieved successfully', {
+        blog: blogData,
+        posts: topBlogPosts.items,
+        tags: allBlogTags,
+      }),
     );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -58,9 +49,7 @@ export async function getPublicPostsListHandler(req: Request, res: Response) {
       logger.error('NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Blog not found'),
-        );
+        .json(new BlogbeeResponse('Blog not found'));
       return;
     }
 
@@ -73,23 +62,16 @@ export async function getPublicPostsListHandler(req: Request, res: Response) {
     logger.info('GET_POSTS_LIST_SUCCESS: Fetching posts list for blog');
 
     res.status(StatusCodes.OK).json(
-      new BlogbeeResponse(
-        'Posts list fetched successfully',
-        {
-          blog: blogData,
-          posts: postsData,
-        },
-      ),
+      new BlogbeeResponse('Posts list fetched successfully', {
+        blog: blogData,
+        posts: postsData,
+      }),
     );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -102,9 +84,7 @@ export async function getPublicPostDetailsHandler(req: Request, res: Response) {
       logger.error('NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Blog not found'),
-        );
+        .json(new BlogbeeResponse('Blog not found'));
       return;
     }
 
@@ -116,9 +96,7 @@ export async function getPublicPostDetailsHandler(req: Request, res: Response) {
       logger.error('NOT_FOUND_ERROR: Post not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Post not found'),
-        );
+        .json(new BlogbeeResponse('Post not found'));
       return;
     }
 
@@ -131,30 +109,21 @@ export async function getPublicPostDetailsHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new BlogbeeResponse(
-            'Post does not belong to the specified blog',
-          ),
+          new BlogbeeResponse('Post does not belong to the specified blog'),
         );
       return;
     }
 
     res.status(StatusCodes.OK).json(
-      new BlogbeeResponse(
-        'Post details fetched successfully',
-        {
-          blog: blogData,
-          post: postData,
-        },
-      ),
+      new BlogbeeResponse('Post details fetched successfully', {
+        blog: blogData,
+        post: postData,
+      }),
     );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }

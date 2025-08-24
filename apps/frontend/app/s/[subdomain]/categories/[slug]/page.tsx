@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { PostCard } from '@/app/s/[subdomain]/_components/post-card';
+import { Button } from '@/components/ui/button';
 
 export default function PostCategoriesPage() {
   return (

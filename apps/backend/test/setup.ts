@@ -2,11 +2,11 @@ import {
   MongoDBContainer,
   type StartedMongoDBContainer,
 } from '@testcontainers/mongodb';
+import { type Collection, type Db, MongoClient, type WithId } from 'mongodb';
 import { afterAll, beforeAll, beforeEach, vi } from 'vitest';
-import { type Collection, type Db, MongoClient, type WithId } from "mongodb";
-import { config } from '../src/config';
 import { BLOG_COLLECTION } from '../src/api/blogs/blogs.services';
 import { POSTS_COLLECTION } from '../src/api/posts/posts.services';
+import { config } from '../src/config';
 
 let mongodbContainer: StartedMongoDBContainer;
 let db: Db;
@@ -24,10 +24,11 @@ beforeAll(async () => {
   await dbClient.connect();
   db = dbClient.db(config.TEST_DB_NAME);
 
-  vi.mock("../src/db", () => ({
+  vi.mock('../src/db', () => ({
     getDB: (): Db => db,
     getDBClient: (): MongoClient => dbClient,
-    collection: <T>(collectionName: string): Collection<WithId<T>> => db.collection<WithId<T>>(collectionName)
+    collection: <T>(collectionName: string): Collection<WithId<T>> =>
+      db.collection<WithId<T>>(collectionName),
   }));
 }, timeout);
 

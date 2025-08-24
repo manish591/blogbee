@@ -66,12 +66,7 @@ export function buildServer() {
   app.use('/v1', v1Routes);
 
   app.use((_req, _res, next) => {
-    next(
-      new BlogbeeError(
-        StatusCodes.NOT_FOUND,
-        'Not found',
-      ),
-    );
+    next(new BlogbeeError(StatusCodes.NOT_FOUND, 'Not found'));
   });
 
   app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
@@ -80,26 +75,15 @@ export function buildServer() {
         logger.error('FILE_LIMIT_ERROR: Allowed file size limit is 10MB');
         res
           .status(StatusCodes.BAD_REQUEST)
-          .json(
-            new BlogbeeResponse(
-              'Allowed file size limit is 10MB',
-            ),
-          );
+          .json(new BlogbeeResponse('Allowed file size limit is 10MB'));
         return;
       }
 
-      next(
-        new BlogbeeError(
-          StatusCodes.BAD_REQUEST,
-          err.message,
-        ),
-      );
+      next(new BlogbeeError(StatusCodes.BAD_REQUEST, err.message));
     }
 
     if (err instanceof BlogbeeError) {
-      res.status(err.status).json(
-        new BlogbeeResponse(err.message)
-      );
+      res.status(err.status).json(new BlogbeeResponse(err.message));
 
       return;
     }

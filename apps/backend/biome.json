@@ -3,6 +3,12 @@
   "extends": "//",
   "files": {
     "ignoreUnknown": false,
-    "includes": ["./src/**/*.ts", "./test/**/*.ts", "./src/**/*.test.ts"]
+    "includes": [
+      "./src/**/*.ts",
+      "./test/**/*.ts",
+      "./src/**/*.test.ts",
+      "!/dist",
+      "!/coverage"
+    ]
   }
 }

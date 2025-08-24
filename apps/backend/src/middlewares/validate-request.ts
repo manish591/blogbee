@@ -25,9 +25,7 @@ export function validateRequest(schema: ZodObject) {
         );
         res
           .status(StatusCodes.BAD_REQUEST)
-          .json(
-            new BlogbeeResponse('Bad request'),
-          );
+          .json(new BlogbeeResponse('Bad request'));
         return;
       }
 

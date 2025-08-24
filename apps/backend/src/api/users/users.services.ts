@@ -1,15 +1,15 @@
-import * as db from "../../db";
 import { StatusCodes } from 'http-status-codes';
 import { ObjectId } from 'mongodb';
 import { config } from '../../config';
+import * as db from '../../db';
 import type { Session, Users } from '../../db/schema';
 import { BlogbeeError } from '../../utils/app-error';
+import { generateRandomString, hashPassword } from '../../utils/auth';
 import { logger } from '../../utils/logger';
 import type { TEditUserProfileBody } from './users.schema';
-import { generateRandomString, hashPassword } from "../../utils/auth";
 
-export const USERS_COLLECTION = "users";
-export const SESSION_COLLECTION = "session";
+export const USERS_COLLECTION = 'users';
+export const SESSION_COLLECTION = 'session';
 
 export async function getUserByEmail(email: string) {
   try {
@@ -24,9 +24,7 @@ export async function getUserByEmail(email: string) {
   }
 }
 
-export async function createUser(
-  data: Omit<Users, 'createdAt' | 'updatedAt'>,
-) {
+export async function createUser(data: Omit<Users, 'createdAt' | 'updatedAt'>) {
   try {
     const hashedPassword = await hashPassword(data.password);
     const res = await db.collection<Users>(USERS_COLLECTION).insertOne({

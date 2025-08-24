@@ -1,3 +1,4 @@
+import { DialogTitle } from '@radix-ui/react-dialog';
 import { Plus } from 'lucide-react';
 import { AddNewBlogForm } from '@/app/blogs/all/add-new-blog-form';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,6 @@ import {
   DialogHeader,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { DialogTitle } from '@radix-ui/react-dialog';
 
 export function AddNewBlog() {
   return (

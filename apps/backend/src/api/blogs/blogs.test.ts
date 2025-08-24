@@ -1,8 +1,8 @@
 import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildServer } from '../../app';
-import { UPLOADED_BLOG_LOGO_IDENTIFIER } from "../blogs/blogs.routes";
 import * as uploadUtils from '../../utils/upload';
+import { UPLOADED_BLOG_LOGO_IDENTIFIER } from '../blogs/blogs.routes';
 import { createPost, getPostById } from '../posts/posts.services';
 import { createTag, getTagById } from '../tags/tags.services';
 import { createUser } from '../users/users.services';
@@ -107,10 +107,7 @@ describe('blogs', () => {
     });
 
     it('should return 409 conflict if blog with slug already exists', async () => {
-      await createBlog(
-        userId,
-        { name: blogData.name, slug: blogData.slug }
-      );
+      await createBlog(userId, { name: blogData.name, slug: blogData.slug });
       const app = buildServer();
       const data = { name: 'different name', slug: blogData.slug };
       const res = await request(app)
@@ -525,9 +522,7 @@ describe('blogs', () => {
         blogId,
         name: 'typescript',
       };
-      const newPostId = (
-        await createPost(userId, blogId)
-      ).postId.toString();
+      const newPostId = (await createPost(userId, blogId)).postId.toString();
       const newTagId = (
         await createTag(userId, blogId, newTagData)
       ).tagId.toString();

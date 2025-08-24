@@ -2,9 +2,7 @@ import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { BlogbeeResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
-import {
-  uploadFileToCloudinary,
-} from '../../utils/upload';
+import { uploadFileToCloudinary } from '../../utils/upload';
 import type {
   TCreateBlogBody,
   TEditBlogBody,
@@ -35,9 +33,7 @@ export async function createBlogHandler(
       logger.info('UNAUTHORIZED_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -48,9 +44,7 @@ export async function createBlogHandler(
       logger.error('SLUG_CONFLICT_ERROR: Slug not available');
       res
         .status(StatusCodes.CONFLICT)
-        .json(
-          new BlogbeeResponse('Slug not available'),
-        );
+        .json(new BlogbeeResponse('Slug not available'));
       return;
     }
 
@@ -60,20 +54,12 @@ export async function createBlogHandler(
 
     res
       .status(StatusCodes.CREATED)
-      .json(
-        new BlogbeeResponse(
-          'Created the blog successfully',
-        ),
-      );
+      .json(new BlogbeeResponse('Created the blog successfully'));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -85,9 +71,7 @@ export async function getAllBlogsByUserHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -105,20 +89,13 @@ export async function getAllBlogsByUserHandler(req: Request, res: Response) {
     res
       .status(StatusCodes.OK)
       .json(
-        new BlogbeeResponse(
-          'Blogs fetched successfully',
-          allUserBlogsData,
-        ),
+        new BlogbeeResponse('Blogs fetched successfully', allUserBlogsData),
       );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -130,9 +107,7 @@ export async function getBlogByIdHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -144,9 +119,7 @@ export async function getBlogByIdHandler(req: Request, res: Response) {
       logger.error('NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Blog not found'),
-        );
+        .json(new BlogbeeResponse('Blog not found'));
       return;
     }
 
@@ -170,21 +143,12 @@ export async function getBlogByIdHandler(req: Request, res: Response) {
 
     res
       .status(StatusCodes.OK)
-      .json(
-        new BlogbeeResponse(
-          'Blog data returned successfully',
-          blogData,
-        ),
-      );
+      .json(new BlogbeeResponse('Blog data returned successfully', blogData));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -196,9 +160,7 @@ export async function uploadBlogLogoHandler(req: Request, res: Response) {
       logger.error('UPLOAD_FILE_ERROR: File not found in req.file');
       res
         .status(StatusCodes.BAD_REQUEST)
-        .json(
-          new BlogbeeResponse('File not found'),
-        );
+        .json(new BlogbeeResponse('File not found'));
       return;
     }
 
@@ -206,22 +168,15 @@ export async function uploadBlogLogoHandler(req: Request, res: Response) {
     logger.info('BLOG_LOGO_UPLOAD_SUCCESS: Blog logo uploaded successfully');
 
     res.status(StatusCodes.OK).json(
-      new BlogbeeResponse(
-        'Blog logo uploaded successfully',
-        {
-          url: profileImageUrl,
-        },
-      ),
+      new BlogbeeResponse('Blog logo uploaded successfully', {
+        url: profileImageUrl,
+      }),
     );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -236,9 +191,7 @@ export async function editBlogHandler(
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -249,9 +202,7 @@ export async function editBlogHandler(
       logger.error('NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Blog not found'),
-        );
+        .json(new BlogbeeResponse('Blog not found'));
       return;
     }
 
@@ -263,9 +214,7 @@ export async function editBlogHandler(
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new BlogbeeResponse(
-            'You do not have permissions to edit the blog',
-          ),
+          new BlogbeeResponse('You do not have permissions to edit the blog'),
         );
       return;
     }
@@ -275,20 +224,12 @@ export async function editBlogHandler(
 
     res
       .status(StatusCodes.OK)
-      .json(
-        new BlogbeeResponse(
-          'Edited the blog successfully',
-        ),
-      );
+      .json(new BlogbeeResponse('Edited the blog successfully'));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -300,9 +241,7 @@ export async function deleteBlogHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -313,9 +252,7 @@ export async function deleteBlogHandler(req: Request, res: Response) {
       logger.error('NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Blog not found'),
-        );
+        .json(new BlogbeeResponse('Blog not found'));
       return;
     }
 
@@ -327,9 +264,7 @@ export async function deleteBlogHandler(req: Request, res: Response) {
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new BlogbeeResponse(
-            'You do not have permissions to delete the blog',
-          ),
+          new BlogbeeResponse('You do not have permissions to delete the blog'),
         );
       return;
     }
@@ -339,19 +274,11 @@ export async function deleteBlogHandler(req: Request, res: Response) {
 
     res
       .status(StatusCodes.OK)
-      .json(
-        new BlogbeeResponse(
-          'Deleted the blog successfully',
-        ),
-      );
+      .json(new BlogbeeResponse('Deleted the blog successfully'));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }

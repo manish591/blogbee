@@ -1,15 +1,21 @@
-import { type Collection, type Db, MongoClient, type MongoClientOptions, ServerApiVersion, type WithId } from 'mongodb';
-import { config } from '../config';
-import { logger } from '../utils/logger';
-import { BlogbeeError } from '../utils/app-error';
-import { POSTS_COLLECTION } from '../api/posts/posts.services';
+import {
+  type Collection,
+  type Db,
+  MongoClient,
+  type MongoClientOptions,
+  ServerApiVersion,
+  type WithId,
+} from 'mongodb';
 import { BLOG_COLLECTION } from '../api/blogs/blogs.services';
+import { POSTS_COLLECTION } from '../api/posts/posts.services';
+import { config } from '../config';
+import { BlogbeeError } from '../utils/app-error';
+import { logger } from '../utils/logger';
 
 let db: Db;
 let mongoClient: MongoClient;
 
-export async function connectToDatabase(
-) {
+export async function connectToDatabase() {
   try {
     const dbClientOptions: MongoClientOptions = {
       serverSelectionTimeoutMS: 10000,
@@ -62,7 +68,7 @@ export async function disconnectFromDatabase() {
 
 export function getDB(): Db {
   if (!db) {
-    throw new BlogbeeError(500, "Database not initialised");
+    throw new BlogbeeError(500, 'Database not initialised');
   }
 
   return db;
@@ -70,7 +76,7 @@ export function getDB(): Db {
 
 export function getDBClient(): MongoClient {
   if (!mongoClient || !db) {
-    throw new BlogbeeError(500, "Database not initialised");
+    throw new BlogbeeError(500, 'Database not initialised');
   }
 
   return mongoClient;
@@ -78,7 +84,7 @@ export function getDBClient(): MongoClient {
 
 export function collection<T>(collectionName: string): Collection<WithId<T>> {
   if (!db) {
-    throw new BlogbeeError(500, "Database not initialised");
+    throw new BlogbeeError(500, 'Database not initialised');
   }
 
   return db.collection<WithId<T>>(collectionName);

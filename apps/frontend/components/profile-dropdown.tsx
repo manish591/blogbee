@@ -1,16 +1,16 @@
+import { CircleHelp, LayoutDashboard, Settings, UserIcon } from 'lucide-react';
+import Link from 'next/link';
+import { ProfileAvatar } from '@/components/profile-avatar';
+import { SignoutButton } from '@/components/signout-button';
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LayoutDashboard, UserIcon, Settings, CircleHelp } from 'lucide-react';
-import { ProfileAvatar } from '@/components/profile-avatar';
 import type { User } from '@/lib/dal';
-import Link from 'next/link';
-import { SignoutButton } from '@/components/signout-button';
 
 export function ProfileDropdown({ user }: Readonly<{ user: User }>) {
   return (

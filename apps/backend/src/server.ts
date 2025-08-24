@@ -1,4 +1,4 @@
-import * as db from "../src/db";
+import * as db from '../src/db';
 import { buildServer } from './app';
 import { config } from './config';
 import { logger } from './utils/logger';

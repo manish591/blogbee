@@ -1,6 +1,8 @@
 import { ChevronsUpDown, Slash } from 'lucide-react';
 import { BlogDashboardSidebar } from '@/app/blogs/[blogId]/dashboard/blog-dashboard-sidebar';
 import { Header } from '@/components/header';
+import { Logo } from '@/components/logo';
+import { ProfileDropdown } from '@/components/profile-dropdown';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -10,8 +12,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Logo } from '@/components/logo';
-import { ProfileDropdown } from '@/components/profile-dropdown';
 
 export default async function BlogDashboardLayout({
   children,

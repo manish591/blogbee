@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import { PostCard } from './_components/post-card';
-import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { PostCard } from './_components/post-card';
 
 export default function BlogHomePage() {
   return (

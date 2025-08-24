@@ -121,10 +121,7 @@ describe('POSTS', () => {
       };
       const otherUser = await createUser(otherUserData);
       const otherUserId = otherUser.userId.toString();
-      const otherUserBlog = await createBlog(
-        otherUserId,
-        otherUserBlogData,
-      );
+      const otherUserBlog = await createBlog(otherUserId, otherUserBlogData);
       const otherUserBlogId = otherUserBlog.blogId.toString();
       const app = buildServer();
       const data = {
@@ -217,10 +214,7 @@ describe('POSTS', () => {
       };
       const otherUser = await createUser(otherUserData);
       const otherUserId = otherUser.userId.toString();
-      const otherUserBlog = await createBlog(
-        otherUserId,
-        otherUserBlogData
-      );
+      const otherUserBlog = await createBlog(otherUserId, otherUserBlogData);
       const otherUserBlogId = otherUserBlog.blogId.toString();
       const app = buildServer();
       const res = await request(app)
@@ -322,10 +316,7 @@ describe('POSTS', () => {
       };
       const otherUser = await createUser(otherUserData);
       const otherUserId = otherUser.userId.toString();
-      const otherUserBlog = await createBlog(
-        otherUserId,
-        otherUserBlogData
-      );
+      const otherUserBlog = await createBlog(otherUserId, otherUserBlogData);
       const otherUserBlogId = otherUserBlog.blogId.toString();
       const otherUserPost = await createPost(otherUserId, otherUserBlogId);
       const otherUserPostId = otherUserPost.postId.toString();
@@ -396,10 +387,7 @@ describe('POSTS', () => {
       };
       const otherUser = await createUser(otherUserData);
       const otherUserId = otherUser.userId.toString();
-      const otherUserBlog = await createBlog(
-        otherUserId,
-        otherUserBlogData
-      );
+      const otherUserBlog = await createBlog(otherUserId, otherUserBlogData);
       const otherUserBlogId = otherUserBlog.blogId.toString();
       const otherUserPost = await createPost(otherUserId, otherUserBlogId);
       const otherUserPostId = otherUserPost.postId.toString();
@@ -469,10 +457,7 @@ describe('POSTS', () => {
       };
       const otherUser = await createUser(otherUserData);
       const otherUserId = otherUser.userId.toString();
-      const otherUserBlog = await createBlog(
-        otherUserId,
-        otherUserBlogData
-      );
+      const otherUserBlog = await createBlog(otherUserId, otherUserBlogData);
       const otherUserBlogId = otherUserBlog.blogId.toString();
       const otherUserPost = await createPost(otherUserId, otherUserBlogId);
       const otherUserPostId = otherUserPost.postId.toString();
@@ -535,18 +520,14 @@ describe('POSTS', () => {
       };
       const otherUser = await createUser(otherUserData);
       const otherUserId = otherUser.userId.toString();
-      const otherUserBlog = await createBlog(
-        otherUserId,
-        otherUserBlogData
-      );
+      const otherUserBlog = await createBlog(otherUserId, otherUserBlogData);
       const otherUserBlogId = otherUserBlog.blogId.toString();
       const otherUserPost = await createPost(otherUserId, otherUserBlogId);
       const otherUserPostId = otherUserPost.postId.toString();
-      const otherUserTag = await createTag(
-        otherUserId,
-        otherUserBlogId,
-        { name: 'other user tag', blogId: otherUserBlogId }
-      );
+      const otherUserTag = await createTag(otherUserId, otherUserBlogId, {
+        name: 'other user tag',
+        blogId: otherUserBlogId,
+      });
       const otherUserTagId = otherUserTag.tagId.toString();
       const app = buildServer();
       const res = await request(app)
@@ -595,11 +576,7 @@ describe('POSTS', () => {
         name: 'new blog tag',
         blogId: newBlogId,
       };
-      const tagOnNewBlog = await createTag(
-        userId,
-        newBlogId,
-        tagOnNewBlogData
-      );
+      const tagOnNewBlog = await createTag(userId, newBlogId, tagOnNewBlogData);
       const tagOnNewBlogId = tagOnNewBlog.tagId.toString();
       const app = buildServer();
       const res = await request(app)
@@ -664,18 +641,14 @@ describe('POSTS', () => {
       };
       const otherUser = await createUser(otherUserData);
       const otherUserId = otherUser.userId.toString();
-      const otherUserBlog = await createBlog(
-        otherUserId,
-        otherUserBlogData
-      );
+      const otherUserBlog = await createBlog(otherUserId, otherUserBlogData);
       const otherUserBlogId = otherUserBlog.blogId.toString();
       const otherUserPost = await createPost(otherUserId, otherUserBlogId);
       const otherUserPostId = otherUserPost.postId.toString();
-      const otherUserTagId = await createTag(
-        otherUserId,
-        otherUserBlogId,
-        { name: 'other user tag', blogId: otherUserBlogId }
-      ).then((tag) => tag.tagId.toString());
+      const otherUserTagId = await createTag(otherUserId, otherUserBlogId, {
+        name: 'other user tag',
+        blogId: otherUserBlogId,
+      }).then((tag) => tag.tagId.toString());
       addTagToPost(otherUserPostId, otherUserTagId);
       const app = buildServer();
       const res = await request(app)
@@ -695,11 +668,10 @@ describe('POSTS', () => {
     it('should return 404 not found if user attempts to delete the tag from the post where tag is not attached to the post', async () => {
       const createdPost = await createPost(userId, blogId);
       const createdPostId = createdPost.postId.toString();
-      const createdTag = await createTag(
-        userId,
+      const createdTag = await createTag(userId, blogId, {
+        name: 'new tag',
         blogId,
-        { name: 'new tag', blogId }
-      );
+      });
       const createdTagId = createdTag.tagId.toString();
       const app = buildServer();
       const res = await request(app)
@@ -726,11 +698,7 @@ describe('POSTS', () => {
         name: 'new blog tag',
         blogId: newBlogId,
       };
-      const tagOnNewBlog = await createTag(
-        userId,
-        newBlogId,
-        tagOnNewBlogData
-      );
+      const tagOnNewBlog = await createTag(userId, newBlogId, tagOnNewBlogData);
       const tagOnNewBlogId = tagOnNewBlog.tagId.toString();
       const app = buildServer();
       const res = await request(app)

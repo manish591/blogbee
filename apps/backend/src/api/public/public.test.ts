@@ -45,15 +45,11 @@ describe('EMBED API', () => {
       const blogSlug = blogData.slug;
       const blogId = createdBlog.blogId.toString();
       await createPost(userId, blogId);
-      await createTag(
-        userId,
+      await createTag(userId, blogId, {
         blogId,
-        {
-          blogId,
-          name: 'test tag',
-          description: 'test tag description',
-        }
-      );
+        name: 'test tag',
+        description: 'test tag description',
+      });
       const app = buildServer();
       const res = await request(app).get(`/v1/public/blogs?blog=${blogSlug}`);
 
@@ -184,12 +180,9 @@ describe('EMBED API', () => {
       const createdPost = await createPost(userId, createdBlogId);
       const createdPostId = createdPost.postId.toString();
       const postSlug = 'new-slug';
-      editPost(
-        createdPostId,
-        {
-          slug: postSlug,
-        }
-      );
+      editPost(createdPostId, {
+        slug: postSlug,
+      });
       const app = buildServer();
       const res = await request(app).get(
         `/v1/public/posts/${postSlug}?blog=${blogData.slug}`,

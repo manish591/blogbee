@@ -1,13 +1,13 @@
 import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildServer } from '../../app';
+import * as uploadUtils from '../../utils/upload';
+import { UPLOADED_PROFILE_IMG_IDENTIFIER } from './users.routes';
 import {
   createUser,
   getUserAuthSessions,
   getUserByEmail,
 } from './users.services';
-import { UPLOADED_PROFILE_IMG_IDENTIFIER } from './users.routes';
-import * as uploadUtils from "../../utils/upload";
 
 describe('users', () => {
   describe('POST /v1/users', () => {

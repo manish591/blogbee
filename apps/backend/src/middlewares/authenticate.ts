@@ -14,12 +14,12 @@ export async function authenticate(
     const sessionId: string | undefined = cookie.sessionId;
 
     if (!sessionId) {
-      logger.error('UNAUTHORIZED_ERROR: Authorization cookies not found in the request');
+      logger.error(
+        'UNAUTHORIZED_ERROR: Authorization cookies not found in the request',
+      );
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -29,9 +29,7 @@ export async function authenticate(
       logger.error('UNAUTHORIZED_ERROR: Session not found');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -45,10 +43,6 @@ export async function authenticate(
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }

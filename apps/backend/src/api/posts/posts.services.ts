@@ -1,13 +1,13 @@
-import * as db from "../../db";
 import { StatusCodes } from 'http-status-codes';
 import { ObjectId } from 'mongodb';
+import * as db from '../../db';
 import { PostStatus, type Posts, type Tags } from '../../db/schema';
 import { BlogbeeError } from '../../utils/app-error';
 import { logger } from '../../utils/logger';
+import { TAGS_COLLECTION } from '../tags/tags.services';
 import type { TEditPostBody } from './posts.schema';
-import { TAGS_COLLECTION } from "../tags/tags.services";
 
-export const POSTS_COLLECTION = "posts";
+export const POSTS_COLLECTION = 'posts';
 
 export async function createPost(userId: string, blogId: string) {
   try {
@@ -184,10 +184,7 @@ export async function isPostSlugAvailable(
   }
 }
 
-export async function isPostOwnedByUser(
-  userId: string,
-  postId: string,
-) {
+export async function isPostOwnedByUser(userId: string, postId: string) {
   try {
     const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
       _id: new ObjectId(postId),
@@ -285,7 +282,7 @@ export async function removeTagFromPost(postId: string, tagId: string) {
   }
 }
 
-export async function isPostContainsTag(postId: string, tagId: string,) {
+export async function isPostContainsTag(postId: string, tagId: string) {
   try {
     const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
       _id: new ObjectId(postId),

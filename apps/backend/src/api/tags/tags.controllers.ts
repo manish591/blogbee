@@ -20,9 +20,7 @@ export async function createTagHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -33,9 +31,7 @@ export async function createTagHandler(req: Request, res: Response) {
       logger.error('NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Blog not found'),
-        );
+        .json(new BlogbeeResponse('Blog not found'));
       return;
     }
 
@@ -59,20 +55,12 @@ export async function createTagHandler(req: Request, res: Response) {
 
     res
       .status(StatusCodes.CREATED)
-      .json(
-        new BlogbeeResponse(
-          'Tag created successfully',
-        ),
-      );
+      .json(new BlogbeeResponse('Tag created successfully'));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -84,9 +72,7 @@ export async function getBlogTagsHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -97,9 +83,7 @@ export async function getBlogTagsHandler(req: Request, res: Response) {
       logger.error('NOT_FOUND_ERROR: Blog not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(
-          new BlogbeeResponse('Blog not found'),
-        );
+        .json(new BlogbeeResponse('Blog not found'));
       return;
     }
 
@@ -123,21 +107,12 @@ export async function getBlogTagsHandler(req: Request, res: Response) {
 
     res
       .status(StatusCodes.OK)
-      .json(
-        new BlogbeeResponse(
-          'Tags fetched successfuly',
-          data,
-        ),
-      );
+      .json(new BlogbeeResponse('Tags fetched successfuly', data));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -149,9 +124,7 @@ export async function editTagHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -186,18 +159,12 @@ export async function editTagHandler(req: Request, res: Response) {
 
     res
       .status(StatusCodes.OK)
-      .json(
-        new BlogbeeResponse('Edited tag successfully'),
-      );
+      .json(new BlogbeeResponse('Edited tag successfully'));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
 
@@ -209,9 +176,7 @@ export async function deleteTagHandler(req: Request, res: Response) {
       logger.info('Unauthorized_ERROR: User not found in res.locals');
       res
         .status(StatusCodes.UNAUTHORIZED)
-        .json(
-          new BlogbeeResponse('Unauthorized'),
-        );
+        .json(new BlogbeeResponse('Unauthorized'));
       return;
     }
 
@@ -246,17 +211,11 @@ export async function deleteTagHandler(req: Request, res: Response) {
 
     res
       .status(StatusCodes.OK)
-      .json(
-        new BlogbeeResponse('Deleted tag successfully'),
-      );
+      .json(new BlogbeeResponse('Deleted tag successfully'));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(
-        new BlogbeeResponse(
-          'Internal server error occured',
-        ),
-      );
+      .json(new BlogbeeResponse('Internal server error occured'));
   }
 }
