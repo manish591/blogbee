@@ -1,7 +1,7 @@
-import { BackButton } from '@/components/back-button';
-import { Button } from '@/components/ui/button';
 import { AlertCircle, ArrowLeft, Home } from 'lucide-react';
 import Link from 'next/link';
+import { BackButton } from '@/components/back-button';
+import { Button } from '@/components/ui/button';
 
 export default function NotFoundPage() {
   return (

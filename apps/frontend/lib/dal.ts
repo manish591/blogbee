@@ -1,7 +1,6 @@
 import "server-only";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 export type User = {
   name: string,
@@ -13,11 +12,11 @@ export type User = {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export async function verifySession(): Promise<{ isAuthenticated: boolean, user: User }> {
+export async function verifySession(): Promise<{ isAuthenticated: boolean, user: User } | null> {
   if (!API_URL) throw new Error("NEXT_PUBLIC_API_URL is not defined");
 
   const token = (await cookies()).get('sessionId')?.value;
-  const res = await fetch(API_URL, {
+  const res = await fetch(`${API_URL}/v1/me`, {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${token}`,
@@ -26,7 +25,7 @@ export async function verifySession(): Promise<{ isAuthenticated: boolean, user:
   const data = await res.json();
 
   if (!res.ok) {
-    redirect("/login");
+    return null;
   }
 
   return { isAuthenticated: true, user: data.data };

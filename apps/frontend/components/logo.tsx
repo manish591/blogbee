@@ -1,6 +1,6 @@
+import Link from 'next/link';
 import { APP_NAME } from '@/constants';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
 
 export function Logo({ className }: Readonly<{ className?: string }>) {
   return (
