@@ -43,20 +43,16 @@ export default async function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="w-full h-full p-2 overflow-hidden">
-        <div
-          className="h-full rounded-md overflow-hidden"
-          style={{
-            background: `linear-gradient(135deg, rgba(255, 255, 196, 1.000) 0.000%, rgba(255, 97, 100, 1.000) 50.000%, rgba(176, 0, 18, 1.000) 100.000%)`,
-          }}
-        >
+      <div className="w-full h-full p-2">
+        <div className="relative w-full h-full rounded-md bg-black/90">
           <Image
             src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1755607989/krisjanis-kazaks-bRB_9zllVN4-unsplash_fov1wv.jpg"
-            alt=""
+            alt="auth-placeholder"
+            className="rounded-md brightness-50 w-full h-full saturate-0 absolute inset-0 object-cover dark:brightness-[0.2] dark:grayscale"
             width={1080}
-            height={960}
-            className="w-full h-full object-cover blur-xs saturate-0"
+            height={1080}
           />
+          <div className="absolute inset-0 blur-3xl opacity-30 bg-primary/80"></div>
         </div>
       </div>
     </div>
