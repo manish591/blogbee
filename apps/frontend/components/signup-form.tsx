@@ -13,6 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { createUser } from '@/app/(auth)/actions';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   name: z.string().trim().min(5).max(30),
@@ -23,6 +25,7 @@ const formSchema = z.object({
 export type SignupFormData = z.infer<typeof formSchema>;
 
 export function SignupForm() {
+  const router = useRouter();
   const form = useForm<SignupFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -32,8 +35,19 @@ export function SignupForm() {
     },
   });
 
-  function onSubmit(values: SignupFormData) {
-    console.log('values', values);
+  async function onSubmit(values: SignupFormData) {
+    try {
+      await createUser(values);
+      form.reset({
+        name: '',
+        email: '',
+        password: '',
+      });
+      router.refresh();
+      console.log('SIGNUP_SUCESS: Created the user successfully');
+    } catch (err) {
+      console.log('SIGNUP_FAILED: Failed to signup user', err);
+    }
   }
 
   return (

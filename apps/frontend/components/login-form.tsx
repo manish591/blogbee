@@ -13,6 +13,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { useRouter } from 'next/navigation';
+import { loginUser } from '@/app/(auth)/actions';
 
 const formSchema = z.object({
   email: z.email().trim(),
@@ -22,6 +24,7 @@ const formSchema = z.object({
 export type LoginFormData = z.infer<typeof formSchema>;
 
 export function LoginForm() {
+  const router = useRouter();
   const form = useForm<LoginFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -30,8 +33,18 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit(values: LoginFormData) {
-    console.log('values', values);
+  async function onSubmit(values: LoginFormData) {
+    try {
+      await loginUser(values);
+      form.reset({
+        email: '',
+        password: '',
+      });
+      router.refresh();
+      console.log('LOGGED_IN_SUCCESS: User logged in successfully');
+    } catch (err) {
+      console.log('LOGGED_IN_FAILED: Failed to login user', err);
+    }
   }
 
   return (
