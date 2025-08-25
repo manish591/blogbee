@@ -231,12 +231,36 @@ describe('blogs', () => {
     it('should return 200 ok along with blogs for search query fourth', async () => {
       const app = buildServer();
       const res = await request(app)
-        .get('/v1/blogs?q=fourth')
+        .get('/v1/blogs?query=fourth')
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
       expect(res.body.data.length).toBe(1);
+    });
+
+    it("should return 200 ok along with blogs that are sorted by latest", async () => {
+      const app = buildServer();
+      const res = await request(app)
+        .get('/v1/blogs?sort=latest')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.length).toBe(4);
+      expect(res.body.data[0].name).toBe(blogData4.name);
+    });
+
+    it("should return 200 ok along with blogs that are sorted by oldest", async () => {
+      const app = buildServer();
+      const res = await request(app)
+        .get('/v1/blogs?sort=oldest')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.length).toBe(4);
+      expect(res.body.data[0].name).toBe(blogData1.name);
     });
   });
 

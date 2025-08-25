@@ -43,9 +43,10 @@ export const createBlogSchema = z.object({
 export const getAllBlogsByUserSchema = z.object({
   query: z
     .object({
-      q: z.string().optional().default(''),
+      query: z.string().optional().default(''),
       page: z.coerce.number().optional().default(1),
       limit: z.coerce.number().optional().default(10),
+      sort: z.union([z.literal("latest"), z.literal("oldest")]).optional()
     })
     .strict(),
 });

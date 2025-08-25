@@ -82,27 +82,41 @@ export async function getBlogBySlug(slug: string) {
 
 export async function getAllBlogsByUser(
   userId: string,
-  q: string = '',
+  query: string = '',
   page: number = 1,
   limit: number = 10,
+  sort?: "latest" | "oldest"
 ) {
   try {
     const docsToSkip = (page - 1) * limit;
     const docsToInclude = limit;
 
-    const res = await db
+    const cursor = db
       .collection<Blogs>(BLOG_COLLECTION)
       .find({
         userId: new ObjectId(userId),
-        ...(q && {
+        ...(query && {
           $text: {
-            $search: q,
+            $search: query,
           },
         }),
       })
       .skip(docsToSkip)
-      .limit(docsToInclude)
-      .toArray();
+      .limit(docsToInclude);
+
+    if (sort) {
+      if (sort === "latest") {
+        cursor.sort({
+          createdAt: -1
+        })
+      } else if (sort === "oldest") {
+        cursor.sort({
+          createdAt: 1
+        });
+      }
+    }
+
+    const res = await cursor.toArray();
     return res;
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
