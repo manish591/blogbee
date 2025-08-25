@@ -3,25 +3,20 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-
-export interface TBlogData {
-  id: number;
-  name: string;
-  url: string;
-  posts: number;
-  lastUpdated: string;
-}
+import { BlogData } from '@/app/dal/blogs/get-all-blogs';
+import Link from 'next/link';
+import { convertDateToReadableFormat } from '@/lib/date';
 
 export function BlogCard({
   data,
   showListView,
 }: Readonly<{
-  data: TBlogData;
+  data: BlogData;
   showListView?: boolean;
 }>) {
   return (
     <Card
-      key={data.id}
+      key={data._id}
       className={cn(
         'bg-background shadow-none',
         showListView &&
@@ -49,24 +44,44 @@ export function BlogCard({
             </Avatar>
           </div>
           <div className={cn('mb-4', showListView && 'mb-0')}>
-            <h3 className="font-medium">{data.name}</h3>
-            <p className="text-sm text-foreground/50">{data.url}</p>
+            <h3 className="font-medium leading-[1.1]">{data.name}</h3>
+            <Link
+              href={`https://${data.slug}.blogbee.site`}
+              className="text-sm text-foreground/50 hover:underline"
+            >
+              {data.slug}.blogbee.site
+            </Link>
           </div>
         </div>
         <div className={cn('mb-8 text-sm', showListView && 'mb-0')}>
-          <p className="text-foreground/80">{data.posts} posts</p>
+          <p className="text-foreground/80">10 posts</p>
           <p className="text-foreground/50">
-            Last updated on {data.lastUpdated}
+            Last updated on{' '}
+            {convertDateToReadableFormat(new Date(data.updatedAt))}
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="flex-1 bg-transparent">
-            <ExternalLink className="mr-2 h-3 w-3" />
-            Go to blog
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 bg-transparent"
+            asChild
+          >
+            <Link href={`https://${data.slug}.blogbee.site`}>
+              <ExternalLink className="mr-2 h-3 w-3" />
+              Go to blog
+            </Link>
           </Button>
-          <Button variant="outline" size="sm" className="flex-1 bg-transparent">
-            <BarChart3 className="mr-2 h-3 w-3" />
-            Blog dashboard
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1 bg-transparent"
+            asChild
+          >
+            <Link href={`/blogs/${data._id}`}>
+              <BarChart3 className="mr-2 h-3 w-3" />
+              Blog dashboard
+            </Link>
           </Button>
         </div>
       </CardContent>
