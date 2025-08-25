@@ -9,7 +9,9 @@ export function ProfileAvatar({
   return (
     <Avatar className={cn('h-6 w-6', className)}>
       <AvatarImage src={profileImg} />
-      <AvatarFallback className="text-sm">{profileName[0]}</AvatarFallback>
+      <AvatarFallback className="text-sm bg-accent">
+        {profileName[0]}
+      </AvatarFallback>
     </Avatar>
   );
 }
