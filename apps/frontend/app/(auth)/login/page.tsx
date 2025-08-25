@@ -51,6 +51,7 @@ export default async function LoginPage() {
             className="rounded-md brightness-50 w-full h-full saturate-0 absolute inset-0 object-cover dark:brightness-[0.2] dark:grayscale"
             width={1080}
             height={1080}
+            loading="lazy"
           />
           <div className="absolute inset-0 blur-3xl opacity-30 bg-primary/80"></div>
         </div>
