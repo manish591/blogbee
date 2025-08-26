@@ -156,7 +156,7 @@ export async function getBlogByIdHandler(req: Request, res: Response) {
 
 export async function uploadBlogLogoHandler(req: Request, res: Response) {
   try {
-    const uploadedFile = req.file;
+    const uploadedFile = req.file?.path;
 
     if (!uploadedFile) {
       logger.error('UPLOAD_FILE_ERROR: File not found in req.file');

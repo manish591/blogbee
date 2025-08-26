@@ -152,7 +152,7 @@ export async function logoutUserHandler(_req: Request, res: Response) {
 
 export async function uploadProfileImageHandler(req: Request, res: Response) {
   try {
-    const uploadedFile = req.file;
+    const uploadedFile = req.file?.path;
 
     if (!uploadedFile) {
       logger.error('BAD_REQUEST_ERROR: Upload profile image not found');
