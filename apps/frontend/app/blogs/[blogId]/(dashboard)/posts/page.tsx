@@ -52,6 +52,14 @@ export default async function ArticlesPage({
   const blogId = (await params).blogId;
   const postData: PostData[] = [];
 
+  function handleCreateNewPost() {
+    try {
+      console.log('handling');
+    } catch (err) {
+      console.log('CREATE_NEW_POST_ERROR: Failed to create new post', err);
+    }
+  }
+
   return (
     <main className="py-3 px-6">
       <Breadcrumb>

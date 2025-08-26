@@ -4,10 +4,6 @@ import "server-only";
 import { BlogData } from "./get-all-blogs";
 
 export async function getBlog(blogId: string): Promise<BlogData> {
-  if (!API_URL) {
-    throw new Error('ENV_NOT_DEFINED_ERROR: API URL is not defined');
-  }
-
   const cookieHeader = await serializeCookies();
 
   const res = await fetch(`${API_URL}/v1/blogs/${blogId}`, {

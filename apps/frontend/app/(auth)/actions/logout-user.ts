@@ -6,10 +6,6 @@ import { serializeCookies } from '@/lib/cookie';
 
 
 export async function logoutUser() {
-  if (!API_URL) {
-    throw new Error('API_URL not defined');
-  }
-
   const cookieHeader = await serializeCookies();
 
   const res = await fetch(`${API_URL}/v1/users/logout`, {

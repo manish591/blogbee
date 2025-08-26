@@ -6,10 +6,6 @@ import { serializeCookies } from "@/lib/cookie";
 import { revalidatePath } from "next/cache";
 
 export async function createNewBlog(blogData: AddNewBlogSchema) {
-  if (!API_URL) {
-    throw new Error('ENV_NOT_DEFINED_ERROR: API URL is not defined');
-  }
-
   const cookieHeader = await serializeCookies();
 
   const res = await fetch(`${API_URL}/v1/blogs`, {

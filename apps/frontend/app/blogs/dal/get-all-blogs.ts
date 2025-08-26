@@ -19,10 +19,6 @@ export type BlogData = {
 }
 
 export async function getAllBlogs({ query, page, limit, sort }: Readonly<GetAllBlogsOptions>): Promise<BlogData[]> {
-  if (!API_URL) {
-    throw new Error('ENV_NOT_DEFINED_ERROR: API URL is not defined');
-  }
-
   const cookieHeader = await serializeCookies();
 
   const url = new URL(`${API_URL}/v1/blogs`);

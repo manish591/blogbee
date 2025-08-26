@@ -17,10 +17,6 @@ export type VerifySessionOutput = {
 };
 
 export const verifySession = cache(async (): Promise<VerifySessionOutput | null> => {
-  if (!API_URL) {
-    throw new Error('ENV_NOT_DEFINED_ERROR: API URL is not defined');
-  }
-
   const cookieHeader = await serializeCookies();
 
   const res = await fetch(`${API_URL}/v1/users/me`, {

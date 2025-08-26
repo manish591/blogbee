@@ -5,10 +5,6 @@ import type { SignupFormData } from '@/components/signup-form';
 import { API_URL } from '@/constants';
 
 export async function createUser(data: SignupFormData) {
-  if (!API_URL) {
-    throw new Error('API_URL not defined');
-  }
-
   const res = await fetch(`${API_URL}/v1/users`, {
     method: 'POST',
     credentials: 'include',

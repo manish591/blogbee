@@ -4,10 +4,6 @@ import { API_URL } from "@/constants";
 import { serializeCookies } from "@/lib/cookie";
 
 export async function uploadBlogLogo(formData: FormData): Promise<string> {
-  if (!API_URL) {
-    throw new Error('ENV_NOT_DEFINED_ERROR: API URL is not defined');
-  }
-
   const cookieHeader = await serializeCookies();
 
   const res = await fetch(`${API_URL}/v1/blogs/logo`, {
