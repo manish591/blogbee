@@ -1,4 +1,4 @@
-import { unlinkSync } from 'node:fs';
+import fs from 'node:fs';
 import { v2 as cloudinary } from 'cloudinary';
 import { StatusCodes } from 'http-status-codes';
 import multer from 'multer';
@@ -32,16 +32,17 @@ export async function uploadFileToCloudinary(localFilePath: string) {
   try {
     const res = await cloudinary.uploader.upload(localFilePath, {
       resource_type: 'auto',
+      timeout: 60000,
     });
 
     if (!res.url) {
       throw new Error("UPLOAD_FILE_FAILED: Failed to upload file");
     }
 
-    unlinkSync(localFilePath);
+    fs.unlinkSync(localFilePath);
     return res.url;
   } catch (err) {
-    unlinkSync(localFilePath);
+    fs.unlinkSync(localFilePath);
     logger.error('An internal server error occured', err);
     throw new BlogbeeError(
       StatusCodes.INTERNAL_SERVER_ERROR,
