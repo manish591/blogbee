@@ -4,7 +4,6 @@ import { cookies } from 'next/headers';
 import { API_URL } from '@/constants';
 import { serializeCookies } from '@/lib/cookie';
 
-
 export async function logoutUser() {
   const cookieHeader = await serializeCookies();
 

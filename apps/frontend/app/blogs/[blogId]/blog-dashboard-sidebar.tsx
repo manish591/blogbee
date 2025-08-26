@@ -7,8 +7,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { getBlog } from '../dal/get-blog';
 import { APP_NAME } from '@/constants';
+import { getBlog } from '../dal/get-blog';
 
 export async function BlogDashboardSidebar({
   selectedBlogId,

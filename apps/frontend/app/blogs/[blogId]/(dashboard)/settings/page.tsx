@@ -1,5 +1,4 @@
 import { getBlog } from '@/app/blogs/dal/get-blog';
-import { BlogSettingsForm } from './blog-settings-form';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,6 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { BlogSettingsForm } from './blog-settings-form';
 
 export default async function BlogDashboardSettingsPage({
   params,

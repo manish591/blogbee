@@ -85,7 +85,7 @@ export async function getAllBlogsByUser(
   query: string = '',
   page: number = 1,
   limit: number = 10,
-  sort?: "latest" | "oldest"
+  sort?: 'latest' | 'oldest',
 ) {
   try {
     const docsToSkip = (page - 1) * limit;
@@ -105,13 +105,13 @@ export async function getAllBlogsByUser(
       .limit(docsToInclude);
 
     if (sort) {
-      if (sort === "latest") {
+      if (sort === 'latest') {
         cursor.sort({
-          createdAt: -1
-        })
-      } else if (sort === "oldest") {
+          createdAt: -1,
+        });
+      } else if (sort === 'oldest') {
         cursor.sort({
-          createdAt: 1
+          createdAt: 1,
         });
       }
     }

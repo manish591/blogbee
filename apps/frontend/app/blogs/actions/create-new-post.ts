@@ -1,26 +1,27 @@
-"use server";
+'use server';
 
-import { API_URL } from "@/constants";
-import { serializeCookies } from "@/lib/cookie";
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation';
+import { API_URL } from '@/constants';
+import { serializeCookies } from '@/lib/cookie';
 
 export type NewPostFormSchema = {
-  blodId: string
-}
+  blogId: string;
+};
 
 export async function createNewPost(postData: Readonly<NewPostFormSchema>) {
   const cookieHeader = await serializeCookies();
 
   const res = await fetch(`${API_URL}/v1/posts`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      cookie: cookieHeader
+      'Content-Type': 'application/json',
+      cookie: cookieHeader,
     },
-    body: JSON.stringify(postData)
+    body: JSON.stringify(postData),
   });
 
-  if (!res) {
-    throw new Error("CREATE_NEW_POST_ERROR: Failed to create new post");
+  if (!res.ok) {
+    throw new Error('CREATE_NEW_POST_ERROR: Failed to create new post');
   }
 
   const data = await res.json();

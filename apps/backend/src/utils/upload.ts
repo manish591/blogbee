@@ -8,11 +8,11 @@ import { logger } from './logger';
 
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
-    cb(null, './public/temp')
+    cb(null, './public/temp');
   },
   filename: (_req, file, cb) => {
-    cb(null, file.originalname)
-  }
+    cb(null, file.originalname);
+  },
 });
 
 export const upload = multer({
@@ -26,18 +26,18 @@ cloudinary.config({
   cloud_name: config.CLOUDINARY_CLOUD_NAME,
   api_key: config.CLOUDINARY_API_KEY,
   api_secret: config.CLOUDINARY_API_SECRET,
-  timeout: 60000
+  timeout: 60000,
 });
 
 export async function uploadFileToCloudinary(localFilePath: string) {
   try {
     const res = await cloudinary.uploader.upload(localFilePath, {
       resource_type: 'auto',
-      timeout: 60000
+      timeout: 60000,
     });
 
     if (!res.url) {
-      throw new Error("UPLOAD_FILE_FAILED: Failed to upload file");
+      throw new Error('UPLOAD_FILE_FAILED: Failed to upload file');
     }
 
     fs.unlinkSync(localFilePath);

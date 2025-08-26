@@ -1,15 +1,15 @@
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import Link from 'next/link';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Check, ChevronsUpDown } from 'lucide-react';
 import { getAllBlogs } from '../dal/get-all-blogs';
-import Link from 'next/link';
 
 export async function BlogsSwitcher({
   selectedBlogId,

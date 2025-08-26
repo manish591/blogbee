@@ -1,7 +1,7 @@
 'use client';
 
 import { LayoutGrid, List } from 'lucide-react';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 

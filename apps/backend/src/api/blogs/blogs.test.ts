@@ -239,7 +239,7 @@ describe('blogs', () => {
       expect(res.body.data.length).toBe(1);
     });
 
-    it("should return 200 ok along with blogs that are sorted by latest", async () => {
+    it('should return 200 ok along with blogs that are sorted by latest', async () => {
       const app = buildServer();
       const res = await request(app)
         .get('/v1/blogs?sort=latest')
@@ -251,7 +251,7 @@ describe('blogs', () => {
       expect(res.body.data[0].name).toBe(blogData4.name);
     });
 
-    it("should return 200 ok along with blogs that are sorted by oldest", async () => {
+    it('should return 200 ok along with blogs that are sorted by oldest', async () => {
       const app = buildServer();
       const res = await request(app)
         .get('/v1/blogs?sort=oldest')

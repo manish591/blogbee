@@ -1,41 +1,46 @@
-import "server-only";
-import { API_URL } from "@/constants";
-import { serializeCookies } from "@/lib/cookie";
+import 'server-only';
+import { API_URL } from '@/constants';
+import { serializeCookies } from '@/lib/cookie';
 
 export type GetAllBlogsOptions = {
-  sort?: string,
+  sort?: string;
   query?: string;
   page?: number;
   limit?: number;
-}
+};
 
 export type BlogData = {
-  _id: string,
-  name: string,
-  slug: string,
-  about: string,
-  createdAt: string,
-  updatedAt: string
-}
+  _id: string;
+  name: string;
+  slug: string;
+  about: string;
+  createdAt: string;
+  updatedAt: string;
+};
 
-export async function getAllBlogs({ query, page, limit, sort }: Readonly<GetAllBlogsOptions>): Promise<BlogData[]> {
+export async function getAllBlogs({
+  query,
+  page,
+  limit,
+  sort,
+}: Readonly<GetAllBlogsOptions>): Promise<BlogData[]> {
   const cookieHeader = await serializeCookies();
 
   const url = new URL(`${API_URL}/v1/blogs`);
-  if (query) url.searchParams.append("query", query);
-  if (page) url.searchParams.append("page", String(page));
-  if (limit) url.searchParams.append("limit", String(limit));
-  if (sort) url.searchParams.append("sort", sort);
+  if (query) url.searchParams.append('query', query);
+  if (page) url.searchParams.append('page', String(page));
+  if (limit) url.searchParams.append('limit', String(limit));
+  if (sort) url.searchParams.append('sort', sort);
 
   const res = await fetch(url, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      cookie: cookieHeader
-    }
+      cookie: cookieHeader,
+    },
   });
 
   if (!res.ok) {
-    throw new Error("BLOGS_FETCH_ERROR: Failed to fetch blogs");
+    throw new Error('BLOGS_FETCH_ERROR: Failed to fetch blogs');
   }
 
   const data = await res.json();

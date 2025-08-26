@@ -1,14 +1,14 @@
 import { Slash } from 'lucide-react';
+import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
+import { verifySession } from '@/app/(auth)/dal/verify-session';
 import { BlogDashboardSidebar } from '@/app/blogs/[blogId]/blog-dashboard-sidebar';
 import { Header } from '@/components/header';
 import { Logo } from '@/components/logo';
 import { ProfileDropdown } from '@/components/profile-dropdown';
-import { BlogsSwitcher } from './blog-switcher';
-import { verifySession } from '@/app/(auth)/dal/verify-session';
-import { redirect } from 'next/navigation';
-import { Suspense } from 'react';
-import { BlogSwitcherLoader } from './blog-switcher-loader';
 import { BlogDashboardSidebarLoader } from './blog-dashboard-sidebar-loader';
+import { BlogsSwitcher } from './blog-switcher';
+import { BlogSwitcherLoader } from './blog-switcher-loader';
 
 export default async function BlogDashboardLayout({
   children,

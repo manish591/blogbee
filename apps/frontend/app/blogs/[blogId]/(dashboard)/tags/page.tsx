@@ -1,6 +1,5 @@
 import { Plus } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { Card } from '@/components/ui/card';
 
 const categories = [
   {

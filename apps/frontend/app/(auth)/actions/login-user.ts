@@ -1,8 +1,8 @@
-"use server";
+'use server';
 
-import { cookies } from "next/headers";
-import type { LoginFormData } from "@/components/login-form";
-import { API_URL } from "@/constants";
+import { cookies } from 'next/headers';
+import type { LoginFormData } from '@/components/login-form';
+import { API_URL } from '@/constants';
 
 export async function loginUser(data: LoginFormData) {
   const res = await fetch(`${API_URL}/v1/users/login`, {

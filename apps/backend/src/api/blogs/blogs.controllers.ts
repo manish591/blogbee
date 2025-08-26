@@ -78,13 +78,13 @@ export async function getAllBlogsByUserHandler(req: Request, res: Response) {
     const query = req.query.query as string;
     const limit = req.query.limit as string;
     const page = req.query.page as string;
-    const sort = req.query.sort as "latest" | "oldest";
+    const sort = req.query.sort as 'latest' | 'oldest';
     const allUserBlogsData = await getAllBlogsByUser(
       userData.userId,
       query,
       Number(page),
       Math.min(20, Number(limit)),
-      sort
+      sort,
     );
     logger.info('FETCH_ALL_BLOG_SUCCESS: Blogs fetched successfully');
 

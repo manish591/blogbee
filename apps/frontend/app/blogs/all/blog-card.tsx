@@ -1,11 +1,11 @@
 import { BarChart3, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
+import type { BlogData } from '@/app/blogs/dal/get-all-blogs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { BlogData } from '@/app/blogs/dal/get-all-blogs';
-import Link from 'next/link';
 import { convertDateToReadableFormat } from '@/lib/date';
+import { cn } from '@/lib/utils';
 
 export function BlogCard({
   data,

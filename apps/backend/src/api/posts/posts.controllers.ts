@@ -57,11 +57,11 @@ export async function createPostHandler(req: Request, res: Response) {
     const createdPostData = await createPost(userId, blogId);
     logger.info('CREATE_POST_SUCCESS: Post created successfully');
 
-    res
-      .status(StatusCodes.CREATED)
-      .json(new BlogbeeResponse('Post created successfully', {
-        id: createdPostData.postId
-      }));
+    res.status(StatusCodes.CREATED).json(
+      new BlogbeeResponse('Post created successfully', {
+        id: createdPostData.postId,
+      }),
+    );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res

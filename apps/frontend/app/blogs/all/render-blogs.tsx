@@ -1,8 +1,8 @@
+import { FileText, Plus } from 'lucide-react';
 import { BlogCard } from '@/app/blogs/all/blog-card';
 import { getAllBlogs } from '@/app/blogs/dal/get-all-blogs';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { FileText, Plus } from 'lucide-react';
 
 export type RenderBlogsProps = {
   layout: string;

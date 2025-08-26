@@ -160,8 +160,8 @@ describe('POSTS', () => {
       expect(res.body).toMatchObject({
         message: 'Post created successfully',
         data: {
-          id: allBlogPosts.items[0]._id.toString()
-        }
+          id: allBlogPosts.items[0]._id.toString(),
+        },
       });
     });
   });

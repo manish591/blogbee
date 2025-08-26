@@ -2,6 +2,7 @@
 
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { Plus } from 'lucide-react';
+import { useState } from 'react';
 import { AddNewBlogForm } from '@/app/blogs/all/add-new-blog-form';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,7 +11,6 @@ import {
   DialogHeader,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useState } from 'react';
 
 export function AddNewBlog() {
   const [openDialog, setOpenDialog] = useState(false);

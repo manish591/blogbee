@@ -1,7 +1,7 @@
 'use client';
 
 import { Check, ListFilter } from 'lucide-react';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,

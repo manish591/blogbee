@@ -1,7 +1,7 @@
 'use client';
 
 import { Search } from 'lucide-react';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 
 export function BlogsSearchInput() {

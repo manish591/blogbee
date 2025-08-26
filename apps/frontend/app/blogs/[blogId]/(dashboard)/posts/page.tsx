@@ -1,15 +1,6 @@
-import {
-  Edit,
-  FileText,
-  Filter,
-  MoreHorizontal,
-  Plus,
-  PlusCircle,
-  Search,
-} from 'lucide-react';
+import { Edit, FileText, Filter, MoreHorizontal, Search } from 'lucide-react';
+import type { PostData } from '@/app/blogs/dal/get-all-posts';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,7 +9,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { PostData } from '@/app/blogs/dal/get-all-posts';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { AddNewPostButton } from './add-new-post-button';
 
 const articles = [
   {
@@ -51,14 +44,6 @@ export default async function ArticlesPage({
 }>) {
   const blogId = (await params).blogId;
   const postData: PostData[] = [];
-
-  function handleCreateNewPost() {
-    try {
-      console.log('handling');
-    } catch (err) {
-      console.log('CREATE_NEW_POST_ERROR: Failed to create new post', err);
-    }
-  }
 
   return (
     <main className="py-3 px-6">
@@ -99,10 +84,9 @@ export default async function ArticlesPage({
                 <Filter className="w-4 h-4 mr-2" />
                 Filter
               </Button>
-              <Button className="ml-auto">
-                <PlusCircle />
-                New Draft
-              </Button>
+              <AddNewPostButton blogId={blogId}>
+                <span>New Draft</span>
+              </AddNewPostButton>
             </div>
             {postData.length < 1 ? (
               <div className="flex py-10 justify-center p-8">
@@ -119,10 +103,9 @@ export default async function ArticlesPage({
                       site below.
                     </p>
                     <span className="loading loading-ring loading-md"></span>
-                    <Button className="gap-2">
-                      <Plus className="w-4 h-4" />
+                    <AddNewPostButton blogId={blogId}>
                       Create First Draft Post
-                    </Button>
+                    </AddNewPostButton>
                   </div>
                 </div>
               </div>
