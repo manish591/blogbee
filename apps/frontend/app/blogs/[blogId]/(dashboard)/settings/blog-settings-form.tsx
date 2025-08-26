@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -15,27 +14,47 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { editBlog } from '@/app/blogs/actions/edit-blog';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   name: z.string().min(5).max(30),
   about: z.string().max(300).optional(),
-  logo: z.url().optional(),
 });
 
-export type TAddNewBlogFormSchema = z.infer<typeof formSchema>;
+export type EditBlogFormSchema = z.infer<typeof formSchema>;
+export type EditBlogData = EditBlogFormSchema & { id: string };
 
-export function BlogSettingsForm() {
-  const form = useForm<TAddNewBlogFormSchema>({
+export function BlogSettingsForm({
+  blogId,
+  name,
+  about,
+}: Readonly<{ blogId: string; name?: string; about?: string }>) {
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  const form = useForm<EditBlogFormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      about: '',
-      logo: '',
+      name,
+      about,
     },
   });
 
-  function onSubmit(values: TAddNewBlogFormSchema) {
-    console.log(values);
+  async function onSubmit(values: EditBlogFormSchema) {
+    setIsLoading(true);
+    try {
+      await editBlog({
+        ...values,
+        id: blogId,
+      });
+      setIsLoading(false);
+      router.refresh();
+    } catch (err) {
+      setIsLoading(false);
+      console.log('EDIT_BLOG_ERROR: Failed to edit blog', err);
+    }
   }
 
   return (
@@ -46,12 +65,12 @@ export function BlogSettingsForm() {
           name="name"
           render={({ field }) => (
             <FormItem className="grid gap-3">
-              <FormLabel className="text-base">Blog Name</FormLabel>
+              <FormLabel className="text-base">Name</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   className="shadow-none h-10"
-                  placeholder="Blog name"
+                  placeholder="Enter blog name"
                 />
               </FormControl>
               <FormMessage />
@@ -65,30 +84,28 @@ export function BlogSettingsForm() {
             <FormItem className="grid gap-3">
               <FormLabel className="text-base">About</FormLabel>
               <FormControl>
-                <Textarea placeholder="About" {...field} />
+                <Textarea
+                  className="min-h-28 shadow-none"
+                  placeholder="Enter about blog"
+                  {...field}
+                />
               </FormControl>
-              <FormDescription>
-                Mapping custom domains is coming soon
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div>
-          <p className="font-semibold mb-3">Logo</p>
-          <div className="flex flex-col items-center rounded-md p-2 py-4 border-dashed border-2">
-            <div className="text-center">
-              <p className="text-base font-medium text-gray-700 mb-1">
-                Drop your Blog Logo here
-              </p>
-              <p className="text-sm text-gray-500">
-                Recommended size 500x500px
-              </p>
-            </div>
-          </div>
-        </div>
         <div className="flex items-center justify-end mt-8">
-          <Button>Update</Button>
+          <Button disabled={isLoading}>
+            {isLoading && (
+              <output
+                className="animate-spin inline-block size-3.5 border-2 border-current border-t-transparent text-white rounded-full"
+                aria-label="loading"
+              >
+                <span className="sr-only">Loading...</span>
+              </output>
+            )}
+            <span>Update</span>
+          </Button>
         </div>
       </form>
     </Form>

@@ -1,3 +1,4 @@
+import { getBlog } from '@/app/blogs/dal/get-blog';
 import { BlogSettingsForm } from './blog-settings-form';
 import {
   Breadcrumb,
@@ -14,6 +15,7 @@ export default async function BlogDashboardSettingsPage({
   params: Promise<{ blogId: string }>;
 }>) {
   const blogId = (await params).blogId;
+  const blogData = await getBlog(blogId);
 
   return (
     <main className="py-3 px-6">
@@ -37,7 +39,11 @@ export default async function BlogDashboardSettingsPage({
             </div>
           </div>
           <div>
-            <BlogSettingsForm />
+            <BlogSettingsForm
+              blogId={blogId}
+              name={blogData.name}
+              about={blogData.about}
+            />
           </div>
         </div>
       </div>
