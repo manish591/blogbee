@@ -40,14 +40,14 @@ export async function BlogDashboardSidebar({
           className="text-[15px] text-foreground/70 flex items-center gap-2 hover:bg-secondary transition-colors py-[5px] px-2 rounded-md"
         >
           <NotepadText className="w-4 h-4" strokeWidth={2} />
-          <span>Posts & Drafts</span>
+          <span>Posts</span>
         </Link>
         <Link
-          href={`/blogs/${selectedBlogId}/categories`}
+          href={`/blogs/${selectedBlogId}/tags`}
           className="text-[15px] text-foreground/70 flex items-center gap-2 hover:bg-secondary transition-colors py-[5px] px-2 rounded-md"
         >
           <Tags className="w-4 h-4" strokeWidth={2} />
-          <span>Categories</span>
+          <span>Tags</span>
         </Link>
       </div>
       <div className="mt-auto px-6">
