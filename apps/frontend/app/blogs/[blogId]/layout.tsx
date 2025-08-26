@@ -1,5 +1,5 @@
 import { Slash } from 'lucide-react';
-import { BlogDashboardSidebar } from '@/app/blogs/[blogId]/sidebar';
+import { BlogDashboardSidebar } from '@/app/blogs/[blogId]/blog-dashboard-sidebar';
 import { Header } from '@/components/header';
 import { Logo } from '@/components/logo';
 import { ProfileDropdown } from '@/components/profile-dropdown';
@@ -8,6 +8,7 @@ import { verifySession } from '@/app/(auth)/dal/verify-session';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { BlogSwitcherLoader } from './blog-switcher-loader';
+import { BlogDashboardSidebarLoader } from './blog-dashboard-sidebar-loader';
 
 export default async function BlogDashboardLayout({
   children,
@@ -40,8 +41,15 @@ export default async function BlogDashboardLayout({
         </div>
       </Header>
       <main>
-        <div className="grid grid-cols-[280px_minmax(0,1fr)]">
-          <BlogDashboardSidebar blogId={blogId} />
+        <div className="grid grid-cols-[260px_minmax(0,1fr)]">
+          <aside className="sticky top-[70px] h-[calc(100svh-70px)] bg-background border-r overflow-auto py-4 flex flex-col">
+            <div className="px-6">
+              <p className="uppercase text-sm">Blog Dashboard</p>
+            </div>
+            <Suspense fallback={<BlogDashboardSidebarLoader />}>
+              <BlogDashboardSidebar selectedBlogId={blogId} />
+            </Suspense>
+          </aside>
           <div>{children}</div>
         </div>
       </main>

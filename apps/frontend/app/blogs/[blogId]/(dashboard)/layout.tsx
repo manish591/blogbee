@@ -33,7 +33,7 @@ export default async function BlogDashboardLayout({
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <div className="max-w-4xl px-12 mx-auto">{children}</div>
+      <div className="max-w-4xl px-16 mx-auto">{children}</div>
     </main>
   );
 }
