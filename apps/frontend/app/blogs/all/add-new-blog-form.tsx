@@ -15,51 +15,58 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { APP_NAME } from '@/constants';
+import { createNewBlog } from '../actions/create-new-blog';
+import { useState } from 'react';
 
 const formSchema = z.object({
   name: z.string().min(5).max(30),
   slug: z.string().min(5).max(30),
-  logo: z.url().optional(),
+  logo: z.union([z.undefined(), z.url()]).optional(),
 });
 
-export type TAddNewBlogFormSchema = z.infer<typeof formSchema>;
+export type AddNewBlogSchema = z.infer<typeof formSchema>;
 
-export function AddNewBlogForm() {
-  const form = useForm<TAddNewBlogFormSchema>({
+export function AddNewBlogForm({
+  openFormDialog,
+}: Readonly<{
+  openFormDialog: React.Dispatch<React.SetStateAction<boolean>>;
+}>) {
+  const [isLoading, setIsLoading] = useState(false);
+  const form = useForm<AddNewBlogSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
       slug: '',
-      logo: '',
+      logo: undefined,
     },
   });
 
-  function onSubmit(values: TAddNewBlogFormSchema) {
-    console.log(values);
+  async function onSubmit(values: AddNewBlogSchema) {
+    setIsLoading(true);
+    try {
+      await createNewBlog(values);
+      setIsLoading(false);
+      openFormDialog(false);
+      console.log('CREATE_NEW_BLOG_SUCCESS: Create the blog successfully');
+    } catch (err) {
+      console.log('CREATE_NEW_BLOG_ERROR: Failed to create new blog', err);
+    }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
-        <div className="flex flex-col items-center rounded-md p-2 py-4 border-dashed border-2">
-          <div className="text-center">
-            <p className="text-base font-medium text-gray-700 mb-1">
-              Drop your Blog Logo here
-            </p>
-            <p className="text-sm text-gray-500">Recommended size 500x500px</p>
-          </div>
-        </div>
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem className="grid gap-3">
-              <FormLabel>Blog Name</FormLabel>
+              <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   className="shadow-none"
-                  placeholder="Blog name"
+                  placeholder="Enter blog name"
                 />
               </FormControl>
               <FormMessage />
@@ -71,15 +78,15 @@ export function AddNewBlogForm() {
           name="slug"
           render={({ field }) => (
             <FormItem className="grid gap-3">
-              <FormLabel>Blog Url</FormLabel>
+              <FormLabel>Slug</FormLabel>
               <FormControl>
                 <div className="flex border rounded-md focus-within:ring-[3px] focus-within:border-ring focus-within:ring-ring/50">
                   <Input
                     {...field}
                     className="shadow-none border-none rounded-none focus-visible:ring-[0px]"
-                    placeholder="Blog Url"
+                    placeholder="Enter blog slug"
                   />
-                  <div className="flex items-center px-2 h-full border border-secondary bg-secondary">
+                  <div className="flex items-center px-2 h-full border border-secondary bg-secondary tracking-wider">
                     .{APP_NAME}.site
                   </div>
                 </div>
@@ -92,10 +99,26 @@ export function AddNewBlogForm() {
           )}
         />
         <div className="flex items-center justify-between mt-8">
-          <Button variant="outline" type="button">
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => {
+              openFormDialog(false);
+            }}
+          >
             Cancel
           </Button>
-          <Button>Submit</Button>
+          <Button disabled={isLoading}>
+            {isLoading && (
+              <output
+                className="animate-spin inline-block size-3.5 border-2 border-current border-t-transparent text-white rounded-full"
+                aria-label="loading"
+              >
+                <span className="sr-only">Loading...</span>
+              </output>
+            )}
+            <span>Submit</span>
+          </Button>
         </div>
       </form>
     </Form>

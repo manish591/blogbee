@@ -1,3 +1,5 @@
+'use client';
+
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { Plus } from 'lucide-react';
 import { AddNewBlogForm } from '@/app/blogs/all/add-new-blog-form';
@@ -8,10 +10,13 @@ import {
   DialogHeader,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { useState } from 'react';
 
 export function AddNewBlog() {
+  const [openDialog, setOpenDialog] = useState(false);
+
   return (
-    <Dialog>
+    <Dialog open={openDialog} onOpenChange={setOpenDialog}>
       <DialogTrigger asChild>
         <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2">
           <Plus className="h-4 w-4" />
@@ -27,7 +32,7 @@ export function AddNewBlog() {
           </p>
         </DialogHeader>
         <div className="mt-4">
-          <AddNewBlogForm />
+          <AddNewBlogForm openFormDialog={setOpenDialog} />
         </div>
       </DialogContent>
     </Dialog>
