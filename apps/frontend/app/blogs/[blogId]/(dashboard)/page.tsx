@@ -8,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import Link from 'next/link';
 
 export default async function BlogDashboardOverviewPage({
   params,
@@ -15,7 +16,6 @@ export default async function BlogDashboardOverviewPage({
   params: Promise<{ blogId: string }>;
 }>) {
   const blogId = (await params).blogId;
-  await new Promise((res) => setTimeout(res, 5000));
 
   return (
     <main className="py-3 px-6">
@@ -78,7 +78,10 @@ export default async function BlogDashboardOverviewPage({
               <h2 className="text-lg font-medium text-foreground mb-4">
                 Quick links
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Link
+                href={`/blogs/${blogId}/posts`}
+                className="grid grid-cols-1 md:grid-cols-3 gap-4"
+              >
                 <Card className="p-6 cursor-pointer shadow-none hover:border-neutral-400">
                   <CardContent className="p-0">
                     <div className="flex items-start gap-4">
@@ -96,7 +99,7 @@ export default async function BlogDashboardOverviewPage({
                     </div>
                   </CardContent>
                 </Card>
-              </div>
+              </Link>
             </div>
           </div>
         </div>
