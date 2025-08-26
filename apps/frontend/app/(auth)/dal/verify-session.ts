@@ -16,7 +16,7 @@ export type VerifySessionOutput = {
   user: User;
 };
 
-export const verifySession = cache(async function (): Promise<VerifySessionOutput | null> {
+export const verifySession = cache(async (): Promise<VerifySessionOutput | null> => {
   if (!API_URL) {
     throw new Error('ENV_NOT_DEFINED_ERROR: API URL is not defined');
   }

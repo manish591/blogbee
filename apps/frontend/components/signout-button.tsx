@@ -2,20 +2,20 @@
 
 import { LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { signoutUser } from '@/app/(auth)/actions';
+import { logoutUser } from '@/app/(auth)/actions/logout-user';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-export function SignoutButton({ className }: Readonly<{ className?: string }>) {
+export function LogoutButton({ className }: Readonly<{ className?: string }>) {
   const router = useRouter();
 
-  async function handleSignoutUser() {
+  async function handleLogoutUser() {
     try {
-      await signoutUser();
-      console.log('SIGNOUT_SUCCESS: Successfully signout user');
+      await logoutUser();
+      console.log('LOGOUT_SUCCESS: Successfully logout user');
       router.refresh();
     } catch (err) {
-      console.log('SIGNOUT_ERROR: Failed to signout user', err);
+      console.log('LOGOUT_ERROR: Failed to logout user', err);
     }
   }
 
@@ -26,10 +26,10 @@ export function SignoutButton({ className }: Readonly<{ className?: string }>) {
         'w-full text-sm text-foreground/70 px-0 justify-start',
         className,
       )}
-      onClick={handleSignoutUser}
+      onClick={handleLogoutUser}
     >
       <LogOut />
-      <p>Signout</p>
+      <p>Logout</p>
     </Button>
   );
 }

@@ -8,7 +8,7 @@ import { BlogsSearchInput } from './blogs-search-input';
 import { BlogsSortingDropdown } from './blogs-sorting-dropdown';
 import { BlogsLayoutSwitcher } from './blogs-layout-switcher';
 import { AddNewBlog } from './add-new-blog';
-import { verifySession } from '@/app/dal/users/verify-session';
+import { verifySession } from '@/app/(auth)/dal/verify-session';
 import { RenderBlogs } from './render-blogs';
 import { Suspense } from 'react';
 import { BlogsLoadingView } from './blogs-loading-view';

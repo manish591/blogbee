@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { loginUser } from '@/app/(auth)/actions';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -15,6 +14,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { loginUser } from '@/app/(auth)/actions/login-user';
 
 const formSchema = z.object({
   email: z.email().trim(),

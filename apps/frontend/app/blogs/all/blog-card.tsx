@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { BlogData } from '@/app/dal/blogs/get-all-blogs';
+import { BlogData } from '@/app/blogs/dal/get-all-blogs';
 import Link from 'next/link';
 import { convertDateToReadableFormat } from '@/lib/date';
 

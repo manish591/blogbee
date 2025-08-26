@@ -1,7 +1,6 @@
 import { CircleHelp, LayoutDashboard, Settings, UserIcon } from 'lucide-react';
 import Link from 'next/link';
 import { ProfileAvatar } from '@/components/profile-avatar';
-import { SignoutButton } from '@/components/signout-button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import type { User } from '@/lib/dal';
+import type { User } from '@/app/(auth)/dal/verify-session';
+import { LogoutButton } from './signout-button';
 
 export function ProfileDropdown({ user }: Readonly<{ user: User }>) {
   return (
@@ -66,7 +66,7 @@ export function ProfileDropdown({ user }: Readonly<{ user: User }>) {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild className="cursor-pointer">
-          <SignoutButton />
+          <LogoutButton />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

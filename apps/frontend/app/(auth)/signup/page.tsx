@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { BackButton } from '@/components/back-button';
 import { SignupForm } from '@/components/signup-form';
-import { verifySession } from '@/app/dal/users/verify-session';
+import { verifySession } from '../dal/verify-session';
 
 export default async function SignupPage() {
   const session = await verifySession();

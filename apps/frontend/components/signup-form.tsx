@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { createUser } from '@/app/(auth)/actions';
+import { createUser } from '@/app/(auth)/actions/create-user';
 import { Button } from '@/components/ui/button';
 import {
   Form,
