@@ -47,6 +47,7 @@ export function BlogCard({
             <h3 className="font-medium leading-[1.1]">{data.name}</h3>
             <Link
               href={`https://${data.slug}.blogbee.site`}
+              target="_blank"
               className="text-sm text-foreground/50 hover:underline"
             >
               {data.slug}.blogbee.site
@@ -67,7 +68,7 @@ export function BlogCard({
             className="flex-1 bg-transparent"
             asChild
           >
-            <Link href={`https://${data.slug}.blogbee.site`}>
+            <Link href={`https://${data.slug}.blogbee.site`} target="_blank">
               <ExternalLink className="mr-2 h-3 w-3" />
               Go to blog
             </Link>
