@@ -1,5 +1,5 @@
-import { Footer } from '@/app/s/[subdomain]/_components/footer';
-import { Header } from '@/app/s/[subdomain]/_components/header';
+import { Footer } from '@/app/s/[subdomain]/components/footer';
+import { Header } from '@/app/s/[subdomain]/components/header';
 
 export default function BlogRootLayout({
   children,
