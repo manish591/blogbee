@@ -159,6 +159,9 @@ describe('POSTS', () => {
       expect(res.status).toBe(201);
       expect(res.body).toMatchObject({
         message: 'Post created successfully',
+        data: {
+          id: allBlogPosts.items[0]._id.toString()
+        }
       });
     });
   });
