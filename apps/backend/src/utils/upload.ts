@@ -26,13 +26,14 @@ cloudinary.config({
   cloud_name: config.CLOUDINARY_CLOUD_NAME,
   api_key: config.CLOUDINARY_API_KEY,
   api_secret: config.CLOUDINARY_API_SECRET,
+  timeout: 60000
 });
 
 export async function uploadFileToCloudinary(localFilePath: string) {
   try {
     const res = await cloudinary.uploader.upload(localFilePath, {
       resource_type: 'auto',
-      timeout: 60000,
+      timeout: 60000
     });
 
     if (!res.url) {
@@ -43,7 +44,7 @@ export async function uploadFileToCloudinary(localFilePath: string) {
     return res.url;
   } catch (err) {
     fs.unlinkSync(localFilePath);
-    logger.error('An internal server error occured', err);
+    logger.error(`An internal server error occured:  ${JSON.stringify(err)}`);
     throw new BlogbeeError(
       StatusCodes.INTERNAL_SERVER_ERROR,
       'Failed to upload files. Try again later!',
