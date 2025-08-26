@@ -1,5 +1,5 @@
 import { ChevronsUpDown, Slash } from 'lucide-react';
-import { BlogDashboardSidebar } from '@/app/blogs/[blogId]/dashboard/blog-dashboard-sidebar';
+import { BlogDashboardSidebar } from '@/app/blogs/[blogId]/blog-dashboard-sidebar';
 import { Header } from '@/components/header';
 import { Logo } from '@/components/logo';
 import { ProfileDropdown } from '@/components/profile-dropdown';
@@ -25,7 +25,7 @@ export default async function BlogDashboardLayout({
   return (
     <div className="flex flex-col min-h-screen bg-secondary/20">
       <Header>
-        <div className="px-6">
+        <div className="h-16 flex justify-between px-6">
           <div className="flex items-center space-x-2">
             <Logo />
             <span>
