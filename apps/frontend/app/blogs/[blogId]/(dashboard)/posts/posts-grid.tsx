@@ -1,9 +1,10 @@
-import { Edit, FileText, RotateCcw } from 'lucide-react';
+import { Edit, FileText } from 'lucide-react';
 import Link from 'next/link';
 import type { PostData } from '@/app/blogs/dal/get-all-posts';
 import { Button } from '@/components/ui/button';
 import { convertDateToReadableFormat } from '@/lib/date';
 import { PostsOptionsDropdown } from './post-options-dropdown';
+import { RestorePostButton } from './restore-post-button';
 
 export function PostsGrid({ postData }: Readonly<{ postData: PostData[] }>) {
   return (
@@ -68,13 +69,7 @@ export function PostsGrid({ postData }: Readonly<{ postData: PostData[] }>) {
                   </Button>
                 )}
                 {post.postStatus === 2 ? (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="cursor-pointer"
-                  >
-                    <RotateCcw />
-                  </Button>
+                  <RestorePostButton postId={post._id} />
                 ) : (
                   <PostsOptionsDropdown postId={post._id} />
                 )}
