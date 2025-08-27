@@ -10,6 +10,10 @@ export async function RenderPosts({
     query,
   });
 
+  const publishedPosts = postData.items.filter((post) => post.postStatus === 0);
+  const draftPosts = postData.items.filter((post) => post.postStatus === 1);
+  const deletedPosts = postData.items.filter((post) => post.postStatus === 2);
+
   return (
     <Tabs defaultValue="published" className="w-full">
       <TabsList className="p-0 mb-3 border-b w-full items-end justify-start bg-transparent rounded-none">
@@ -36,38 +40,17 @@ export async function RenderPosts({
       </TabsList>
       <TabsContent value="published">
         <div className="bg-card rounded-lg border">
-          <div className="grid grid-cols-12 gap-4 p-4 border-b bg-muted/30">
-            <div className="col-span-6 font-medium text-foreground">Title</div>
-            <div className="col-span-4 font-medium text-foreground">Slug</div>
-            <div className="col-span-2 font-medium text-foreground text-right">
-              Actions
-            </div>
-          </div>
-          <PostsGrid postData={postData.items} />
+          <PostsGrid postData={publishedPosts} />
         </div>
       </TabsContent>
       <TabsContent value="draft">
         <div className="bg-card rounded-lg border">
-          <div className="grid grid-cols-12 gap-4 p-4 border-b bg-muted/30">
-            <div className="col-span-6 font-medium text-foreground">Title</div>
-            <div className="col-span-4 font-medium text-foreground">Slug</div>
-            <div className="col-span-2 font-medium text-foreground text-right">
-              Actions
-            </div>
-          </div>
-          <PostsGrid postData={postData.items} />
+          <PostsGrid postData={draftPosts} />
         </div>
       </TabsContent>
       <TabsContent value="deleted">
         <div className="bg-card rounded-lg border">
-          <div className="grid grid-cols-12 gap-4 p-4 border-b bg-muted/30">
-            <div className="col-span-6 font-medium text-foreground">Title</div>
-            <div className="col-span-4 font-medium text-foreground">Slug</div>
-            <div className="col-span-2 font-medium text-foreground text-right">
-              Actions
-            </div>
-          </div>
-          <PostsGrid postData={postData.items} />
+          <PostsGrid postData={deletedPosts} />
         </div>
       </TabsContent>
     </Tabs>

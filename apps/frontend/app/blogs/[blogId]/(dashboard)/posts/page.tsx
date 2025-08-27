@@ -24,7 +24,7 @@ export default async function BlogDashboardPostsPage({
   const query = (queryParams.query ?? '') as string;
 
   return (
-    <main className="py-3 px-6">
+    <main className="py-3 px-6 min-h-screen">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

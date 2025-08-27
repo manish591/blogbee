@@ -25,6 +25,13 @@ export function PostsGrid({ postData }: Readonly<{ postData: PostData[] }>) {
         </div>
       ) : (
         <div>
+          <div className="grid grid-cols-12 gap-4 p-4 border-b bg-muted/30">
+            <div className="col-span-6 font-medium text-foreground">Title</div>
+            <div className="col-span-4 font-medium text-foreground">Slug</div>
+            <div className="col-span-2 font-medium text-foreground text-right">
+              Actions
+            </div>
+          </div>
           {postData.map((post, index) => (
             <div
               key={post._id}

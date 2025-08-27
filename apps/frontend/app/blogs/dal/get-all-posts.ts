@@ -7,7 +7,7 @@ export type PostData = {
   userId: string;
   blogId: string;
   title: string;
-  postStatus: string;
+  postStatus: number;
   tags: string[];
   subTitle?: string;
   slug?: string;
