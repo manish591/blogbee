@@ -66,7 +66,7 @@ export async function getPostBySlug(postSlug: string) {
 
 export async function getAllPosts(
   blogId: string,
-  q: string = '',
+  query: string = '',
   page: number = 1,
   limit: number = 10,
 ) {
@@ -83,9 +83,9 @@ export async function getAllPosts(
       .collection<Posts>(POSTS_COLLECTION)
       .find({
         blogId: new ObjectId(blogId),
-        ...(q && {
+        ...(query && {
           $text: {
-            $search: q,
+            $search: query,
           },
         }),
       })

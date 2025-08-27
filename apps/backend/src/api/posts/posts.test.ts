@@ -285,7 +285,7 @@ describe('POSTS', () => {
       await editPost(postToEditId, editPostData);
       const app = buildServer();
       const res = await request(app)
-        .get(`/v1/posts?blogId=${blogId}&q=updated`)
+        .get(`/v1/posts?blogId=${blogId}&query=updated`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
 

@@ -24,7 +24,7 @@ export const getAllPostsSchema = z.object({
         .refine((val) => ObjectId.isValid(val), {
           message: 'Invalid mongodb objectid',
         }),
-      q: z.string().optional().default(''),
+      query: z.string().optional().default(''),
       page: z.coerce.number().optional().default(1),
       limit: z.coerce.number().optional().default(10),
     })
