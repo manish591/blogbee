@@ -1,4 +1,4 @@
-import { Edit, FileText } from 'lucide-react';
+import { Edit, FileText, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import type { PostData } from '@/app/blogs/dal/get-all-posts';
 import { Button } from '@/components/ui/button';
@@ -55,17 +55,29 @@ export function PostsGrid({ postData }: Readonly<{ postData: PostData[] }>) {
                 </span>
               </div>
               <div className="col-span-2 flex items-center justify-end gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0 cursor-pointer"
-                  asChild
-                >
-                  <Link href={`/posts/${post._id}/edit`}>
-                    <Edit className="w-4 h-4" />
-                  </Link>
-                </Button>
-                <PostsOptionsDropdown postId={post._id} />
+                {(post.postStatus === 0 || post.postStatus === 1) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 cursor-pointer"
+                    asChild
+                  >
+                    <Link href={`/posts/${post._id}/edit`}>
+                      <Edit className="w-4 h-4" />
+                    </Link>
+                  </Button>
+                )}
+                {post.postStatus === 2 ? (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="cursor-pointer"
+                  >
+                    <RotateCcw />
+                  </Button>
+                ) : (
+                  <PostsOptionsDropdown postId={post._id} />
+                )}
               </div>
             </div>
           ))}

@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
 
 export function PostsOptionsDropdown({ postId }: Readonly<{ postId: string }>) {
   const router = useRouter();
@@ -36,6 +37,9 @@ export function PostsOptionsDropdown({ postId }: Readonly<{ postId: string }>) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
+        <DropdownMenuItem className="cursor-pointer">
+          <Link href={`#`}>Preview</Link>
+        </DropdownMenuItem>
         <DropdownMenuItem
           variant="destructive"
           className="cursor-pointer"

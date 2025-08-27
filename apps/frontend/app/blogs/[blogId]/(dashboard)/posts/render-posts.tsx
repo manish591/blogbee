@@ -10,8 +10,8 @@ export async function RenderPosts({
     query,
   });
 
-  const publishedPosts = postData.items.filter((post) => post.postStatus === 0);
-  const draftPosts = postData.items.filter((post) => post.postStatus === 1);
+  const draftPosts = postData.items.filter((post) => post.postStatus === 0);
+  const publishedPosts = postData.items.filter((post) => post.postStatus === 1);
   const deletedPosts = postData.items.filter((post) => post.postStatus === 2);
 
   return (
