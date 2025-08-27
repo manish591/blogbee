@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,8 +9,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { deletePost } from '@/app/blogs/actions/delete-post';
 
-export function PostsOptionsDropdown() {
+export function PostsOptionsDropdown({ postId }: Readonly<{ postId: string }>) {
+  const router = useRouter();
+
+  async function handleDeletePost() {
+    try {
+      await deletePost(postId);
+      console.log('DELETE_POST_SUCCESS: Deleted the post successfully');
+      router.refresh();
+    } catch (err) {
+      console.log('DELETE_POST_ERROR: Failed to delete the psot', err);
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -22,7 +36,11 @@ export function PostsOptionsDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem variant="destructive" className="cursor-pointer">
+        <DropdownMenuItem
+          variant="destructive"
+          className="cursor-pointer"
+          onClick={handleDeletePost}
+        >
           Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
