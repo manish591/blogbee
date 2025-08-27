@@ -46,9 +46,9 @@ export interface Posts {
   userId: ObjectId;
   blogId: ObjectId;
   postStatus: PostStatus;
-  title: string;
-  tags: ObjectId[];
   slug?: string;
+  tags: ObjectId[];
+  title: string;
   subTitle?: string;
   content?: string;
   coverImg?: string;
@@ -57,7 +57,7 @@ export interface Posts {
 }
 
 export enum PostStatus {
-  DRAFT,
-  PUBLISHED,
-  ARCHIVED,
+  DRAFT = "draft",
+  PUBLISHED = "published",
+  ARCHIVED = "archived",
 }
