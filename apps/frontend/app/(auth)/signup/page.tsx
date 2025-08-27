@@ -49,7 +49,7 @@ export default async function SignupPage() {
             src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1755607989/krisjanis-kazaks-bRB_9zllVN4-unsplash_fov1wv.jpg"
             alt="auth-placeholder"
             className="rounded-md brightness-50 w-full h-full saturate-0 absolute inset-0 object-cover dark:brightness-[0.2] dark:grayscale"
-            width={1080}
+            width={960}
             height={1080}
             loading="lazy"
           />
