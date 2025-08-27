@@ -22,19 +22,19 @@ export async function RenderPosts({
             value="published"
             className="data-[state=active]:bg-transparent p-0 py-1.5 border-0 rounded-none border-b-2 data-[state=active]:border-neutral-300 data-[state=active]:shadow-none px-[1px] text-foreground/70"
           >
-            Published
+            Published ({publishedPosts.length})
           </TabsTrigger>
           <TabsTrigger
             value="draft"
             className="data-[state=active]:bg-transparent p-0 py-1.5 border-0 rounded-none border-b-2 data-[state=active]:border-neutral-300 data-[state=active]:shadow-none px-[1px] text-foreground/70"
           >
-            Draft
+            Draft ({draftPosts.length})
           </TabsTrigger>
           <TabsTrigger
             value="deleted"
             className="data-[state=active]:bg-transparent p-0 py-1.5 border-0 rounded-none border-b-2 data-[state=active]:border-neutral-300 data-[state=active]:shadow-none px-[1px] text-foreground/70"
           >
-            Archived
+            Deleted ({deletedPosts.length})
           </TabsTrigger>
         </div>
       </TabsList>
