@@ -1,7 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { MoreHorizontal } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { deletePost } from '@/app/blogs/actions/delete-post';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -9,7 +10,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { deletePost } from '@/app/blogs/actions/delete-post';
 
 export function PostsOptionsDropdown({ postId }: Readonly<{ postId: string }>) {
   const router = useRouter();

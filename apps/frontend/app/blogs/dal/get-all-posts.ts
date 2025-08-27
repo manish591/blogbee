@@ -18,35 +18,38 @@ export type PostData = {
 };
 
 export type GetAllPostsReturnValue = {
-  currentPage: number,
-  limit: number,
-  totalItems: number,
-  totalPages: number,
-  hasNext: boolean,
-  hasPrevious: boolean,
-  items: PostData[]
-}
+  currentPage: number;
+  limit: number;
+  totalItems: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  items: PostData[];
+};
 
 export type GetAllPostsOptions = {
-  query?: string
-}
+  query?: string;
+};
 
-export async function getAllPosts(blogId: string, opts?: GetAllPostsOptions): Promise<GetAllPostsReturnValue> {
+export async function getAllPosts(
+  blogId: string,
+  opts?: GetAllPostsOptions,
+): Promise<GetAllPostsReturnValue> {
   const cookieHeader = await serializeCookies();
 
   const url = new URL(`${API_URL}/v1/posts`);
-  url.searchParams.append("blogId", blogId);
-  if (opts?.query) url.searchParams.append("query", opts.query);
+  url.searchParams.append('blogId', blogId);
+  if (opts?.query) url.searchParams.append('query', opts.query);
 
   const res = await fetch(url, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      cookie: cookieHeader
-    }
+      cookie: cookieHeader,
+    },
   });
 
   if (!res.ok) {
-    throw new Error("GET_ALL_POSTS_FAILED: Failed to get all the posts");
+    throw new Error('GET_ALL_POSTS_FAILED: Failed to get all the posts');
   }
 
   const data = await res.json();

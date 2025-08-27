@@ -111,7 +111,12 @@ export async function getAllPostsHandler(req: Request, res: Response) {
     const query = (req.query.query as string) ?? '';
     const limit = (req.query.limit as string) ? Number(req.query.limit) : 10;
     const page = (req.query.page as string) ? Number(req.query.page) : 1;
-    const postsData = await getAllPosts(blogId, query, Number(page), Number(limit));
+    const postsData = await getAllPosts(
+      blogId,
+      query,
+      Number(page),
+      Number(limit),
+    );
     logger.info('GET_POST_SUCCESS: Posts fetched successfully');
 
     res

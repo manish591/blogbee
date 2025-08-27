@@ -1,3 +1,4 @@
+import { getAllTags } from '@/app/blogs/dal/get-all-tags';
 import { Badge } from '@/components/ui/badge';
 import {
   Breadcrumb,
@@ -8,7 +9,6 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Card } from '@/components/ui/card';
-import { getAllTags } from '@/app/blogs/dal/get-all-tags';
 import { AddNewTag } from './add-new-tag';
 
 export default async function BlogDashboardTagsPage({

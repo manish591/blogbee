@@ -1,8 +1,8 @@
+import { Edit, FileText } from 'lucide-react';
+import Link from 'next/link';
 import type { PostData } from '@/app/blogs/dal/get-all-posts';
 import { Button } from '@/components/ui/button';
 import { convertDateToReadableFormat } from '@/lib/date';
-import { Edit, FileText } from 'lucide-react';
-import Link from 'next/link';
 import { PostsOptionsDropdown } from './post-options-dropdown';
 
 export function PostsGrid({ postData }: Readonly<{ postData: PostData[] }>) {
