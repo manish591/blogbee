@@ -38,8 +38,8 @@ export default async function BlogDashboardPostsPage({
       </Breadcrumb>
       <div className="max-w-4xl px-16 mx-auto">
         <div>
-          <div className="py-8">
-            <div className="border-b pb-6">
+          <div className="pt-8 pb-4">
+            <div className="pb-6">
               <h1 className="text-3xl font-semibold">Posts & Drafts</h1>
               <p className="text-foreground/70 mt-2">
                 Your posts status will show here
@@ -47,7 +47,7 @@ export default async function BlogDashboardPostsPage({
             </div>
           </div>
           <div>
-            <div className="flex items-center gap-4 mb-8">
+            <div className="flex items-center gap-4 mb-3">
               <PostsSearchInput />
               <PostsFilters />
               <AddNewPostButton blogId={blogId}>

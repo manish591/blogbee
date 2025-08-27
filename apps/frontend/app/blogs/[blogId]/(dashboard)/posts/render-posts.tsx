@@ -1,9 +1,8 @@
-import { FileText, Edit, MoreHorizontal } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { getAllPosts } from '@/app/blogs/dal/get-all-posts';
-import { Button } from '@/components/ui/button';
-import { convertDateToReadableFormat } from '@/lib/date';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { AddNewPostButton } from './add-new-post-button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PostsGrid } from './posts-grid';
 
 export async function RenderPosts({
   blogId,
@@ -35,54 +34,78 @@ export async function RenderPosts({
           </div>
         </div>
       ) : (
-        <div className="bg-card rounded-lg border">
-          <div className="grid grid-cols-12 gap-4 p-4 border-b bg-muted/30">
-            <div className="col-span-6 font-medium text-foreground">Title</div>
-            <div className="col-span-4 font-medium text-foreground">Slug</div>
-            <div className="col-span-2 font-medium text-foreground text-right">
-              Actions
+        <Tabs defaultValue="published" className="w-full">
+          <TabsList className="p-0 mb-3 border-b w-full items-end justify-start bg-transparent rounded-none">
+            <div className="flex items-center gap-6">
+              <TabsTrigger
+                value="published"
+                className="data-[state=active]:bg-transparent p-0 py-1.5 border-0 rounded-none border-b-2 data-[state=active]:border-neutral-300 data-[state=active]:shadow-none px-[1px] text-foreground/70"
+              >
+                Published
+              </TabsTrigger>
+              <TabsTrigger
+                value="draft"
+                className="data-[state=active]:bg-transparent p-0 py-1.5 border-0 rounded-none border-b-2 data-[state=active]:border-neutral-300 data-[state=active]:shadow-none px-[1px] text-foreground/70"
+              >
+                Draft
+              </TabsTrigger>
+              <TabsTrigger
+                value="deleted"
+                className="data-[state=active]:bg-transparent p-0 py-1.5 border-0 rounded-none border-b-2 data-[state=active]:border-neutral-300 data-[state=active]:shadow-none px-[1px] text-foreground/70"
+              >
+                Archived
+              </TabsTrigger>
             </div>
-          </div>
-          {postData.items.map((post, index) => (
-            <div
-              key={post._id}
-              className={`grid grid-cols-12 gap-4 p-4 ${index !== postData.items.length - 1 ? 'border-b' : ''}`}
-            >
-              <div className="col-span-6">
-                <h3 className="font-medium text-foreground mb-2 hover:text-primary cursor-pointer">
-                  {post.title}
-                </h3>
-                <div className="flex items-center gap-2">
-                  <Avatar className="w-6 h-6">
-                    <AvatarFallback className="bg-teal-500 text-white text-xs font-medium">
-                      M
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="text-muted-foreground text-sm">
-                    Manish Devrani
-                  </span>
-                  <span className="text-muted-foreground text-sm">•</span>
-                  <span className="text-muted-foreground text-sm">
-                    {convertDateToReadableFormat(new Date(post.updatedAt))}
-                  </span>
+          </TabsList>
+          <TabsContent value="published">
+            <div className="bg-card rounded-lg border">
+              <div className="grid grid-cols-12 gap-4 p-4 border-b bg-muted/30">
+                <div className="col-span-6 font-medium text-foreground">
+                  Title
+                </div>
+                <div className="col-span-4 font-medium text-foreground">
+                  Slug
+                </div>
+                <div className="col-span-2 font-medium text-foreground text-right">
+                  Actions
                 </div>
               </div>
-              <div className="col-span-4 flex items-center">
-                <span className="text-muted-foreground text-sm">
-                  {post.slug}
-                </span>
-              </div>
-              <div className="col-span-2 flex items-center justify-end gap-2">
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <Edit className="w-4 h-4" />
-                </Button>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <MoreHorizontal className="w-4 h-4" />
-                </Button>
-              </div>
+              <PostsGrid postData={postData.items} />
             </div>
-          ))}
-        </div>
+          </TabsContent>
+          <TabsContent value="draft">
+            <div className="bg-card rounded-lg border">
+              <div className="grid grid-cols-12 gap-4 p-4 border-b bg-muted/30">
+                <div className="col-span-6 font-medium text-foreground">
+                  Title
+                </div>
+                <div className="col-span-4 font-medium text-foreground">
+                  Slug
+                </div>
+                <div className="col-span-2 font-medium text-foreground text-right">
+                  Actions
+                </div>
+              </div>
+              <PostsGrid postData={postData.items} />
+            </div>
+          </TabsContent>
+          <TabsContent value="deleted">
+            <div className="bg-card rounded-lg border">
+              <div className="grid grid-cols-12 gap-4 p-4 border-b bg-muted/30">
+                <div className="col-span-6 font-medium text-foreground">
+                  Title
+                </div>
+                <div className="col-span-4 font-medium text-foreground">
+                  Slug
+                </div>
+                <div className="col-span-2 font-medium text-foreground text-right">
+                  Actions
+                </div>
+              </div>
+              <PostsGrid postData={postData.items} />
+            </div>
+          </TabsContent>
+        </Tabs>
       )}
     </>
   );
