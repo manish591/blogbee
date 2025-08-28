@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 
 export const createBlogSchema = z.object({
   body: z
@@ -43,9 +43,35 @@ export const createBlogSchema = z.object({
 export const getAllBlogsByUserSchema = z.object({
   query: z
     .object({
-      query: z.string().optional().default(''),
-      page: z.coerce.number().optional().default(1),
-      limit: z.coerce.number().optional().default(10),
+      query: z.string().optional(),
+      page: z.coerce.number().nonnegative().max(1000).optional().default(1),
+      limit: z.string().transform((val) => {
+        if (val.trim() === "") {
+          throw new ZodError([
+            {
+              code: "custom",
+              path: ["limit"],
+              message: "limit cannot be empty"
+            }
+          ]);
+        }
+
+        const num = Number(val);
+
+        if (Number.isNaN(num)) {
+          throw new ZodError([
+            {
+              code: "custom",
+              path: ["limit"],
+              message: "limit must be a number"
+            }
+          ]);
+        }
+
+        return num;
+      }).refine((val) => val >= 1, {
+        message: "limit must be greater than or equal to zero"
+      }).optional(),
       sort: z.union([z.literal('latest'), z.literal('oldest')]).optional(),
     })
     .strict(),

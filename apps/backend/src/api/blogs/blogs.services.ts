@@ -82,27 +82,64 @@ export async function getBlogBySlug(slug: string) {
 
 export async function getAllBlogsByUser(
   userId: string,
-  query: string = '',
-  page: number = 1,
-  limit: number = 10,
-  sort?: 'latest' | 'oldest',
+  options?: {
+    query?: string,
+    page?: number,
+    limit?: number,
+    sort?: "latest" | "oldest"
+  }
 ) {
   try {
+    const query = options?.query ?? "";
+    const limit = options?.limit ?? 10;
+    const page = options?.page ?? 1;
+    const sort = options?.sort;
     const docsToSkip = (page - 1) * limit;
     const docsToInclude = limit;
-
-    const cursor = db
+    const totalItems = await db
       .collection<Blogs>(BLOG_COLLECTION)
-      .find({
-        userId: new ObjectId(userId),
-        ...(query && {
-          $text: {
-            $search: query,
-          },
-        }),
-      })
-      .skip(docsToSkip)
-      .limit(docsToInclude);
+      .countDocuments({ userId: new ObjectId(userId) });
+    const totalPages = Math.ceil(totalItems / limit);
+    const currentPage = page;
+
+    const cursor = db.collection<Blogs>(BLOG_COLLECTION).aggregate([
+      {
+        $match: {
+          userId: new ObjectId(userId),
+          ...(query && {
+            $text: {
+              $search: query,
+            },
+          }),
+        }
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "_id",
+          foreignField: "blogId",
+          pipeline: [
+            {
+              $group: { _id: "$blogId", total: { $sum: 1 } }
+            }
+          ],
+          as: "posts"
+        }
+      },
+      {
+        $addFields: {
+          postsCount: {
+            $ifNull: [{ $arrayElemAt: ["$posts.total", 0] }, 0]
+          }
+        }
+      },
+      {
+        $limit: docsToInclude
+      },
+      {
+        $skip: docsToSkip
+      }
+    ]);
 
     if (sort) {
       if (sort === 'latest') {
@@ -117,7 +154,13 @@ export async function getAllBlogsByUser(
     }
 
     const res = await cursor.toArray();
-    return res;
+    return {
+      currentPage,
+      limit,
+      totalItems,
+      totalPages,
+      items: res
+    };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new BlogbeeError(

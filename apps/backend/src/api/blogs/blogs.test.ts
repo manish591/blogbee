@@ -12,6 +12,7 @@ import {
   getBlogById,
   getBlogBySlug,
 } from './blogs.services';
+import type { ObjectId } from 'mongodb';
 
 describe('blogs', () => {
   const loggedInUser = {
@@ -120,7 +121,7 @@ describe('blogs', () => {
       const createdBlog = await getBlogBySlug(blogData.slug);
 
       // blog count 1 signifies no new blogs created
-      expect(allBlogs.length).toBe(1);
+      expect(allBlogs.items.length).toBe(1);
       expect(createdBlog?.name).not.toBe(data.name);
       expect(res.status).toBe(409);
       expect(res.body).toMatchObject({
@@ -183,8 +184,10 @@ describe('blogs', () => {
       password: 'new pass',
     };
 
+    let createdBlog: { blogId: ObjectId, success: boolean; };
+
     beforeEach(async () => {
-      await createBlog(userId, blogData1);
+      createdBlog = await createBlog(userId, blogData1);
       await createBlog(userId, blogData2);
       await createBlog(userId, blogData3);
       await createBlog(userId, blogData4);
@@ -206,6 +209,19 @@ describe('blogs', () => {
       });
     });
 
+    it('should return 400 bad request if invalid data type is passed in query parameters', async () => {
+      const app = buildServer();
+      const res = await request(app)
+        .get('/v1/blogs?limit=')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        message: 'Bad request',
+      });
+    });
+
     it('should return 200 ok along with users blogs', async () => {
       const app = buildServer();
       const res = await request(app)
@@ -214,7 +230,8 @@ describe('blogs', () => {
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
-      expect(res.body.data.length).toBe(4);
+      expect(res.body.data.totalItems).toBe(4);
+      expect(res.body.data.items.length).toBe(4);
     });
 
     it('should return 200 ok along with blogs with limit 3', async () => {
@@ -225,7 +242,8 @@ describe('blogs', () => {
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
-      expect(res.body.data.length).toBe(3);
+      expect(res.body.data.items.length).toBe(3);
+      expect(res.body.data.totalPages).toBe(2);
     });
 
     it('should return 200 ok along with blogs for search query fourth', async () => {
@@ -236,7 +254,7 @@ describe('blogs', () => {
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
-      expect(res.body.data.length).toBe(1);
+      expect(res.body.data.items.length).toBe(1);
     });
 
     it('should return 200 ok along with blogs that are sorted by latest', async () => {
@@ -247,8 +265,8 @@ describe('blogs', () => {
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
-      expect(res.body.data.length).toBe(4);
-      expect(res.body.data[0].name).toBe(blogData4.name);
+      expect(res.body.data.items.length).toBe(4);
+      expect(res.body.data.items[0].name).toBe(blogData4.name);
     });
 
     it('should return 200 ok along with blogs that are sorted by oldest', async () => {
@@ -259,8 +277,22 @@ describe('blogs', () => {
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(200);
-      expect(res.body.data.length).toBe(4);
-      expect(res.body.data[0].name).toBe(blogData1.name);
+      expect(res.body.data.items.length).toBe(4);
+      expect(res.body.data.items[0].name).toBe(blogData1.name);
+    });
+
+    it("should return 200 ok along with postCount for each blog", async () => {
+      await createPost(userId, createdBlog.blogId.toString());
+      await createPost(userId, createdBlog.blogId.toString());
+      const app = buildServer();
+      const res = await request(app)
+        .get('/v1/blogs?query=first')
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.items.length).toBe(1);
+      expect(res.body.data.items[0].postsCount).toBe(2);
     });
   });
 
