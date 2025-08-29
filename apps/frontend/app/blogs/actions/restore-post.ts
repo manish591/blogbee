@@ -13,7 +13,7 @@ export async function restorePost(postId: string) {
       cookie: cookieHeader
     },
     body: JSON.stringify({
-      postStatus: 1
+      postStatus: 'draft'
     })
   });
 

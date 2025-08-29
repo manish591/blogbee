@@ -56,7 +56,7 @@ export function PostsGrid({ postData }: Readonly<{ postData: PostData[] }>) {
                 </span>
               </div>
               <div className="col-span-2 flex items-center justify-end gap-2">
-                {(post.postStatus === 0 || post.postStatus === 1) && (
+                {post.postStatus !== 'archived' && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -68,7 +68,7 @@ export function PostsGrid({ postData }: Readonly<{ postData: PostData[] }>) {
                     </Link>
                   </Button>
                 )}
-                {post.postStatus === 2 ? (
+                {post.postStatus === 'archived' ? (
                   <RestorePostButton postId={post._id} />
                 ) : (
                   <PostsOptionsDropdown postId={post._id} />
