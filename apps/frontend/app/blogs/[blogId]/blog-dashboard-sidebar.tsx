@@ -43,11 +43,11 @@ export async function BlogDashboardSidebar({
           <span>Posts & drafts</span>
         </Link>
         <Link
-          href={`/blogs/${selectedBlogId}/tags`}
+          href={`/blogs/${selectedBlogId}/categories`}
           className="text-[15px] text-foreground/70 flex items-center gap-2 hover:bg-secondary transition-colors py-[5px] px-2 rounded-md"
         >
           <Tags className="w-4 h-4" strokeWidth={2} />
-          <span>Tags</span>
+          <span>Categories</span>
         </Link>
       </div>
       <div className="mt-auto px-6">

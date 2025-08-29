@@ -1,4 +1,4 @@
-import { getAllTags } from '@/app/blogs/dal/get-all-tags';
+import { getAllTags } from '@/app/blogs/dal/get-all-categories';
 import { Badge } from '@/components/ui/badge';
 import {
   Breadcrumb,
@@ -9,7 +9,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Card } from '@/components/ui/card';
-import { AddNewTag } from './add-new-tag';
+import { AddNewTag } from './add-new-category';
 
 export default async function BlogDashboardTagsPage({
   params,
@@ -28,7 +28,7 @@ export default async function BlogDashboardTagsPage({
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Tags</BreadcrumbPage>
+            <BreadcrumbPage>Categories</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -36,9 +36,9 @@ export default async function BlogDashboardTagsPage({
         <div>
           <div className="pt-8 pb-4">
             <div className="pb-6">
-              <h1 className="text-3xl font-semibold">Tags</h1>
+              <h1 className="text-3xl font-semibold">Categories</h1>
               <p className="text-foreground/70 mt-2">
-                Your posts Tags listed here
+                Your posts categories listed here
               </p>
             </div>
           </div>
@@ -50,7 +50,9 @@ export default async function BlogDashboardTagsPage({
                 className="p-4 border rounded-md shadow-none cursor-pointer"
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-foreground">{tag.name}</h3>
+                  <h3 className="font-semibold text-foreground capitalize">
+                    {tag.name}
+                  </h3>
                   <Badge variant="secondary" className="rounded-md">
                     {tag.posts.length} posts
                   </Badge>

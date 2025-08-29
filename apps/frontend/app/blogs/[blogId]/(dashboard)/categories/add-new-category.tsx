@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { createNewTag } from '@/app/blogs/actions/create-new-tag';
+import { createNewTag } from '@/app/blogs/actions/create-new-category';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -50,14 +50,14 @@ export function AddNewTag({ blogId }: Readonly<{ blogId: string }>) {
   async function onSubmit(values: AddNewTagFormSchema) {
     setIsLoading(true);
     try {
-      const tagData = { ...values, blogId };
-      await createNewTag(tagData);
+      const categoryData = { ...values, blogId };
+      await createNewTag(categoryData);
       setOpenFormDialog(false);
       setIsLoading(false);
-      console.log('ADD_NEW_TAG_SUCCESS: New tag created successfully');
+      console.log('ADD_NEW_TAG_SUCCESS: New category created successfully');
     } catch (err) {
       setIsLoading(false);
-      console.log('ADD_NEW_TAG: Faile to create new tag', err);
+      console.log('ADD_NEW_TAG: Faile to create new category', err);
     }
   }
 
@@ -66,7 +66,7 @@ export function AddNewTag({ blogId }: Readonly<{ blogId: string }>) {
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          className="h-28 w-full p-0 hover:bg-transparent"
+          className="h-28 w-full p-0 hover:bg-transparent cursor-pointer"
         >
           <Card className="bg-transparent shadow-none border-2 border-dashed w-full h-full hover:border-neutral-400">
             <div className="h-full flex items-center justify-center">
@@ -94,7 +94,7 @@ export function AddNewTag({ blogId }: Readonly<{ blogId: string }>) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Name</FormLabel>
-                      <Input placeholder="Enter tag name" {...field} />
+                      <Input placeholder="Enter category name" {...field} />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -105,7 +105,10 @@ export function AddNewTag({ blogId }: Readonly<{ blogId: string }>) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Description</FormLabel>
-                      <Input placeholder="Enter tag description" {...field} />
+                      <Input
+                        placeholder="Enter category description"
+                        {...field}
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
