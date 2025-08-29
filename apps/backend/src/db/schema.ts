@@ -30,13 +30,15 @@ export interface Blogs {
   updatedAt: Date;
 }
 
-export interface Tags {
+export interface Categories {
   _id?: ObjectId;
   name: string;
   description?: string | null;
   blogId: ObjectId;
   userId: ObjectId;
-  posts: ObjectId[];
+  posts: {
+    id: ObjectId
+  }[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -47,7 +49,10 @@ export interface Posts {
   blogId: ObjectId;
   postStatus: PostStatus;
   slug?: string;
-  tags: ObjectId[];
+  categories: {
+    id: ObjectId
+    name: string,
+  }[];
   title: string;
   subTitle?: string;
   content?: string;
