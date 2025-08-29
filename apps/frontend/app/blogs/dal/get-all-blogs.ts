@@ -14,6 +14,7 @@ export type BlogData = {
   name: string;
   slug: string;
   about: string;
+  postsCount: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -23,7 +24,13 @@ export async function getAllBlogs({
   page,
   limit,
   sort,
-}: Readonly<GetAllBlogsOptions>): Promise<BlogData[]> {
+}: Readonly<GetAllBlogsOptions>): Promise<{
+  currentPage: number,
+  limit: number;
+  totalPages: number;
+  totalItems: number;
+  items: BlogData[]
+}> {
   const cookieHeader = await serializeCookies();
 
   const url = new URL(`${API_URL}/v1/blogs`);

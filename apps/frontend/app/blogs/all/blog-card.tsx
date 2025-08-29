@@ -55,7 +55,7 @@ export function BlogCard({
           </div>
         </div>
         <div className={cn('mb-8 text-sm', showListView && 'mb-0')}>
-          <p className="text-foreground/80">10 posts</p>
+          <p className="text-foreground/80">{data.postsCount} posts</p>
           <p className="text-foreground/50">
             Last updated on{' '}
             {convertDateToReadableFormat(new Date(data.updatedAt))}

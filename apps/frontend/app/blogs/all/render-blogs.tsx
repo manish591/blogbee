@@ -28,7 +28,7 @@ export async function RenderBlogs({
 
   return (
     <>
-      {blogsData.length < 1 ? (
+      {blogsData.items.length < 1 ? (
         <div className="flex py-20 justify-center min-h-screen p-8">
           <div className="border-0 w-full max-w-md shadow-none">
             <div className="flex flex-col items-center text-center p-8">
@@ -57,7 +57,7 @@ export async function RenderBlogs({
                 'grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-0 border rounded-md bg-background',
             )}
           >
-            {blogsData.map((blog) => (
+            {blogsData.items.map((blog) => (
               <BlogCard
                 key={blog._id}
                 data={blog}
