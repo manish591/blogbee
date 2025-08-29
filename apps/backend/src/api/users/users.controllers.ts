@@ -4,19 +4,15 @@ import { BlogbeeResponse } from '../../utils/api-response';
 import { comparePassword } from '../../utils/auth';
 import { logger } from '../../utils/logger';
 import { uploadFileToCloudinary } from '../../utils/upload';
-import type {
-  TCreateUserBody,
-  TEditUserProfileBody,
-  TLoginUserBody,
-} from './users.schema';
 import {
   createAuthSession,
   createUser,
-  editUserProfile,
+  editUser,
+  getUser,
   getUserByEmail,
-  getUserDetails,
   revokeAuthSession,
 } from './users.services';
+import type { CreateUserBody, EditUserBody, LoginUserBody } from './users.schema';
 
 export const COOKIE_OPTIONS: CookieOptions = {
   secure: true,
@@ -31,7 +27,7 @@ export async function createUserHandler(
   req: Request<
     Record<string, unknown>,
     Record<string, unknown>,
-    TCreateUserBody
+    CreateUserBody
   >,
   res: Response,
 ) {
@@ -74,7 +70,7 @@ export async function loginUserHandler(
   req: Request<
     Record<string, unknown>,
     Record<string, unknown>,
-    TLoginUserBody
+    LoginUserBody
   >,
   res: Response,
 ) {
@@ -183,7 +179,7 @@ export async function editProfileHandler(
   req: Request<
     Record<string, unknown>,
     Record<string, unknown>,
-    TEditUserProfileBody
+    EditUserBody
   >,
   res: Response,
 ) {
@@ -200,7 +196,7 @@ export async function editProfileHandler(
 
     const userId = userData.userId;
 
-    await editUserProfile(userId, req.body);
+    await editUser(userId, req.body);
     logger.info('EDIT_USER_SUCCESS: User data edited successfully');
 
     res
@@ -227,7 +223,7 @@ export async function getUserDetailsHandler(_req: Request, res: Response) {
     }
 
     const userId = userData.userId;
-    const data = await getUserDetails(userId);
+    const data = await getUser(userId);
     logger.info('GET_USER_DETAILS_SUCCESS: User details fetched successfully');
 
     res

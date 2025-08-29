@@ -12,7 +12,7 @@ import {
 } from './users.controllers';
 import {
   createUserSchema,
-  editUserProfileSchema,
+  editUserSchema,
   loginUserSchema,
 } from './users.schema';
 
@@ -32,7 +32,7 @@ router.post(
 router.patch(
   '/me',
   authenticate,
-  validateRequest(editUserProfileSchema),
+  validateRequest(editUserSchema),
   editProfileHandler,
 );
 router.get('/me', authenticate, getUserDetailsHandler);

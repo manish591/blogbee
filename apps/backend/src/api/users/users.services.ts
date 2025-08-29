@@ -6,7 +6,7 @@ import type { Session, Users } from '../../db/schema';
 import { BlogbeeError } from '../../utils/app-error';
 import { generateRandomString, hashPassword } from '../../utils/auth';
 import { logger } from '../../utils/logger';
-import type { TEditUserProfileBody } from './users.schema';
+import type { EditUserBody } from './users.schema';
 
 export const USERS_COLLECTION = 'users';
 export const SESSION_COLLECTION = 'session';
@@ -105,7 +105,7 @@ export async function getAuthSession(sessionId: string) {
   }
 }
 
-export async function getUserAuthSessions(userId: string) {
+export async function getAuthSessions(userId: string) {
   try {
     const data = db
       .collection<Session>(SESSION_COLLECTION)
@@ -124,9 +124,9 @@ export async function getUserAuthSessions(userId: string) {
   }
 }
 
-export async function editUserProfile(
+export async function editUser(
   userId: string,
-  data: TEditUserProfileBody,
+  data: EditUserBody,
 ) {
   try {
     const cleanUpdates = Object.fromEntries(
@@ -153,7 +153,7 @@ export async function editUserProfile(
   }
 }
 
-export async function getUserDetails(userId: string) {
+export async function getUser(userId: string) {
   try {
     const data = await db.collection<Users>(USERS_COLLECTION).findOne(
       { _id: new ObjectId(userId) },

@@ -5,7 +5,7 @@ import * as uploadUtils from '../../utils/upload';
 import { UPLOADED_PROFILE_IMG_IDENTIFIER } from './users.routes';
 import {
   createUser,
-  getUserAuthSessions,
+  getAuthSessions,
   getUserByEmail,
 } from './users.services';
 
@@ -170,7 +170,7 @@ describe('users', () => {
           .send(data);
         const loggedInUser = await getUserByEmail(data.email);
         const userId = loggedInUser?._id.toString() as string;
-        const loggedInUserSessions = await getUserAuthSessions(userId);
+        const loggedInUserSessions = await getAuthSessions(userId);
 
         expect(loggedInUserSessions.length).toBe(0);
         expect(res.status).toBe(400);
@@ -194,7 +194,7 @@ describe('users', () => {
         .send(data);
       const loggedInUser = await getUserByEmail(data.email);
       const userId = loggedInUser?._id.toString() as string;
-      const loggedInUserSessions = await getUserAuthSessions(userId);
+      const loggedInUserSessions = await getAuthSessions(userId);
 
       expect(loggedInUserSessions.length).toBe(0);
       expect(res.status).toBe(400);
@@ -255,7 +255,7 @@ describe('users', () => {
         .send(data);
       const loggedInUser = await getUserByEmail(data.email);
       const userId = loggedInUser?._id.toString() as string;
-      const loggedInUserSessions = await getUserAuthSessions(userId);
+      const loggedInUserSessions = await getAuthSessions(userId);
 
       expect(loggedInUserSessions.length).toBe(1);
       expect(res.status).toBe(200);
@@ -292,7 +292,7 @@ describe('users', () => {
         .set('Cookie', [cookie]);
       const loggedOutUser = await getUserByEmail(loggedInUser.email);
       const userId = loggedOutUser?._id.toString() as string;
-      const userAuthSession = await getUserAuthSessions(userId);
+      const userAuthSession = await getAuthSessions(userId);
 
       expect(userAuthSession.length).toBe(0);
       expect(res.status).toBe(200);

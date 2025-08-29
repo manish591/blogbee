@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const createUserSchema = z.object({
   body: z
     .object({
-      name: z.string().trim().min(5).max(30),
+      name: z.string().trim().max(30),
       email: z.email().trim(),
       password: z.string().min(6).max(30),
     })
@@ -19,33 +19,22 @@ export const loginUserSchema = z.object({
     .strict(),
 });
 
-export const editUserProfileSchema = z.object({
+export const editUserSchema = z.object({
   body: z
     .object({
       name: z
-        .union([z.string(), z.undefined()])
-        .transform((val) => {
-          if (val === undefined) return undefined;
-          const trimmedValue = val.trim();
-          return trimmedValue === '' ? undefined : trimmedValue;
-        })
-        .refine((val) => val && val.length >= 6 && val.length <= 30, {
-          message: 'name should be between 6 and 30 characters long',
-        })
+        .string()
+        .trim().max(30)
         .optional(),
       profileImg: z
-        .union([z.undefined(), z.url()])
-        .transform((val) => {
-          if (val === undefined) return undefined;
-          return val.trim();
-        })
+        .url()
         .optional(),
     })
     .strict(),
 });
 
-export type TCreateUserBody = z.infer<typeof createUserSchema>['body'];
-export type TLoginUserBody = z.infer<typeof loginUserSchema>['body'];
-export type TEditUserProfileBody = z.infer<
-  typeof editUserProfileSchema
+export type CreateUserBody = z.infer<typeof createUserSchema>['body'];
+export type LoginUserBody = z.infer<typeof loginUserSchema>['body'];
+export type EditUserBody = z.infer<
+  typeof editUserSchema
 >['body'];
