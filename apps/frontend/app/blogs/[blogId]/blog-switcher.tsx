@@ -10,12 +10,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { getAllBlogs } from '../dal/get-all-blogs';
+import { DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu';
 
 export async function BlogsSwitcher({
   selectedBlogId,
 }: Readonly<{ selectedBlogId: string }>) {
   const allBlogs = await getAllBlogs({ limit: 5, sort: 'latest' });
-  const selectedBlog = allBlogs.find((blog) => blog._id === selectedBlogId);
+  const selectedBlog = allBlogs.items.find(
+    (blog) => blog._id === selectedBlogId,
+  );
 
   return (
     <div className="flex items-center gap-2">
@@ -34,16 +37,16 @@ export async function BlogsSwitcher({
             <ChevronsUpDown className="w-4 h-4 text-foreground/70" />
           </span>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-40 shadow-sm" align="center">
-          <DropdownMenuLabel className="text-foreground/70 text-sm">
+        <DropdownMenuContent className="w-40 shadow-sm p-0" align="center">
+          <DropdownMenuLabel className="text-foreground/70 text-sm pt-3 px-3">
             Blogs
           </DropdownMenuLabel>
           <DropdownMenuGroup>
-            {allBlogs.map((blog) => {
+            {allBlogs.items.map((blog) => {
               return (
                 <DropdownMenuItem
                   key={blog._id}
-                  className="cursor-pointer"
+                  className="cursor-pointer px-3"
                   asChild
                 >
                   <Link href={`/blogs/${blog._id}`}>
@@ -65,6 +68,15 @@ export async function BlogsSwitcher({
                 </DropdownMenuItem>
               );
             })}
+            <DropdownMenuSeparator className="h-[1px] mt-2 bg-border" />
+            <DropdownMenuItem
+              asChild
+              className="cursor-pointer text-center block"
+            >
+              <Link href="/blogs/all" className="text-center">
+                View all blogs
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
