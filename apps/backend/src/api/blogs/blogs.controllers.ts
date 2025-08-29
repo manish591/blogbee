@@ -3,11 +3,6 @@ import { StatusCodes } from 'http-status-codes';
 import { BlogbeeResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
 import { uploadFileToCloudinary } from '../../utils/upload';
-import type {
-  TCreateBlogBody,
-  TEditBlogBody,
-  TEditBlogParams,
-} from './blogs.schema';
 import {
   createBlog,
   deleteBlog,
@@ -17,12 +12,13 @@ import {
   isBlogOwnedByUser,
   isSlugTaken,
 } from './blogs.services';
+import type { CreateBlogBody, EditBlogBody, EditBlogParams, GetBlogsQuery } from './blogs.schema';
 
 export async function createBlogHandler(
   req: Request<
     Record<string, unknown>,
     Record<string, unknown>,
-    TCreateBlogBody
+    CreateBlogBody
   >,
   res: Response,
 ) {
@@ -63,7 +59,7 @@ export async function createBlogHandler(
   }
 }
 
-export async function getAllBlogsByUserHandler(req: Request, res: Response) {
+export async function getBlogsHandler(req: Request<Record<string, unknown>, Record<string, unknown>, Record<string, unknown>, GetBlogsQuery>, res: Response) {
   try {
     const userData = res.locals.user;
 
@@ -75,10 +71,11 @@ export async function getAllBlogsByUserHandler(req: Request, res: Response) {
       return;
     }
 
-    const query = (req.query.query ?? "") as string;
-    const limit = req.query.limit ? Number(req.query.limit) : 10;
-    const page = req.query.page ? Number(req.query.page) : 1;
-    const sort = req.query.sort as "latest" | "oldest" | undefined;
+    const queryParams = req.query;
+    const query = queryParams.query ?? "";
+    const limit = queryParams.limit ? Number(queryParams.limit) : 10;
+    const page = queryParams.page ? Number(queryParams.page) : 1;
+    const sort = queryParams.sort;
     const allUserBlogsData = await getAllBlogsByUser(userData.userId, { query, limit, page, sort });
     logger.info('FETCH_ALL_BLOG_SUCCESS: Blogs fetched successfully');
 
@@ -177,7 +174,7 @@ export async function uploadBlogLogoHandler(req: Request, res: Response) {
 }
 
 export async function editBlogHandler(
-  req: Request<TEditBlogParams, Record<string, unknown>, TEditBlogBody>,
+  req: Request<EditBlogParams, Record<string, unknown>, EditBlogBody>,
   res: Response,
 ) {
   try {

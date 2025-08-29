@@ -4,7 +4,6 @@ import { buildServer } from '../../app';
 import * as uploadUtils from '../../utils/upload';
 import { UPLOADED_BLOG_LOGO_IDENTIFIER } from '../blogs/blogs.routes';
 import { createPost, getPostById } from '../posts/posts.services';
-import { createTag, getTagById } from '../tags/tags.services';
 import { createUser } from '../users/users.services';
 import {
   createBlog,
@@ -13,6 +12,7 @@ import {
   getBlogBySlug,
 } from './blogs.services';
 import type { ObjectId } from 'mongodb';
+import { createCategory, getCategoryById } from '../categories/categories.services';
 
 describe('blogs', () => {
   const loggedInUser = {
@@ -573,15 +573,15 @@ describe('blogs', () => {
       });
     });
 
-    it('should return 200 ok and delete the corresponding posts and tags related to blog', async () => {
-      const newTagData = {
+    it('should return 200 ok and delete the corresponding posts and categories related to blog', async () => {
+      const newCategoryData = {
         blogId,
         name: 'typescript',
       };
       const newPostId = (await createPost(userId, blogId)).postId.toString();
-      const newTagId = (
-        await createTag(userId, blogId, newTagData)
-      ).tagId.toString();
+      const newCategoryId = (
+        await createCategory(userId, blogId, newCategoryData)
+      ).categoryId.toString();
       const app = buildServer();
       const res = await request(app)
         .delete(`/v1/blogs/${blogId}`)
@@ -589,11 +589,11 @@ describe('blogs', () => {
         .set('Cookie', [cookie]);
       const deletedBlog = await getBlogById(blogId);
       const deletedPost = await getPostById(newPostId);
-      const deletedTag = await getTagById(newTagId);
+      const deletedCategory = await getCategoryById(newCategoryId);
 
       expect(deletedBlog).toBe(null);
       expect(deletedPost).toBe(null);
-      expect(deletedTag).toBe(null);
+      expect(deletedCategory).toBe(null);
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
         message: 'Deleted the blog successfully',

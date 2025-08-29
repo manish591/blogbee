@@ -1,12 +1,12 @@
 import { StatusCodes } from 'http-status-codes';
 import { ObjectId } from 'mongodb';
 import * as db from '../../db';
-import type { Blogs, Posts, Tags } from '../../db/schema';
+import type { Blogs, Categories, Posts } from '../../db/schema';
 import { BlogbeeError } from '../../utils/app-error';
 import { logger } from '../../utils/logger';
 import { POSTS_COLLECTION } from '../posts/posts.services';
-import { TAGS_COLLECTION } from '../tags/tags.services';
-import type { TCreateBlogBody, TEditBlogBody } from './blogs.schema';
+import type { CreateBlogBody, EditBlogBody } from './blogs.schema';
+import { CATEGORIES_COLLECTION } from '../categories/categories.services';
 
 export const BLOG_COLLECTION = 'blogs';
 
@@ -25,7 +25,7 @@ export async function isSlugTaken(slug: string) {
   }
 }
 
-export async function createBlog(userId: string, data: TCreateBlogBody) {
+export async function createBlog(userId: string, data: CreateBlogBody) {
   try {
     const res = await db.collection<Blogs>(BLOG_COLLECTION).insertOne({
       _id: new ObjectId(),
@@ -170,7 +170,7 @@ export async function getAllBlogsByUser(
   }
 }
 
-export async function editBlog(blogId: string, data: TEditBlogBody) {
+export async function editBlog(blogId: string, data: EditBlogBody) {
   try {
     const cleanUpdates = Object.fromEntries(
       Object.entries(data).filter(([_, value]) => !!value),
@@ -211,8 +211,8 @@ export async function deleteBlog(blogId: string) {
       .deleteOne({
         _id: new ObjectId(blogId),
       });
-    const deleteTagsResult = await db
-      .collection<Tags>(TAGS_COLLECTION)
+    const deletedCategoriesResult = await db
+      .collection<Categories>(CATEGORIES_COLLECTION)
       .deleteMany({
         blogId: new ObjectId(blogId),
       });
@@ -227,7 +227,7 @@ export async function deleteBlog(blogId: string) {
       sucesss: true,
       deleteBlogCount: deleteBlogResult.deletedCount,
       deletePostCount: deletePostsResult.deletedCount,
-      deleteTagCount: deleteTagsResult.deletedCount,
+      deleteCategoriesCount: deletedCategoriesResult.deletedCount,
     };
   } catch (err) {
     await session.abortTransaction();

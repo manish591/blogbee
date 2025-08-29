@@ -6,7 +6,7 @@ import {
   createBlogHandler,
   deleteBlogHandler,
   editBlogHandler,
-  getAllBlogsByUserHandler,
+  getBlogsHandler,
   getBlogByIdHandler,
   uploadBlogLogoHandler,
 } from './blogs.controllers';
@@ -14,7 +14,7 @@ import {
   createBlogSchema,
   deleteBlogSchema,
   editBlogSchema,
-  getAllBlogsByUserSchema,
+  getBlogsSchema,
   getBlogByIdSchema,
 } from './blogs.schema';
 
@@ -31,8 +31,8 @@ router.post(
 router.get(
   '/',
   authenticate,
-  validateRequest(getAllBlogsByUserSchema),
-  getAllBlogsByUserHandler,
+  validateRequest(getBlogsSchema),
+  getBlogsHandler,
 );
 router.get(
   '/:blogId',

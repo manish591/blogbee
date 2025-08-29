@@ -1,77 +1,44 @@
 import { ObjectId } from 'mongodb';
-import { z, ZodError } from 'zod';
+import { z } from 'zod';
 
 export const createBlogSchema = z.object({
   body: z
     .object({
       name: z
         .string()
-        .transform((val) => val.trim())
-        .refine((val) => val.length >= 5 && val.length <= 30, {
-          message:
-            'name should be greater than 5 characters and less than 30 characters',
-        }),
+        .trim().max(30),
       about: z
-        .union([z.string(), z.undefined()])
-        .transform((val) => {
-          if (val === undefined) return undefined;
-          const trimmedValue = val.trim();
-          return trimmedValue === '' ? undefined : trimmedValue;
-        })
+        .string()
+        .trim()
+        .max(300)
         .optional(),
       slug: z
         .string()
+        .trim()
+        .max(30)
         .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, {
           message:
             'name should only contain lowercase characters, numbers and hyphens',
-        })
-        .transform((val) => val.trim())
-        .refine((val) => val.length >= 5 && val.length <= 30, {
-          message: 'slug must be between 5 and 30 characters',
         }),
       logo: z
-        .union([z.url(), z.undefined()])
-        .transform((val) => {
-          if (val === undefined) return undefined;
-          return val.trim();
-        })
+        .url()
         .optional(),
     })
     .strict(),
 });
 
-export const getAllBlogsByUserSchema = z.object({
+export const getBlogsSchema = z.object({
   query: z
     .object({
       query: z.string().optional(),
-      page: z.coerce.number().nonnegative().max(1000).optional().default(1),
-      limit: z.string().transform((val) => {
-        if (val.trim() === "") {
-          throw new ZodError([
-            {
-              code: "custom",
-              path: ["limit"],
-              message: "limit cannot be empty"
-            }
-          ]);
-        }
-
-        const num = Number(val);
-
-        if (Number.isNaN(num)) {
-          throw new ZodError([
-            {
-              code: "custom",
-              path: ["limit"],
-              message: "limit must be a number"
-            }
-          ]);
-        }
-
-        return num;
-      }).refine((val) => val >= 1, {
-        message: "limit must be greater than or equal to zero"
-      }).optional(),
+      page: z.coerce
+        .number()
+        .min(1, { message: "page must be at least 1" })
+        .max(1000, { message: "page must be at most 1000" }).transform(val => String(val)).optional(),
+      limit: z.coerce
+        .number()
+        .min(1, { message: "limit must be at least 1" })
+        .max(20, { message: "limit must be at most 20" }).transform(val => String(val)).optional(),
       sort: z.union([z.literal('latest'), z.literal('oldest')]).optional(),
     })
     .strict(),
@@ -94,35 +61,17 @@ export const editBlogSchema = z.object({
   body: z
     .object({
       name: z
-        .union([
-          z
-            .string()
-            .refine((val) => val && val.length >= 5 && val.length <= 30, {
-              message:
-                'name should be greater than 5 characters and less than 30 characters',
-            }),
-          z.undefined(),
-        ])
-        .transform((val) => {
-          if (val === undefined) return undefined;
-          const trimmedValue = val.trim();
-          return trimmedValue === '' ? undefined : trimmedValue;
-        })
+        .string()
+        .trim()
+        .max(30)
         .optional(),
       about: z
-        .union([z.string(), z.undefined()])
-        .transform((val) => {
-          if (val === undefined) return undefined;
-          const trimmedValue = val.trim();
-          return trimmedValue === '' ? undefined : trimmedValue;
-        })
+        .string()
+        .trim()
+        .max(300)
         .optional(),
       logo: z
-        .union([z.url(), z.undefined()])
-        .transform((val) => {
-          if (val === undefined) return undefined;
-          return val.trim();
-        })
+        .url()
         .optional(),
     })
     .strict(),
@@ -151,11 +100,11 @@ export const deleteBlogSchema = z.object({
     .strict(),
 });
 
-export type TCreateBlogBody = z.infer<typeof createBlogSchema>['body'];
-export type TGetAllBlogsQuery = z.infer<
-  typeof getAllBlogsByUserSchema
+export type CreateBlogBody = z.infer<typeof createBlogSchema>['body'];
+export type GetBlogsQuery = z.infer<
+  typeof getBlogsSchema
 >['query'];
-export type TGetBlogByIdParams = z.infer<typeof getBlogByIdSchema>['params'];
-export type TEditBlogBody = z.infer<typeof editBlogSchema>['body'];
-export type TEditBlogParams = z.infer<typeof editBlogSchema>['params'];
-export type TDeleteBlogParams = z.infer<typeof deleteBlogSchema>['params'];
+export type GetBlogByIdParams = z.infer<typeof getBlogByIdSchema>['params'];
+export type EditBlogBody = z.infer<typeof editBlogSchema>['body'];
+export type EditBlogParams = z.infer<typeof editBlogSchema>['params'];
+export type DeleteBlogParams = z.infer<typeof deleteBlogSchema>['params'];
