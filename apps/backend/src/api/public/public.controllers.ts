@@ -3,8 +3,9 @@ import { StatusCodes } from 'http-status-codes';
 import { BlogbeeResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
 import { getBlogBySlug } from '../blogs/blogs.services';
-import { getAllPosts, getPostBySlug } from '../posts/posts.services';
-import { getBlogTags } from '../tags/tags.services';
+import { getPostBySlug, getPosts } from '../posts/posts.services';
+import { getCategories } from '../categories/categories.services';
+import type { GetPublicPostsQuery } from './public.schema';
 
 export async function getPublicBlogDetailsHandler(req: Request, res: Response) {
   try {
@@ -20,8 +21,8 @@ export async function getPublicBlogDetailsHandler(req: Request, res: Response) {
     }
 
     const blogId = blogData._id.toString();
-    const topBlogPosts = await getAllPosts(blogId);
-    const allBlogTags = await getBlogTags(blogId);
+    const topBlogPosts = await getPosts(blogId);
+    const allBlogCategories = await getCategories(blogId);
 
     logger.info('EMBED_BLOG_SUCCESS: Blog data retrieved successfully');
 
@@ -29,7 +30,7 @@ export async function getPublicBlogDetailsHandler(req: Request, res: Response) {
       new BlogbeeResponse('Blog data retrieved successfully', {
         blog: blogData,
         posts: topBlogPosts.items,
-        tags: allBlogTags,
+        categories: allBlogCategories,
       }),
     );
   } catch (err) {
@@ -40,9 +41,9 @@ export async function getPublicBlogDetailsHandler(req: Request, res: Response) {
   }
 }
 
-export async function getPublicPostsListHandler(req: Request, res: Response) {
+export async function getPublicPostsListHandler(req: Request<Record<string, unknown>, Record<string, unknown>, Record<string, unknown>, GetPublicPostsQuery>, res: Response) {
   try {
-    const blogSlug = req.query.blog as string;
+    const blogSlug = req.query.blog;
     const blogData = await getBlogBySlug(blogSlug);
 
     if (!blogData) {
@@ -54,10 +55,17 @@ export async function getPublicPostsListHandler(req: Request, res: Response) {
     }
 
     const blogId = blogData._id.toString();
-    const q = (req.query.q as string) ?? '';
-    const limit = (req.query.limit as string) ? Number(req.query.limit) : 10;
-    const page = (req.query.page as string) ? Number(req.query.page) : 1;
-    const postsData = await getAllPosts(blogId, q, page, limit);
+    const queryParams = req.query;
+    const query = queryParams.query;
+    const limit = queryParams.limit ? Number(queryParams.limit) : 10;
+    const page = queryParams.page ? Number(queryParams.page) : 1;
+    const category = queryParams.category;
+    const postsData = await getPosts(blogId, {
+      query,
+      limit,
+      page,
+      categories: category
+    });
 
     logger.info('GET_POSTS_LIST_SUCCESS: Fetching posts list for blog');
 

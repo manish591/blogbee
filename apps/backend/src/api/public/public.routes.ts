@@ -5,27 +5,23 @@ import {
   getPublicPostDetailsHandler,
   getPublicPostsListHandler,
 } from './public.controllers';
-import {
-  getPublicBlogDetailsSchema,
-  getPublicPostDetailsSchema,
-  getPublicPostsListSchema,
-} from './public.schema';
+import { getPublicBlogSchema, getPublicPostSchema, getPublicPostsSchema } from './public.schema';
 
 const router = Router();
 
 router.get(
   '/blogs',
-  validateRequest(getPublicBlogDetailsSchema),
+  validateRequest(getPublicBlogSchema),
   getPublicBlogDetailsHandler,
 );
 router.get(
   '/posts',
-  validateRequest(getPublicPostsListSchema),
+  validateRequest(getPublicPostsSchema),
   getPublicPostsListHandler,
 );
 router.get(
   '/posts/:postSlug',
-  validateRequest(getPublicPostDetailsSchema),
+  validateRequest(getPublicPostSchema),
   getPublicPostDetailsHandler,
 );
 

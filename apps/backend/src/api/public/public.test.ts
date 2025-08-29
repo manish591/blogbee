@@ -4,10 +4,10 @@ import { describe, expect, it } from 'vitest';
 import { buildServer } from '../../app';
 import { createBlog } from '../blogs/blogs.services';
 import { createPost, editPost } from '../posts/posts.services';
-import { createTag } from '../tags/tags.services';
 import { createUser } from '../users/users.services';
+import { createCategory } from '../categories/categories.services';
 
-describe('EMBED API', () => {
+describe('PUBLIC API', () => {
   let userId: string;
 
   beforeEach(async () => {
@@ -35,7 +35,7 @@ describe('EMBED API', () => {
       });
     });
 
-    it('should return blog data with blog posts and tags', async () => {
+    it('should return blog data with blog posts and categories', async () => {
       const blogData = {
         name: 'update blog title',
         slug: 'update-blog-title',
@@ -45,10 +45,10 @@ describe('EMBED API', () => {
       const blogSlug = blogData.slug;
       const blogId = createdBlog.blogId.toString();
       await createPost(userId, blogId);
-      await createTag(userId, blogId, {
+      await createCategory(userId, blogId, {
         blogId,
-        name: 'test tag',
-        description: 'test tag description',
+        name: 'test category',
+        description: 'test category description',
       });
       const app = buildServer();
       const res = await request(app).get(`/v1/public/blogs?blog=${blogSlug}`);
@@ -65,13 +65,13 @@ describe('EMBED API', () => {
           posts: [
             expect.objectContaining({
               title: 'untitled',
-              tags: [],
+              categories: [],
             }),
           ],
-          tags: [
+          categories: [
             expect.objectContaining({
-              name: 'test tag',
-              description: 'test tag description',
+              name: 'test category',
+              description: 'test category description',
             }),
           ],
         },
@@ -93,7 +93,7 @@ describe('EMBED API', () => {
       });
     });
 
-    it('should return blog and post data', async () => {
+    it('should return 200 ok along with blog and post data', async () => {
       const blogData = {
         name: 'update blog title',
         slug: 'update-blog-title',
@@ -121,12 +121,10 @@ describe('EMBED API', () => {
             limit: 10,
             totalItems: 1,
             totalPages: 1,
-            hasNext: false,
-            hasPrevious: false,
             items: [
               expect.objectContaining({
                 title: 'untitled',
-                tags: [],
+                categories: [],
               }),
             ],
           },
@@ -195,7 +193,7 @@ describe('EMBED API', () => {
           post: expect.objectContaining({
             title: 'untitled',
             slug: postSlug,
-            tags: [],
+            categories: [],
           }),
           blog: expect.objectContaining({
             name: blogData.name,

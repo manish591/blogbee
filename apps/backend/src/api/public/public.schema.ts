@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const getPublicBlogDetailsSchema = z.object({
+export const getPublicBlogSchema = z.object({
   query: z
     .object({
       blog: z.string().trim(),
@@ -8,18 +8,25 @@ export const getPublicBlogDetailsSchema = z.object({
     .strict(),
 });
 
-export const getPublicPostsListSchema = z.object({
+export const getPublicPostsSchema = z.object({
   query: z
     .object({
       blog: z.string().trim(),
-      limit: z.coerce.number().optional(),
-      page: z.coerce.number().optional(),
-      q: z.string().optional(),
+      query: z.string().optional(),
+      limit: z.coerce
+        .number()
+        .min(1, { message: "limit must be at least 1" })
+        .max(1000, { message: "limit must be at most 1000" }).transform(val => String(val)).optional(),
+      page: z.coerce
+        .number()
+        .min(1, { message: "page must be at least 1" })
+        .max(1000, { message: "page must be at most 1000" }).transform(val => String(val)).optional(),
+      category: z.string().optional()
     })
     .strict(),
 });
 
-export const getPublicPostDetailsSchema = z.object({
+export const getPublicPostSchema = z.object({
   params: z
     .object({
       postSlug: z.string().trim(),
@@ -31,3 +38,8 @@ export const getPublicPostDetailsSchema = z.object({
     })
     .strict(),
 });
+
+export type GetPublicBlogQuery = z.infer<typeof getPublicBlogSchema>['query'];
+export type GetPublicPostsQuery = z.infer<typeof getPublicPostsSchema>['query'];
+export type GetPublicPostQuery = z.infer<typeof getPublicPostSchema>['query'];
+export type GetPublicPostParms = z.infer<typeof getPublicPostSchema>['params'];
