@@ -2,22 +2,22 @@ import { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate';
 import { validateRequest } from '../../middlewares/validate-request';
 import {
-  addTagToPostHandler,
   createPostHandler,
   deletePostHandler,
   editPostHandler,
-  getAllPostsHandler,
+  getPostsHandler,
   getPostByIdHandler,
-  removeTagFromPostHandler,
+  removeCategoryFromPostHandler,
+  addCategoryToPostHandler,
 } from './posts.controllers';
 import {
-  addTagToPostSchema,
+  addCategoryToPostSchema,
   createPostSchema,
   deletePostSchema,
   editPostSchema,
-  getAllPostsSchema,
   getPostByIdSchema,
-  removeTagFromPostSchema,
+  getPostsSchema,
+  removeCategoryFromPostSchema,
 } from './posts.schema';
 
 const router = Router();
@@ -31,8 +31,8 @@ router.post(
 router.get(
   '/',
   authenticate,
-  validateRequest(getAllPostsSchema),
-  getAllPostsHandler,
+  validateRequest(getPostsSchema),
+  getPostsHandler,
 );
 router.get(
   '/:postId',
@@ -53,16 +53,16 @@ router.delete(
   deletePostHandler,
 );
 router.post(
-  '/:postId/tags/:tagId',
+  '/:postId/categories/:categoryId',
   authenticate,
-  validateRequest(addTagToPostSchema),
-  addTagToPostHandler,
+  validateRequest(addCategoryToPostSchema),
+  addCategoryToPostHandler,
 );
 router.delete(
-  '/:postId/tags/:tagId',
+  '/:postId/categories/:categoryId',
   authenticate,
-  validateRequest(removeTagFromPostSchema),
-  removeTagFromPostHandler,
+  validateRequest(removeCategoryFromPostSchema),
+  removeCategoryFromPostHandler,
 );
 
 export { router as postsRouter };

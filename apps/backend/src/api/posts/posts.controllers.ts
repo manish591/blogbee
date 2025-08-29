@@ -3,18 +3,20 @@ import { StatusCodes } from 'http-status-codes';
 import { BlogbeeResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
 import { getBlogById, isBlogOwnedByUser } from '../blogs/blogs.services';
-import { getTagById } from '../tags/tags.services';
+import { getCategoryById } from '../categories/categories.services';
 import {
-  addTagToPost,
+  addCategoryToPost,
   createPost,
   deletePost,
   editPost,
-  getAllPosts,
   getPostById,
-  isPostContainsTag,
+  getPosts,
+  isPostContainsCategory,
   isPostOwnedByUser,
-  removeTagFromPost,
+  removeCategoryFromPost,
 } from './posts.services';
+import type { AddCategoryToPostParams, EditPostBody, EditPostParams, GetPostsQuery, RemoveCategoryFromPostParams } from './posts.schema';
+import { PostStatus } from '../../db/schema';
 
 export async function createPostHandler(req: Request, res: Response) {
   try {
@@ -70,7 +72,7 @@ export async function createPostHandler(req: Request, res: Response) {
   }
 }
 
-export async function getAllPostsHandler(req: Request, res: Response) {
+export async function getPostsHandler(req: Request<Record<string, unknown>, Record<string, unknown>, Record<string, unknown>, GetPostsQuery>, res: Response) {
   try {
     const userData = res.locals.user;
 
@@ -82,7 +84,7 @@ export async function getAllPostsHandler(req: Request, res: Response) {
       return;
     }
 
-    const blogId = req.query.blogId as string;
+    const blogId = req.query.blogId;
     const isBlogExists = await getBlogById(blogId);
 
     if (!isBlogExists) {
@@ -108,15 +110,21 @@ export async function getAllPostsHandler(req: Request, res: Response) {
       return;
     }
 
-    const query = (req.query.query as string) ?? '';
-    const limit = (req.query.limit as string) ? Number(req.query.limit) : 10;
-    const page = (req.query.page as string) ? Number(req.query.page) : 1;
-    const postsData = await getAllPosts(
-      blogId,
+    const queryParams = req.query;
+    const query = queryParams.query;
+    const categories = queryParams.categories;
+    const sort = queryParams.sort;
+    const status = queryParams.status;
+    const limit = queryParams.limit ? Number(queryParams.limit) : 10;
+    const page = queryParams.page ? Number(queryParams.page) : 1;
+    const postsData = await getPosts(blogId, {
       query,
-      Number(page),
-      Number(limit),
-    );
+      limit,
+      page,
+      categories,
+      sort,
+      status
+    });
     logger.info('GET_POST_SUCCESS: Posts fetched successfully');
 
     res
@@ -181,7 +189,7 @@ export async function getPostByIdHandler(req: Request, res: Response) {
   }
 }
 
-export async function editPostHandler(req: Request, res: Response) {
+export async function editPostHandler(req: Request<EditPostParams, Record<string, unknown>, EditPostBody>, res: Response) {
   try {
     const userData = res.locals.user;
 
@@ -214,6 +222,14 @@ export async function editPostHandler(req: Request, res: Response) {
         .json(
           new BlogbeeResponse('You do not have permissions to edit the post'),
         );
+      return;
+    }
+
+    const { postStatus, slug } = req.body;
+
+    if (postStatus === PostStatus.PUBLISHED && (!postData.slug && !slug)) {
+      logger.error("BAD_REQUEST: Publishing post requires a slug to be passed in the body");
+      res.status(StatusCodes.BAD_REQUEST).json(new BlogbeeResponse("Slug is required"));
       return;
     }
 
@@ -281,7 +297,7 @@ export async function deletePostHandler(req: Request, res: Response) {
   }
 }
 
-export async function addTagToPostHandler(req: Request, res: Response) {
+export async function addCategoryToPostHandler(req: Request<AddCategoryToPostParams>, res: Response) {
   try {
     const userData = res.locals.user;
 
@@ -294,7 +310,7 @@ export async function addTagToPostHandler(req: Request, res: Response) {
     }
 
     const postId = req.params.postId;
-    const tagId = req.params.tagId;
+    const categoryId = req.params.categoryId;
     const userId = userData.userId;
 
     const postData = await getPostById(postId);
@@ -306,12 +322,12 @@ export async function addTagToPostHandler(req: Request, res: Response) {
       return;
     }
 
-    const tagData = await getTagById(tagId);
-    if (!tagData) {
-      logger.error('NOT_FOUND_ERROR: Tag not found');
+    const categoryData = await getCategoryById(categoryId);
+    if (!categoryData) {
+      logger.error('NOT_FOUND_ERROR: Category not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(new BlogbeeResponse('Tag not found'));
+        .json(new BlogbeeResponse('Category not found'));
       return;
     }
 
@@ -322,41 +338,41 @@ export async function addTagToPostHandler(req: Request, res: Response) {
         .status(StatusCodes.FORBIDDEN)
         .json(
           new BlogbeeResponse(
-            'You do not have permissions to add tag to this post',
+            'You do not have permissions to add category to this post',
           ),
         );
       return;
     }
 
-    const containsTag = await isPostContainsTag(postId, tagId);
-    if (containsTag) {
-      logger.error('CONFLICT_ERROR: Post already contains this tag');
+    const containsCategory = await isPostContainsCategory(postId, categoryId);
+    if (containsCategory) {
+      logger.error('CONFLICT_ERROR: Post already contains this category');
       res
         .status(StatusCodes.CONFLICT)
-        .json(new BlogbeeResponse('Post already contains this tag'));
+        .json(new BlogbeeResponse('Post already contains this category'));
       return;
     }
 
-    const isPostAndTagFromSameBlog =
-      postData.blogId.toString() === tagData.blogId.toString();
-    if (!isPostAndTagFromSameBlog) {
+    const isPostAndCategoryFromSameBlog =
+      postData.blogId.toString() === categoryData.blogId.toString();
+    if (!isPostAndCategoryFromSameBlog) {
       logger.error(
-        'FORBIDDEN_ERROR: The post and tag must belong to the same blog',
+        'FORBIDDEN_ERROR: The post and category must belong to the same blog',
       );
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new BlogbeeResponse('The post and tag must belong to the same blog'),
+          new BlogbeeResponse('The post and category must belong to the same blog'),
         );
       return;
     }
 
-    await addTagToPost(postId, tagId);
-    logger.info('ADD_TAG_TO_POST_SUCCESS: Tag added to post successfully');
+    await addCategoryToPost(postId, categoryId, categoryData.name);
+    logger.info('ADD_CATEGORY_TO_POST_SUCCESS: category added to post successfully');
 
     res
       .status(StatusCodes.OK)
-      .json(new BlogbeeResponse('Tag added to post successfully'));
+      .json(new BlogbeeResponse('category added to post successfully'));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
@@ -365,7 +381,7 @@ export async function addTagToPostHandler(req: Request, res: Response) {
   }
 }
 
-export async function removeTagFromPostHandler(req: Request, res: Response) {
+export async function removeCategoryFromPostHandler(req: Request<RemoveCategoryFromPostParams>, res: Response) {
   try {
     const userData = res.locals.user;
 
@@ -378,7 +394,7 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
     }
 
     const postId = req.params.postId;
-    const tagId = req.params.tagId;
+    const categoryId = req.params.categoryId;
     const userId = userData.userId;
 
     const postData = await getPostById(postId);
@@ -390,12 +406,12 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
       return;
     }
 
-    const tagData = await getTagById(tagId);
-    if (!tagData) {
-      logger.error('NOT_FOUND_ERROR: Tag not found');
+    const categoryData = await getCategoryById(categoryId);
+    if (!categoryData) {
+      logger.error('NOT_FOUND_ERROR: Category not found');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(new BlogbeeResponse('Tag not found'));
+        .json(new BlogbeeResponse('Category not found'));
       return;
     }
 
@@ -406,43 +422,29 @@ export async function removeTagFromPostHandler(req: Request, res: Response) {
         .status(StatusCodes.FORBIDDEN)
         .json(
           new BlogbeeResponse(
-            'You do not have permissions to delete the tag from this post',
+            'You do not have permissions to delete the category from this post',
           ),
         );
       return;
     }
 
-    const containsTag = await isPostContainsTag(postId, tagId);
-    if (!containsTag) {
-      logger.error('NOT_FOUND_ERROR: Post does not contains this tag');
+    const containscategory = await isPostContainsCategory(postId, categoryId);
+    if (!containscategory) {
+      logger.error('NOT_FOUND_ERROR: Post does not contains this category');
       res
         .status(StatusCodes.NOT_FOUND)
-        .json(new BlogbeeResponse('Post does not contains this tag'));
+        .json(new BlogbeeResponse('Post does not contains this category'));
       return;
     }
 
-    const isPostAndTagFromSameBlog =
-      postData.blogId.toString() === tagData.blogId.toString();
-    if (!isPostAndTagFromSameBlog) {
-      logger.error(
-        'FORBIDDEN_ERROR: The post and tag must belong to the same blog',
-      );
-      res
-        .status(StatusCodes.FORBIDDEN)
-        .json(
-          new BlogbeeResponse('The post and tag must belong to the same blog'),
-        );
-      return;
-    }
-
-    await removeTagFromPost(postId, tagId);
+    await removeCategoryFromPost(postId, categoryId);
     logger.info(
-      'REMOVE_TAG_FROM_POST_SUCCESS: Tag removed from post successfully',
+      'REMOVE_CATEGORY_FROM_POST_SUCCESS: Category removed from the post successfully',
     );
 
     res
       .status(StatusCodes.OK)
-      .json(new BlogbeeResponse('Tag removed from post successfully'));
+      .json(new BlogbeeResponse('Category removed from the post successfully'));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res

@@ -1,11 +1,11 @@
 import { StatusCodes } from 'http-status-codes';
 import { ObjectId } from 'mongodb';
 import * as db from '../../db';
-import { PostStatus, type Posts, type Tags } from '../../db/schema';
+import { type Categories, PostStatus, type Posts } from '../../db/schema';
 import { BlogbeeError } from '../../utils/app-error';
 import { logger } from '../../utils/logger';
-import { TAGS_COLLECTION } from '../tags/tags.services';
-import type { TEditPostBody } from './posts.schema';
+import type { EditPostBody } from './posts.schema';
+import { CATEGORIES_COLLECTION } from '../categories/categories.services';
 
 export const POSTS_COLLECTION = 'posts';
 
@@ -17,7 +17,7 @@ export async function createPost(userId: string, blogId: string) {
       userId: new ObjectId(userId),
       blogId: new ObjectId(blogId),
       postStatus: PostStatus.DRAFT,
-      tags: [],
+      categories: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -64,13 +64,74 @@ export async function getPostBySlug(postSlug: string) {
   }
 }
 
-export async function getAllPosts(
+export async function isPostSlugAvailable(
+  userId: string,
   blogId: string,
-  query: string = '',
-  page: number = 1,
-  limit: number = 10,
+  slug: string,
 ) {
   try {
+    const data = await db.collection<Posts>(POSTS_COLLECTION).findOne({
+      userId: new ObjectId(userId),
+      blogId: new ObjectId(blogId),
+      slug,
+    });
+    return data != null;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
+  }
+}
+
+export async function isPostContainsCategory(postId: string, categoryId: string) {
+  try {
+    const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
+      _id: new ObjectId(postId),
+      "categories.id": new ObjectId(categoryId),
+    });
+    return res != null;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
+  }
+}
+
+export async function isPostOwnedByUser(userId: string, postId: string) {
+  try {
+    const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
+      _id: new ObjectId(postId),
+      userId: new ObjectId(userId),
+    });
+    return res != null;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
+  }
+}
+
+export async function getPosts(
+  blogId: string,
+  options?: {
+    query?: string,
+    page?: number,
+    limit?: number,
+    sort?: "latest" | "oldest",
+    categories?: string,
+    status?: PostStatus
+  },
+) {
+  try {
+    const page = options?.page ?? 1;
+    const limit = options?.limit ?? 10;
+    const query = options?.query ?? "";
     const docsToSkip = (page - 1) * limit;
     const numDocsToReturn = limit;
     const totalItems = await db
@@ -79,7 +140,7 @@ export async function getAllPosts(
     const totalPages = Math.ceil(totalItems / limit);
     const currentPage = page;
 
-    const res = await db
+    const cursor = db
       .collection<Posts>(POSTS_COLLECTION)
       .find({
         blogId: new ObjectId(blogId),
@@ -89,17 +150,40 @@ export async function getAllPosts(
           },
         }),
       })
-      .sort({ updatedAt: -1 })
       .skip(docsToSkip)
-      .limit(numDocsToReturn)
-      .toArray();
+      .limit(numDocsToReturn);
+
+    if (options?.sort) {
+      if (options.sort === "latest") {
+        cursor.sort({ updatedAt: -1 })
+      } else if (options.sort === "oldest") {
+        cursor.sort({ updatedAt: 1 })
+      }
+    }
+
+    if (options?.categories) {
+      const filteredCategories = options.categories.split(",");
+
+      cursor.filter({
+        "categories.name": {
+          $in: filteredCategories
+        }
+      });
+    }
+
+    if (options?.status) {
+      cursor.filter({
+        postStatus: options.status
+      })
+    }
+
+    const res = await cursor.toArray();
+
     return {
       currentPage,
       limit,
       totalItems,
       totalPages,
-      hasNext: currentPage < totalPages,
-      hasPrevious: currentPage > 1,
       items: res,
     };
   } catch (err) {
@@ -111,10 +195,10 @@ export async function getAllPosts(
   }
 }
 
-export async function editPost(postId: string, data: TEditPostBody) {
+export async function editPost(postId: string, data: EditPostBody) {
   try {
     const cleanUpdates = Object.fromEntries(
-      Object.entries(data).filter(([_, value]) => !!value),
+      Object.entries(data).filter(([key, value]) => value !== undefined && key !== "categories"),
     );
 
     const res = await db.collection<Posts>(POSTS_COLLECTION).updateOne(
@@ -128,6 +212,43 @@ export async function editPost(postId: string, data: TEditPostBody) {
         },
       },
     );
+
+    if (data.categories) {
+      const newCategories = data.categories.split(",");
+
+      const newCategoriesData = await Promise.all(newCategories.map(category => {
+        return db.collection<Categories>(CATEGORIES_COLLECTION).findOne({ name: category });
+      }));
+
+      // add categories in posts
+      await db.collection<Posts>(POSTS_COLLECTION).updateOne({
+        _id: new ObjectId(postId)
+      }, {
+        $addToSet: {
+          categories: {
+            $each: newCategoriesData.map(category => {
+              if (category) {
+                return { id: category._id, name: category.name }
+              }
+              return null;
+            }).filter(item => item != null)
+          }
+        }
+      })
+
+      // add posts in categories document
+      await db.collection<Categories>(CATEGORIES_COLLECTION).updateMany({
+        name: {
+          $in: newCategories
+        }
+      }, {
+        $push: {
+          posts: {
+            id: new ObjectId(postId)
+          }
+        }
+      });
+    }
 
     return {
       success: res.acknowledged,
@@ -163,44 +284,7 @@ export async function deletePost(postId: string) {
   }
 }
 
-export async function isPostSlugAvailable(
-  userId: string,
-  blogId: string,
-  slug: string,
-) {
-  try {
-    const data = await db.collection<Posts>(POSTS_COLLECTION).findOne({
-      userId: new ObjectId(userId),
-      blogId: new ObjectId(blogId),
-      slug,
-    });
-    return data != null;
-  } catch (err) {
-    logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new BlogbeeError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      'Internal server error occured',
-    );
-  }
-}
-
-export async function isPostOwnedByUser(userId: string, postId: string) {
-  try {
-    const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
-      _id: new ObjectId(postId),
-      userId: new ObjectId(userId),
-    });
-    return res != null;
-  } catch (err) {
-    logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new BlogbeeError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      'Internal server error occured',
-    );
-  }
-}
-
-export async function addTagToPost(postId: string, tagId: string) {
+export async function addCategoryToPost(postId: string, categoryId: string, categoryName: string) {
   const dbClient = db.getDBClient();
   const session = dbClient.startSession();
   try {
@@ -212,18 +296,23 @@ export async function addTagToPost(postId: string, tagId: string) {
       },
       {
         $push: {
-          tags: new ObjectId(tagId),
+          categories: {
+            id: new ObjectId(categoryId),
+            name: categoryName
+          },
         },
       },
     );
 
-    await db.collection<Tags>(TAGS_COLLECTION).updateOne(
+    await db.collection<Categories>(CATEGORIES_COLLECTION).updateOne(
       {
-        _id: new ObjectId(tagId),
+        _id: new ObjectId(categoryId),
       },
       {
         $push: {
-          posts: new ObjectId(postId),
+          posts: {
+            id: new ObjectId(postId)
+          },
         },
       },
     );
@@ -241,7 +330,7 @@ export async function addTagToPost(postId: string, tagId: string) {
   }
 }
 
-export async function removeTagFromPost(postId: string, tagId: string) {
+export async function removeCategoryFromPost(postId: string, categoryId: string) {
   const dbClient = db.getDBClient();
   const session = dbClient.startSession();
   try {
@@ -253,18 +342,22 @@ export async function removeTagFromPost(postId: string, tagId: string) {
       },
       {
         $pull: {
-          tags: new ObjectId(tagId),
+          categories: {
+            id: new ObjectId(categoryId)
+          },
         },
       },
     );
 
-    await db.collection<Tags>(TAGS_COLLECTION).updateOne(
+    await db.collection<Categories>(CATEGORIES_COLLECTION).updateOne(
       {
-        _id: new ObjectId(tagId),
+        _id: new ObjectId(categoryId),
       },
       {
         $pull: {
-          posts: new ObjectId(postId),
+          posts: {
+            id: new ObjectId(postId)
+          },
         },
       },
     );
@@ -279,21 +372,5 @@ export async function removeTagFromPost(postId: string, tagId: string) {
     );
   } finally {
     await session.endSession();
-  }
-}
-
-export async function isPostContainsTag(postId: string, tagId: string) {
-  try {
-    const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
-      _id: new ObjectId(postId),
-      tags: new ObjectId(tagId),
-    });
-    return res != null;
-  } catch (err) {
-    logger.error('SERVER_ERROR: Internal server error occured', err);
-    throw new BlogbeeError(
-      StatusCodes.INTERNAL_SERVER_ERROR,
-      'Internal server error occured',
-    );
   }
 }

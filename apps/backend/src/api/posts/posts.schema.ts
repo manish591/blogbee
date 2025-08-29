@@ -15,7 +15,7 @@ export const createPostSchema = z.object({
     .strict(),
 });
 
-export const getAllPostsSchema = z.object({
+export const getPostsSchema = z.object({
   query: z
     .object({
       blogId: z
@@ -25,8 +25,17 @@ export const getAllPostsSchema = z.object({
           message: 'Invalid mongodb objectid',
         }),
       query: z.string().optional().default(''),
-      page: z.coerce.number().optional().default(1),
-      limit: z.coerce.number().optional().default(10),
+      page: z.coerce
+        .number()
+        .min(1, { message: "page must be at least 1" })
+        .max(1000, { message: "page must be at most 1000" }).transform(val => String(val)).optional(),
+      limit: z.coerce
+        .number()
+        .min(1, { message: "limit must be at least 1" })
+        .max(1000, { message: "limit must be at most 1000" }).transform(val => String(val)).optional(),
+      categories: z.string().regex(/^[A-Za-z0-9]+(?:,[A-Za-z0-9]+)*$/).optional(),
+      sort: z.union([z.literal("latest"), z.literal("oldest")]).optional(),
+      status: z.enum(PostStatus).optional()
     })
     .strict(),
 });
@@ -48,51 +57,27 @@ export const editPostSchema = z.object({
   body: z
     .object({
       title: z
-        .union([z.string(), z.undefined()])
-        .transform((val) => {
-          if (val === undefined) return undefined;
-          const trimmedValue = val.trim();
-          return trimmedValue === '' ? undefined : trimmedValue;
-        })
+        .string()
+        .trim()
+        .max(300)
         .optional(),
       subTitle: z
-        .union([z.string(), z.undefined()])
-        .transform((val) => {
-          if (val === undefined) return undefined;
-          const trimmedValue = val.trim();
-          return trimmedValue === '' ? undefined : trimmedValue;
-        })
+        .string()
+        .max(300)
         .optional(),
       content: z
-        .union([z.string(), z.undefined()])
-        .transform((val) => {
-          if (val === undefined) return undefined;
-          const trimmedValue = val.trim();
-          return trimmedValue === '' ? undefined : trimmedValue;
-        })
+        .string()
         .optional(),
       coverImg: z
-        .union([z.url(), z.undefined()])
-        .transform((val) => {
-          if (val === undefined) return undefined;
-          return val.trim();
-        })
+        .url()
         .optional(),
       slug: z
-        .union([z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/), z.undefined()])
-        .transform((val) => {
-          if (val === undefined) return undefined;
-          const trimmedValue = val.trim();
-          return trimmedValue === '' ? undefined : trimmedValue;
-        })
+        .string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/)
         .optional(),
       postStatus: z
-        .union([z.undefined(), z.enum(PostStatus)])
-        .transform((val) => {
-          if (val === undefined) return undefined;
-          return val;
-        })
+        .enum(PostStatus)
         .optional(),
+      categories: z.string().regex(/^[A-Za-z0-9]+(?:,[A-Za-z0-9]+)*$/).optional()
     })
     .strict(),
   params: z
@@ -120,7 +105,7 @@ export const deletePostSchema = z.object({
     .strict(),
 });
 
-export const addTagToPostSchema = z.object({
+export const addCategoryToPostSchema = z.object({
   params: z.object({
     postId: z
       .string()
@@ -128,7 +113,7 @@ export const addTagToPostSchema = z.object({
       .refine((val) => ObjectId.isValid(val), {
         message: 'Invalid mongodb objectid',
       }),
-    tagId: z
+    categoryId: z
       .string()
       .trim()
       .refine((val) => ObjectId.isValid(val), {
@@ -137,7 +122,7 @@ export const addTagToPostSchema = z.object({
   }),
 });
 
-export const removeTagFromPostSchema = z.object({
+export const removeCategoryFromPostSchema = z.object({
   params: z.object({
     postId: z
       .string()
@@ -145,7 +130,7 @@ export const removeTagFromPostSchema = z.object({
       .refine((val) => ObjectId.isValid(val), {
         message: 'Invalid mongodb objectid',
       }),
-    tagId: z
+    categoryId: z
       .string()
       .trim()
       .refine((val) => ObjectId.isValid(val), {
@@ -154,13 +139,13 @@ export const removeTagFromPostSchema = z.object({
   }),
 });
 
-export type TCreatePostBody = z.infer<typeof createPostSchema>['body'];
-export type TGetAllPostsQuery = z.infer<typeof getAllPostsSchema>['query'];
-export type TGetPostByIdParams = z.infer<typeof getPostByIdSchema>['params'];
-export type TEditPostBody = z.infer<typeof editPostSchema>['body'];
-export type TEditPostParams = z.infer<typeof editPostSchema>['params'];
-export type TDeletePostParams = z.infer<typeof deletePostSchema>['params'];
-export type TAddTagToPostParams = z.infer<typeof addTagToPostSchema>['params'];
-export type TRemoveTagFromPostParams = z.infer<
-  typeof removeTagFromPostSchema
+export type CreatePostBody = z.infer<typeof createPostSchema>['body'];
+export type GetPostsQuery = z.infer<typeof getPostsSchema>['query'];
+export type GetPostByIdParams = z.infer<typeof getPostByIdSchema>['params'];
+export type EditPostBody = z.infer<typeof editPostSchema>['body'];
+export type EditPostParams = z.infer<typeof editPostSchema>['params'];
+export type DeletePostParams = z.infer<typeof deletePostSchema>['params'];
+export type AddCategoryToPostParams = z.infer<typeof addCategoryToPostSchema>['params'];
+export type RemoveCategoryFromPostParams = z.infer<
+  typeof removeCategoryFromPostSchema
 >['params'];

@@ -1,18 +1,18 @@
-import { ObjectId } from 'mongodb';
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { buildServer } from '../../app';
 import { PostStatus } from '../../db/schema';
 import { createBlog } from '../blogs/blogs.services';
-import { createTag, getTagById } from '../tags/tags.services';
 import { createUser } from '../users/users.services';
 import {
-  addTagToPost,
+  addCategoryToPost,
   createPost,
+  deletePost,
   editPost,
-  getAllPosts,
   getPostById,
+  getPosts,
 } from './posts.services';
+import { createCategory, getCategoryById } from '../categories/categories.services';
 
 describe('POSTS', () => {
   const loggedInUser = {
@@ -60,7 +60,7 @@ describe('POSTS', () => {
         .set('Content-Type', 'application/json')
         .set('Cookie', [cookie])
         .send(data);
-      const allBlogPosts = await getAllPosts(blogId);
+      const allBlogPosts = await getPosts(blogId);
 
       expect(allBlogPosts.items.length).toBe(0);
       expect(res.status).toBe(400);
@@ -80,7 +80,7 @@ describe('POSTS', () => {
         .set('Content-Type', 'application/json')
         .set('Cookie', [cookie])
         .send(data);
-      const allBlogPosts = await getAllPosts(blogId);
+      const allBlogPosts = await getPosts(blogId);
 
       expect(allBlogPosts.items.length).toBe(0);
       expect(res.status).toBe(400);
@@ -100,7 +100,7 @@ describe('POSTS', () => {
         .set('Content-Type', 'application/json')
         .set('Cookie', [cookie])
         .send(data);
-      const allBlogPosts = await getAllPosts(blogId);
+      const allBlogPosts = await getPosts(blogId);
 
       expect(allBlogPosts.items.length).toBe(0);
       expect(res.status).toBe(404);
@@ -109,7 +109,7 @@ describe('POSTS', () => {
       });
     });
 
-    it('should return 403 forbiddedn if user attempts to create post in the blog they do not own', async () => {
+    it('should return 403 forbidden if user attempts to create post in the blog they do not own', async () => {
       const otherUserData = {
         name: 'anjali',
         email: 'anjali@gmail.com',
@@ -133,7 +133,7 @@ describe('POSTS', () => {
         .set('Content-Type', 'application/json')
         .set('Cookie', [cookie])
         .send(data);
-      const allOtherUserBlogPosts = await getAllPosts(blogId);
+      const allOtherUserBlogPosts = await getPosts(blogId);
 
       expect(allOtherUserBlogPosts.items.length).toBe(0);
       expect(res.status).toBe(403);
@@ -153,7 +153,7 @@ describe('POSTS', () => {
         .set('Content-Type', 'application/json')
         .set('Cookie', [cookie])
         .send(data);
-      const allBlogPosts = await getAllPosts(blogId);
+      const allBlogPosts = await getPosts(blogId);
 
       expect(allBlogPosts.items.length).toBe(1);
       expect(res.status).toBe(201);
@@ -291,6 +291,62 @@ describe('POSTS', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.data.items.length).toBe(1);
+    })
+
+    it("should return 200 ok along with post sorted by latest", async () => {
+      await createPost(userId, blogId);
+      const latestPost = await createPost(userId, blogId);
+      const latestPostId = latestPost.postId.toString();
+
+      const app = buildServer();
+      const res = await request(app)
+        .get(`/v1/posts?blogId=${blogId}&sort=latest`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.items.length).toBe(2);
+      expect(res.body.data.items[0]._id).toBe(latestPostId);
+    });
+
+    it("should return 200 ok along with post filtered by category", async () => {
+      await createPost(userId, blogId);
+      const postWithCategory = await createPost(userId, blogId);
+      const postWithCategoryId = postWithCategory.postId.toString();
+      const categoryData = {
+        name: "javascript",
+        blogId
+      }
+      const createdCategory = await createCategory(userId, blogId, categoryData);
+      const createdCategoryId = createdCategory.categoryId.toString();
+      await addCategoryToPost(postWithCategoryId, createdCategoryId, categoryData.name);
+
+      const app = buildServer();
+      const res = await request(app)
+        .get(`/v1/posts?blogId=${blogId}&categories=javascript`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.items.length).toBe(1);
+      expect(res.body.data.items[0].categories[0].name).toBe(categoryData.name);
+    });
+
+    it("should return 200 ok along with post filtered by post status", async () => {
+      await createPost(userId, blogId);
+      const deletedPost = await createPost(userId, blogId);
+      const deletedPostId = deletedPost.postId.toString();
+      await deletePost(deletedPostId);
+
+      const app = buildServer();
+      const res = await request(app)
+        .get(`/v1/posts?blogId=${blogId}&status=archived`)
+        .set('Accept', 'application/json')
+        .set('Cookie', [cookie]);
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.items.length).toBe(1);
+      expect(res.body.data.items[0].postStatus).toBe("archived");
     });
   });
 
@@ -412,6 +468,28 @@ describe('POSTS', () => {
       });
     });
 
+    it("should return 400 bad request if user attempts to publish a post and post slug is not defined", async () => {
+      const unpublishedPostId = (await createPost(userId, blogId)).postId.toString();
+      const data = {
+        postStatus: PostStatus.PUBLISHED
+      }
+
+      const app = buildServer();
+      const res = await request(app)
+        .patch(`/v1/posts/${unpublishedPostId}`)
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+      const updatedPostData = await getPostById(unpublishedPostId);
+
+      expect(updatedPostData?.postStatus).toBe(PostStatus.DRAFT);
+      expect(res.status).toBe(400);
+      expect(res.body).toMatchObject({
+        message: 'Slug is required',
+      });
+    });
+
     it('should return 200 ok for successfully editing the post', async () => {
       const createdPost = await createPost(userId, blogId);
       const createdPostId = createdPost.postId.toString();
@@ -428,6 +506,72 @@ describe('POSTS', () => {
       const editedPost = await getPostById(createdPostId);
 
       expect(editedPost?.content).toBe(data.content);
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        message: 'Posts edited successfully',
+      });
+    });
+
+    it("should return 200 ok for successfully publishing the post", async () => {
+      const publishedPostId = (await createPost(userId, blogId)).postId.toString();
+      const data = {
+        slug: "new-post",
+        postStatus: PostStatus.PUBLISHED
+      }
+
+      const app = buildServer();
+      const res = await request(app)
+        .patch(`/v1/posts/${publishedPostId}`)
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+      const updatedPostData = await getPostById(publishedPostId);
+
+      expect(updatedPostData?.postStatus).toBe(PostStatus.PUBLISHED);
+      expect(res.status).toBe(200);
+      expect(res.body).toMatchObject({
+        message: 'Posts edited successfully',
+      });
+    });
+
+    it("should return 200 ok for updating post with multiple categories and should update the categories with postid", async () => {
+      const createdPost = await createPost(userId, blogId);
+      const createdPostId = createdPost.postId.toString();
+      const firstCategoryData = {
+        name: "firstcategory",
+        blogId
+      }
+      const firstCategory = await createCategory(userId, blogId, firstCategoryData);
+      const firstCategoryId = firstCategory.categoryId.toString();
+      const secondCategoryData = {
+        name: "secondcategory",
+        blogId,
+      }
+      const secondCategory = await createCategory(userId, blogId, secondCategoryData);
+      const secondcategoryId = secondCategory.categoryId.toString();
+      const data = {
+        categories: `${firstCategoryData.name},${secondCategoryData.name}`
+      }
+
+      const app = buildServer();
+      const res = await request(app)
+        .patch(`/v1/posts/${createdPostId}`)
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .set('Cookie', [cookie])
+        .send(data);
+      const updatedPostData = await getPostById(createdPostId);
+      const updatedCategoryOne = await getCategoryById(firstCategoryId);
+      const updatedCategoryTwo = await getCategoryById(secondcategoryId);
+
+      console.log("the post data", updatedPostData);
+
+      expect(updatedPostData?.categories.length).toBe(2);
+      expect(updatedPostData?.categories.map(c => c.name)).toContain(firstCategoryData.name);
+      expect(updatedPostData?.categories.map(c => c.name)).toContain(secondCategoryData.name);
+      expect(updatedCategoryOne?.posts[0].id.toString()).toBe(createdPostId);
+      expect(updatedCategoryTwo?.posts[0].id.toString()).toBe(createdPostId);
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
         message: 'Posts edited successfully',
@@ -498,7 +642,7 @@ describe('POSTS', () => {
     });
   });
 
-  describe('POST /v1/posts/:postId/tags/:tagId', () => {
+  describe('POST /v1/posts/:postId/categories/:categoryId', () => {
     const blogData = {
       name: 'update blog title',
       slug: 'update-blog-title',
@@ -511,7 +655,7 @@ describe('POSTS', () => {
       blogId = (await createBlog(userId, blogData)).blogId.toString();
     });
 
-    it('should return 403 forbidden if user attempts to add tag to the post they do not own', async () => {
+    it('should return 403 forbidden if user attempts to add category to the post they do not own', async () => {
       const otherUserData = {
         name: 'anjali',
         email: 'anjali@gmail.com',
@@ -527,46 +671,46 @@ describe('POSTS', () => {
       const otherUserBlogId = otherUserBlog.blogId.toString();
       const otherUserPost = await createPost(otherUserId, otherUserBlogId);
       const otherUserPostId = otherUserPost.postId.toString();
-      const otherUserTag = await createTag(otherUserId, otherUserBlogId, {
-        name: 'other user tag',
+      const otherUserCategory = await createCategory(otherUserId, otherUserBlogId, {
+        name: 'other user category',
         blogId: otherUserBlogId,
       });
-      const otherUserTagId = otherUserTag.tagId.toString();
+      const otherUserCategoryId = otherUserCategory.categoryId.toString();
       const app = buildServer();
       const res = await request(app)
-        .post(`/v1/posts/${otherUserPostId}/tags/${otherUserTagId}`)
+        .post(`/v1/posts/${otherUserPostId}/categories/${otherUserCategoryId}`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
       const updatedPostData = await getPostById(otherUserPostId);
 
       expect(updatedPostData).toBeDefined();
-      expect(updatedPostData?.tags.map(String)).not.toContain(otherUserTagId);
+      expect(updatedPostData?.categories.map((c) => c.id.toString())).not.toContain(otherUserCategoryId);
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
-        message: 'You do not have permissions to add tag to this post',
+        message: 'You do not have permissions to add category to this post',
       });
     });
 
-    it('should return 409 conflict if user attempts to add tag to the post where tag is already attached to post', async () => {
+    it('should return 409 conflict if user attempts to add category to the post where category is already attached to post', async () => {
       const createdPost = await createPost(userId, blogId);
       const createdPostId = createdPost.postId.toString();
-      const tagData = { name: 'new tag', blogId };
-      const createdTag = await createTag(userId, blogId, tagData);
-      const createdTagId = createdTag.tagId.toString();
-      await addTagToPost(createdPostId, createdTagId);
+      const categoryData = { name: 'new category', blogId };
+      const createdCategory = await createCategory(userId, blogId, categoryData);
+      const createdCategoryId = createdCategory.categoryId.toString();
+      await addCategoryToPost(createdPostId, createdCategoryId, categoryData.name);
       const app = buildServer();
       const res = await request(app)
-        .post(`/v1/posts/${createdPostId}/tags/${createdTagId}`)
+        .post(`/v1/posts/${createdPostId}/categories/${createdCategoryId}`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(409);
       expect(res.body).toMatchObject({
-        message: 'Post already contains this tag',
+        message: 'Post already contains this category',
       });
     });
 
-    it('should return 403 forbidden is user attempts to add tag to the post where postId and tagId belongs to different blogs', async () => {
+    it('should return 403 forbidden is user attempts to add category to the post where postId and categoryId belongs to different blogs', async () => {
       const newBlogData = {
         name: 'other blog',
         slug: 'other-blog',
@@ -575,51 +719,51 @@ describe('POSTS', () => {
       const newBlogId = newBlog.blogId.toString();
       const userPostOnOldBlog = await createPost(userId, blogId);
       const userPostOnOldBlogId = userPostOnOldBlog.postId.toString();
-      const tagOnNewBlogData = {
-        name: 'new blog tag',
+      const categoryOnNewBlogData = {
+        name: 'new blog category',
         blogId: newBlogId,
       };
-      const tagOnNewBlog = await createTag(userId, newBlogId, tagOnNewBlogData);
-      const tagOnNewBlogId = tagOnNewBlog.tagId.toString();
+      const categoryOnNewBlog = await createCategory(userId, newBlogId, categoryOnNewBlogData);
+      const categoryOnNewBlogId = categoryOnNewBlog.categoryId.toString();
       const app = buildServer();
       const res = await request(app)
-        .post(`/v1/posts/${userPostOnOldBlogId}/tags/${tagOnNewBlogId}`)
+        .post(`/v1/posts/${userPostOnOldBlogId}/categories/${categoryOnNewBlogId}`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
       const oldBlogEditedPost = await getPostById(userPostOnOldBlogId);
 
       expect(oldBlogEditedPost).toBeDefined();
-      expect(oldBlogEditedPost?.tags).not.contain(new ObjectId(tagOnNewBlogId));
+      expect(oldBlogEditedPost?.categories.map(c => c.id.toString())).not.contain(categoryOnNewBlogId);
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
-        message: 'The post and tag must belong to the same blog',
+        message: 'The post and category must belong to the same blog',
       });
     });
 
-    it('should return 200 ok for successfully adding tag to the post', async () => {
+    it('should return 200 ok for successfully adding category to the post', async () => {
       const createdPost = await createPost(userId, blogId);
       const createdPostId = createdPost.postId.toString();
-      const tagId = (
-        await createTag(userId, blogId, { name: 'new tag', blogId })
-      ).tagId.toString();
+      const categoryId = (
+        await createCategory(userId, blogId, { name: 'new category', blogId })
+      ).categoryId.toString();
       const app = buildServer();
       const res = await request(app)
-        .post(`/v1/posts/${createdPostId}/tags/${tagId}`)
+        .post(`/v1/posts/${createdPostId}/categories/${categoryId}`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
       const editedPost = await getPostById(createdPostId);
-      const editedTag = await getTagById(tagId);
+      const editedCategory = await getCategoryById(categoryId);
 
-      expect(editedPost?.tags.map(String)).toContain(tagId);
-      expect(editedTag?.posts.map(String)).toContain(createdPostId);
+      expect(editedPost?.categories[0].id.toString()).toBe(categoryId);
+      expect(editedCategory?.posts[0].id.toString()).toBe(createdPostId);
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
-        message: 'Tag added to post successfully',
+        message: 'category added to post successfully',
       });
     });
   });
 
-  describe('DELETE /v1/posts/:postId/tags/:tagId', () => {
+  describe('DELETE /v1/posts/:postId/categories/:categoryId', () => {
     const blogData = {
       name: 'update blog title',
       slug: 'update-blog-title',
@@ -632,7 +776,7 @@ describe('POSTS', () => {
       blogId = (await createBlog(userId, blogData)).blogId.toString();
     });
 
-    it('should return 403 forbidden if user attempts to delete the tag from the post they do not own', async () => {
+    it('should return 403 forbidden if user attempts to delete the category from the post they do not own', async () => {
       const otherUserData = {
         name: 'anjali',
         email: 'anjali@gmail.com',
@@ -648,95 +792,69 @@ describe('POSTS', () => {
       const otherUserBlogId = otherUserBlog.blogId.toString();
       const otherUserPost = await createPost(otherUserId, otherUserBlogId);
       const otherUserPostId = otherUserPost.postId.toString();
-      const otherUserTagId = await createTag(otherUserId, otherUserBlogId, {
-        name: 'other user tag',
+      const otherUserCategoryId = await createCategory(otherUserId, otherUserBlogId, {
+        name: 'other user category',
         blogId: otherUserBlogId,
-      }).then((tag) => tag.tagId.toString());
-      addTagToPost(otherUserPostId, otherUserTagId);
+      }).then((category) => category.categoryId.toString());
+      addCategoryToPost(otherUserPostId, otherUserCategoryId, 'other user category');
+
       const app = buildServer();
       const res = await request(app)
-        .delete(`/v1/posts/${otherUserPostId}/tags/${otherUserTagId}`)
+        .delete(`/v1/posts/${otherUserPostId}/categories/${otherUserCategoryId}`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
       const updatedPostData = await getPostById(otherUserPostId);
 
       expect(updatedPostData).toBeDefined();
-      expect(updatedPostData?.tags.map(String)).toContain(otherUserTagId);
+      expect(updatedPostData?.categories[0].id.toString()).toBe(otherUserCategoryId);
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
-        message: 'You do not have permissions to delete the tag from this post',
+        message: 'You do not have permissions to delete the category from this post',
       });
     });
 
-    it('should return 404 not found if user attempts to delete the tag from the post where tag is not attached to the post', async () => {
+    it('should return 404 not found if user attempts to delete the category from the post where category is not attached to the post', async () => {
       const createdPost = await createPost(userId, blogId);
       const createdPostId = createdPost.postId.toString();
-      const createdTag = await createTag(userId, blogId, {
-        name: 'new tag',
+      const createdCategory = await createCategory(userId, blogId, {
+        name: 'new category',
         blogId,
       });
-      const createdTagId = createdTag.tagId.toString();
+      const createdCategoryId = createdCategory.categoryId.toString();
+
       const app = buildServer();
       const res = await request(app)
-        .delete(`/v1/posts/${createdPostId}/tags/${createdTagId}`)
+        .delete(`/v1/posts/${createdPostId}/categories/${createdCategoryId}`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
 
       expect(res.status).toBe(404);
       expect(res.body).toMatchObject({
-        message: 'Post does not contains this tag',
+        message: 'Post does not contains this category',
       });
     });
 
-    it('should return 403 forbidden is user attempts to add tag to the post where postId and tagId belongs to different blogs', async () => {
-      const newBlogData = {
-        name: 'other blog',
-        slug: 'other-blog',
-      };
-      const newBlog = await createBlog(userId, newBlogData);
-      const newBlogId = newBlog.blogId.toString();
-      const userPostOnOldBlog = await createPost(userId, blogId);
-      const userPostOnOldBlogId = userPostOnOldBlog.postId.toString();
-      const tagOnNewBlogData = {
-        name: 'new blog tag',
-        blogId: newBlogId,
-      };
-      const tagOnNewBlog = await createTag(userId, newBlogId, tagOnNewBlogData);
-      const tagOnNewBlogId = tagOnNewBlog.tagId.toString();
-      const app = buildServer();
-      const res = await request(app)
-        .post(`/v1/posts/${userPostOnOldBlogId}/tags/${tagOnNewBlogId}`)
-        .set('Accept', 'application/json')
-        .set('Cookie', [cookie]);
-      const oldBlogEditedPost = await getPostById(userPostOnOldBlogId);
-
-      expect(oldBlogEditedPost).toBeDefined();
-      expect(oldBlogEditedPost?.tags).not.contain(new ObjectId(tagOnNewBlogId));
-      expect(res.status).toBe(403);
-      expect(res.body).toMatchObject({
-        message: 'The post and tag must belong to the same blog',
-      });
-    });
-
-    it('should return 200 ok for successfully adding tag to the post', async () => {
+    it('should return 200 ok for successfully deleting category from the post', async () => {
       const createdPost = await createPost(userId, blogId);
       const createdPostId = createdPost.postId.toString();
-      const tagId = (
-        await createTag(userId, blogId, { name: 'new tag', blogId })
-      ).tagId.toString();
+      const categoryId = (
+        await createCategory(userId, blogId, { name: 'new category', blogId })
+      ).categoryId.toString();
+      await addCategoryToPost(createdPostId, categoryId, 'new category');
+
       const app = buildServer();
       const res = await request(app)
-        .post(`/v1/posts/${createdPostId}/tags/${tagId}`)
+        .delete(`/v1/posts/${createdPostId}/categories/${categoryId}`)
         .set('Accept', 'application/json')
         .set('Cookie', [cookie]);
       const editedPost = await getPostById(createdPostId);
-      const editedTag = await getTagById(tagId);
+      const editedCategory = await getCategoryById(categoryId);
 
-      expect(editedPost?.tags.map(String)).toContain(tagId);
-      expect(editedTag?.posts.map(String)).toContain(createdPostId);
+      expect(editedPost?.categories.length).toBe(0);
+      expect(editedCategory?.posts.length).toBe(0);
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
-        message: 'Tag added to post successfully',
+        message: 'Category removed from the post successfully',
       });
     });
   });
