@@ -1,7 +1,6 @@
 'use client';
 
 import { MoreHorizontal } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { deletePost } from '@/app/blogs/actions/delete-post';
 import { Button } from '@/components/ui/button';
@@ -37,9 +36,6 @@ export function PostsOptionsDropdown({ postId }: Readonly<{ postId: string }>) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem className="cursor-pointer">
-          <Link href={`#`}>Preview</Link>
-        </DropdownMenuItem>
         <DropdownMenuItem
           variant="destructive"
           className="cursor-pointer"

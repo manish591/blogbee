@@ -52,7 +52,7 @@ export function PostsGrid({ postData }: Readonly<{ postData: PostData[] }>) {
               </div>
               <div className="col-span-4 flex items-center">
                 <span className="text-muted-foreground text-sm">
-                  {post.slug}
+                  {post.slug && `/${post.slug}`}
                 </span>
               </div>
               <div className="col-span-2 flex items-center justify-end gap-2">

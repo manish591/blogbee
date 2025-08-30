@@ -19,8 +19,8 @@ export default async function BlogDashboardPostsPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }>) {
   const blogId = (await params).blogId;
-  const queryParams = await searchParams;
 
+  const queryParams = await searchParams;
   const query = queryParams.query as string | undefined;
   const status = queryParams.status as string | undefined;
   const sort = queryParams.sort as string | undefined;
