@@ -19,7 +19,7 @@ export function BlogsLayoutSwitcher() {
         variant="ghost"
         size="icon"
         className={cn(
-          'h-7 w-7 hover:bg-secondary',
+          'h-7 w-7 hover:bg-secondary cursor-pointer',
           layout === 'grid' && 'bg-secondary',
         )}
         onClick={() => {
@@ -34,7 +34,7 @@ export function BlogsLayoutSwitcher() {
         variant="ghost"
         size="icon"
         className={cn(
-          'h-7 w-7 hover:bg-secondary',
+          'h-7 w-7 hover:bg-secondary cursor-pointer',
           layout === 'list' && 'bg-secondary',
         )}
         onClick={() => {

@@ -17,7 +17,7 @@ export function AddNewBlog() {
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-      <DialogTrigger asChild>
+      <DialogTrigger asChild className="cursor-pointer">
         <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2">
           <Plus className="h-4 w-4" />
           <span>Add New Blog</span>

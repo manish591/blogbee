@@ -19,7 +19,7 @@ export function BlogsSortingDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild className="cursor-pointer">
         <Button variant="outline" size="icon" className="h-9">
           <ListFilter className="h-4 w-4" />
         </Button>

@@ -102,13 +102,14 @@ export function AddNewBlogForm({
           <Button
             variant="outline"
             type="button"
+            className="cursor-pointer"
             onClick={() => {
               openFormDialog(false);
             }}
           >
             Cancel
           </Button>
-          <Button disabled={isLoading}>
+          <Button disabled={isLoading} className="cursor-pointer">
             {isLoading && (
               <output
                 className="animate-spin inline-block size-3.5 border-2 border-current border-t-transparent text-white rounded-full"
