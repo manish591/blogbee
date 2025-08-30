@@ -4,9 +4,18 @@ import { PostsGrid } from './posts-grid';
 export async function RenderPosts({
   blogId,
   query,
-}: Readonly<{ blogId: string; query: string }>) {
+  status,
+  sort,
+}: Readonly<{
+  blogId: string;
+  query?: string;
+  status?: string;
+  sort?: string;
+}>) {
   const postData = await getAllPosts(blogId, {
     query,
+    status,
+    sort,
   });
 
   return (

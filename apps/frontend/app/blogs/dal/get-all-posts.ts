@@ -29,6 +29,8 @@ export type GetAllPostsReturnValue = {
 
 export type GetAllPostsOptions = {
   query?: string;
+  sort?: string;
+  status?: string;
 };
 
 export async function getAllPosts(
@@ -40,6 +42,8 @@ export async function getAllPosts(
   const url = new URL(`${API_URL}/v1/posts`);
   url.searchParams.append('blogId', blogId);
   if (opts?.query) url.searchParams.append('query', opts.query);
+  if (opts?.sort) url.searchParams.append('sort', opts.sort);
+  if (opts?.status) url.searchParams.append('status', opts.status);
 
   const res = await fetch(url, {
     method: 'GET',

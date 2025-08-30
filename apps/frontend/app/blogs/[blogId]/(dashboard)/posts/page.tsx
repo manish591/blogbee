@@ -21,7 +21,9 @@ export default async function BlogDashboardPostsPage({
   const blogId = (await params).blogId;
   const queryParams = await searchParams;
 
-  const query = (queryParams.query ?? '') as string;
+  const query = queryParams.query as string | undefined;
+  const status = queryParams.status as string | undefined;
+  const sort = queryParams.sort as string | undefined;
 
   return (
     <main className="py-3 px-6 min-h-screen">
@@ -54,7 +56,12 @@ export default async function BlogDashboardPostsPage({
                 <span>New Draft</span>
               </AddNewPostButton>
             </div>
-            <RenderPosts blogId={blogId} query={query} />
+            <RenderPosts
+              blogId={blogId}
+              query={query}
+              sort={sort}
+              status={status}
+            />
           </div>
         </div>
       </div>
