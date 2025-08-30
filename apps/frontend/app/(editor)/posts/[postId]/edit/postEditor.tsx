@@ -21,20 +21,29 @@ export function PostEditor({
   const debouncedContent = useDebounce(postContent);
 
   useEffect(() => {
-    (async () => {
-      setIsSavingPost(true);
-      try {
-        await editPost(postId, {
-          title: debouncedTitle,
-          content: debouncedContent,
-        });
-        setIsSavingPost(false);
-      } catch (err) {
-        setIsSavingPost(false);
-        console.log('EDITING_POST_ERROR: Failed to edit the post', err);
-      }
-    })();
-  }, [debouncedTitle, debouncedContent, postId, setIsSavingPost]);
+    if (debouncedTitle !== title || debouncedContent !== content) {
+      (async () => {
+        setIsSavingPost(true);
+        try {
+          await editPost(postId, {
+            title: debouncedTitle,
+            content: debouncedContent,
+          });
+          setIsSavingPost(false);
+        } catch (err) {
+          setIsSavingPost(false);
+          console.log('EDITING_POST_ERROR: Failed to edit the post', err);
+        }
+      })();
+    }
+  }, [
+    content,
+    title,
+    debouncedTitle,
+    debouncedContent,
+    postId,
+    setIsSavingPost,
+  ]);
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
