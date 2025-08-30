@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { convertDateToReadableFormat } from '@/lib/date';
 import { cn } from '@/lib/utils';
+import { BASE_URL, DOMAIN_NAME } from '@/constants';
 
 export function BlogCard({
   data,
@@ -38,19 +39,24 @@ export function BlogCard({
           >
             <Avatar>
               <AvatarImage src="" />
-              <AvatarFallback className="bg-secondary">
+              <AvatarFallback className="bg-secondary uppercase">
                 {data.name[0]}
               </AvatarFallback>
             </Avatar>
           </div>
           <div className={cn('mb-4', showListView && 'mb-0')}>
-            <h3 className="font-medium leading-[1.1]">{data.name}</h3>
+            <h3 className="font-medium leading-[1.1] capitalize">
+              {data.name}
+            </h3>
             <Link
-              href={`https://${data.slug}.blogbee.site`}
+              href={BASE_URL.replace(
+                DOMAIN_NAME,
+                `${data.slug}.${DOMAIN_NAME}`,
+              )}
               target="_blank"
               className="text-sm text-foreground/50 hover:underline"
             >
-              {data.slug}.blogbee.site
+              {`${data.slug}.${DOMAIN_NAME}`}
             </Link>
           </div>
         </div>
@@ -68,7 +74,13 @@ export function BlogCard({
             className="flex-1 bg-transparent"
             asChild
           >
-            <Link href={`https://${data.slug}.blogbee.site`} target="_blank">
+            <Link
+              href={BASE_URL.replace(
+                DOMAIN_NAME,
+                `${data.slug}.${DOMAIN_NAME}`,
+              )}
+              target="_blank"
+            >
               <ExternalLink className="mr-2 h-3 w-3" />
               Go to blog
             </Link>
