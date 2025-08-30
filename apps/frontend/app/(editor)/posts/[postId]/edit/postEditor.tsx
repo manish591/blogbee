@@ -17,8 +17,8 @@ export function PostEditor({
 }>) {
   const [postTitle, setPostTitle] = useState(title);
   const [postContent, setPostContent] = useState(content);
-  const { debouncedValue: debouncedTitle } = useDebounce(postTitle);
-  const { debouncedValue: debouncedContent } = useDebounce(postContent);
+  const debouncedTitle = useDebounce(postTitle);
+  const debouncedContent = useDebounce(postContent);
 
   useEffect(() => {
     (async () => {
