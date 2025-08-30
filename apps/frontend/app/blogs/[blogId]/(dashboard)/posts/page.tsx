@@ -47,7 +47,7 @@ export default async function BlogDashboardPostsPage({
             </div>
           </div>
           <div>
-            <div className="flex items-center gap-4 mb-3">
+            <div className="flex items-center gap-4 mb-4">
               <PostsSearchInput />
               <PostsFilters />
               <AddNewPostButton blogId={blogId}>

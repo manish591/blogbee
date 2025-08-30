@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { APP_NAME } from '@/constants';
+import { BASE_URL, DOMAIN_NAME } from '@/constants';
 import { getBlog } from '../dal/get-blog';
 
 export async function BlogDashboardSidebar({
@@ -56,7 +56,12 @@ export async function BlogDashboardSidebar({
           className="w-full h-10 text-foreground/70 gap-3 cursor-pointer"
           asChild
         >
-          <Link href={`https://${blogData.slug}.${APP_NAME}.site`}>
+          <Link
+            href={BASE_URL.replace(
+              DOMAIN_NAME,
+              `${blogData.slug}.${DOMAIN_NAME}`,
+            )}
+          >
             <ExternalLink className="w-4 h-4" />
             <span>Visit Blog</span>
           </Link>

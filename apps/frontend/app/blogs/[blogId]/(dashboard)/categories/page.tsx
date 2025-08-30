@@ -45,10 +45,7 @@ export default async function BlogDashboardTagsPage({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <AddNewTag blogId={blogId} />
             {tagData.map((tag) => (
-              <Card
-                key={tag._id}
-                className="p-4 border rounded-md shadow-none cursor-pointer"
-              >
+              <Card key={tag._id} className="p-4 border rounded-md shadow-none">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-foreground capitalize">
                     {tag.name}
