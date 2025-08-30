@@ -25,11 +25,11 @@ export async function getAllBlogs({
   limit,
   sort,
 }: Readonly<GetAllBlogsOptions>): Promise<{
-  currentPage: number,
+  currentPage: number;
   limit: number;
   totalPages: number;
   totalItems: number;
-  items: BlogData[]
+  items: BlogData[];
 }> {
   const cookieHeader = await serializeCookies();
 

@@ -15,13 +15,17 @@ export const getPublicPostsSchema = z.object({
       query: z.string().optional(),
       limit: z.coerce
         .number()
-        .min(1, { message: "limit must be at least 1" })
-        .max(1000, { message: "limit must be at most 1000" }).transform(val => String(val)).optional(),
+        .min(1, { message: 'limit must be at least 1' })
+        .max(1000, { message: 'limit must be at most 1000' })
+        .transform((val) => String(val))
+        .optional(),
       page: z.coerce
         .number()
-        .min(1, { message: "page must be at least 1" })
-        .max(1000, { message: "page must be at most 1000" }).transform(val => String(val)).optional(),
-      category: z.string().optional()
+        .min(1, { message: 'page must be at least 1' })
+        .max(1000, { message: 'page must be at most 1000' })
+        .transform((val) => String(val))
+        .optional(),
+      category: z.string().optional(),
     })
     .strict(),
 });

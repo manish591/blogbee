@@ -37,7 +37,7 @@ export interface Categories {
   blogId: ObjectId;
   userId: ObjectId;
   posts: {
-    id: ObjectId
+    id: ObjectId;
   }[];
   createdAt: Date;
   updatedAt: Date;
@@ -50,8 +50,8 @@ export interface Posts {
   postStatus: PostStatus;
   slug?: string;
   categories: {
-    id: ObjectId
-    name: string,
+    id: ObjectId;
+    name: string;
   }[];
   title: string;
   subTitle?: string;
@@ -62,7 +62,7 @@ export interface Posts {
 }
 
 export enum PostStatus {
-  DRAFT = "draft",
-  PUBLISHED = "published",
-  ARCHIVED = "archived",
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+  ARCHIVED = 'archived',
 }

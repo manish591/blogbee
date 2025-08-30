@@ -3,11 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildServer } from '../../app';
 import * as uploadUtils from '../../utils/upload';
 import { UPLOADED_PROFILE_IMG_IDENTIFIER } from './users.routes';
-import {
-  createUser,
-  getAuthSessions,
-  getUserByEmail,
-} from './users.services';
+import { createUser, getAuthSessions, getUserByEmail } from './users.services';
 
 describe('users', () => {
   describe('POST /v1/users', () => {

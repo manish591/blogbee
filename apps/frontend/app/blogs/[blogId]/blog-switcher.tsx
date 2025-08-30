@@ -1,3 +1,4 @@
+import { DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,7 +11,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { getAllBlogs } from '../dal/get-all-blogs';
-import { DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu';
 
 export async function BlogsSwitcher({
   selectedBlogId,

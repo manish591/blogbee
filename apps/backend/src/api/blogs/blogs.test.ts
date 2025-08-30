@@ -1,8 +1,13 @@
+import type { ObjectId } from 'mongodb';
 import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildServer } from '../../app';
 import * as uploadUtils from '../../utils/upload';
 import { UPLOADED_BLOG_LOGO_IDENTIFIER } from '../blogs/blogs.routes';
+import {
+  createCategory,
+  getCategoryById,
+} from '../categories/categories.services';
 import { createPost, getPostById } from '../posts/posts.services';
 import { createUser } from '../users/users.services';
 import {
@@ -11,8 +16,6 @@ import {
   getBlogById,
   getBlogBySlug,
 } from './blogs.services';
-import type { ObjectId } from 'mongodb';
-import { createCategory, getCategoryById } from '../categories/categories.services';
 
 describe('blogs', () => {
   const loggedInUser = {
@@ -184,7 +187,7 @@ describe('blogs', () => {
       password: 'new pass',
     };
 
-    let createdBlog: { blogId: ObjectId, success: boolean; };
+    let createdBlog: { blogId: ObjectId; success: boolean };
 
     beforeEach(async () => {
       createdBlog = await createBlog(userId, blogData1);
@@ -281,7 +284,7 @@ describe('blogs', () => {
       expect(res.body.data.items[0].name).toBe(blogData1.name);
     });
 
-    it("should return 200 ok along with postCount for each blog", async () => {
+    it('should return 200 ok along with postCount for each blog', async () => {
       await createPost(userId, createdBlog.blogId.toString());
       await createPost(userId, createdBlog.blogId.toString());
       const app = buildServer();

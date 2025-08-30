@@ -124,10 +124,7 @@ export async function getAuthSessions(userId: string) {
   }
 }
 
-export async function editUser(
-  userId: string,
-  data: EditUserBody,
-) {
+export async function editUser(userId: string, data: EditUserBody) {
   try {
     const cleanUpdates = Object.fromEntries(
       Object.entries(data).filter(([_, val]) => !!val),

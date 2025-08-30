@@ -4,8 +4,8 @@ import * as db from '../../db';
 import { type Categories, PostStatus, type Posts } from '../../db/schema';
 import { BlogbeeError } from '../../utils/app-error';
 import { logger } from '../../utils/logger';
-import type { EditPostBody } from './posts.schema';
 import { CATEGORIES_COLLECTION } from '../categories/categories.services';
+import type { EditPostBody } from './posts.schema';
 
 export const POSTS_COLLECTION = 'posts';
 
@@ -85,11 +85,14 @@ export async function isPostSlugAvailable(
   }
 }
 
-export async function isPostContainsCategory(postId: string, categoryId: string) {
+export async function isPostContainsCategory(
+  postId: string,
+  categoryId: string,
+) {
   try {
     const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
       _id: new ObjectId(postId),
-      "categories.id": new ObjectId(categoryId),
+      'categories.id': new ObjectId(categoryId),
     });
     return res != null;
   } catch (err) {
@@ -120,18 +123,18 @@ export async function isPostOwnedByUser(userId: string, postId: string) {
 export async function getPosts(
   blogId: string,
   options?: {
-    query?: string,
-    page?: number,
-    limit?: number,
-    sort?: "latest" | "oldest",
-    categories?: string,
-    status?: PostStatus
+    query?: string;
+    page?: number;
+    limit?: number;
+    sort?: 'latest' | 'oldest';
+    categories?: string;
+    status?: PostStatus;
   },
 ) {
   try {
     const page = options?.page ?? 1;
     const limit = options?.limit ?? 10;
-    const query = options?.query ?? "";
+    const query = options?.query ?? '';
     const docsToSkip = (page - 1) * limit;
     const numDocsToReturn = limit;
     const totalItems = await db
@@ -154,27 +157,27 @@ export async function getPosts(
       .limit(numDocsToReturn);
 
     if (options?.sort) {
-      if (options.sort === "latest") {
-        cursor.sort({ updatedAt: -1 })
-      } else if (options.sort === "oldest") {
-        cursor.sort({ updatedAt: 1 })
+      if (options.sort === 'latest') {
+        cursor.sort({ updatedAt: -1 });
+      } else if (options.sort === 'oldest') {
+        cursor.sort({ updatedAt: 1 });
       }
     }
 
     if (options?.categories) {
-      const filteredCategories = options.categories.split(",");
+      const filteredCategories = options.categories.split(',');
 
       cursor.filter({
-        "categories.name": {
-          $in: filteredCategories
-        }
+        'categories.name': {
+          $in: filteredCategories,
+        },
       });
     }
 
     if (options?.status) {
       cursor.filter({
-        postStatus: options.status
-      })
+        postStatus: options.status,
+      });
     }
 
     const res = await cursor.toArray();
@@ -198,7 +201,9 @@ export async function getPosts(
 export async function editPost(postId: string, data: EditPostBody) {
   try {
     const cleanUpdates = Object.fromEntries(
-      Object.entries(data).filter(([key, value]) => value !== undefined && key !== "categories"),
+      Object.entries(data).filter(
+        ([key, value]) => value !== undefined && key !== 'categories',
+      ),
     );
 
     const res = await db.collection<Posts>(POSTS_COLLECTION).updateOne(
@@ -214,40 +219,52 @@ export async function editPost(postId: string, data: EditPostBody) {
     );
 
     if (data.categories) {
-      const newCategories = data.categories.split(",");
+      const newCategories = data.categories.split(',');
 
-      const newCategoriesData = await Promise.all(newCategories.map(category => {
-        return db.collection<Categories>(CATEGORIES_COLLECTION).findOne({ name: category });
-      }));
+      const newCategoriesData = await Promise.all(
+        newCategories.map((category) => {
+          return db
+            .collection<Categories>(CATEGORIES_COLLECTION)
+            .findOne({ name: category });
+        }),
+      );
 
       // add categories in posts
-      await db.collection<Posts>(POSTS_COLLECTION).updateOne({
-        _id: new ObjectId(postId)
-      }, {
-        $addToSet: {
-          categories: {
-            $each: newCategoriesData.map(category => {
-              if (category) {
-                return { id: category._id, name: category.name }
-              }
-              return null;
-            }).filter(item => item != null)
-          }
-        }
-      })
+      await db.collection<Posts>(POSTS_COLLECTION).updateOne(
+        {
+          _id: new ObjectId(postId),
+        },
+        {
+          $addToSet: {
+            categories: {
+              $each: newCategoriesData
+                .map((category) => {
+                  if (category) {
+                    return { id: category._id, name: category.name };
+                  }
+                  return null;
+                })
+                .filter((item) => item != null),
+            },
+          },
+        },
+      );
 
       // add posts in categories document
-      await db.collection<Categories>(CATEGORIES_COLLECTION).updateMany({
-        name: {
-          $in: newCategories
-        }
-      }, {
-        $push: {
-          posts: {
-            id: new ObjectId(postId)
-          }
-        }
-      });
+      await db.collection<Categories>(CATEGORIES_COLLECTION).updateMany(
+        {
+          name: {
+            $in: newCategories,
+          },
+        },
+        {
+          $push: {
+            posts: {
+              id: new ObjectId(postId),
+            },
+          },
+        },
+      );
     }
 
     return {
@@ -284,7 +301,11 @@ export async function deletePost(postId: string) {
   }
 }
 
-export async function addCategoryToPost(postId: string, categoryId: string, categoryName: string) {
+export async function addCategoryToPost(
+  postId: string,
+  categoryId: string,
+  categoryName: string,
+) {
   const dbClient = db.getDBClient();
   const session = dbClient.startSession();
   try {
@@ -298,7 +319,7 @@ export async function addCategoryToPost(postId: string, categoryId: string, cate
         $push: {
           categories: {
             id: new ObjectId(categoryId),
-            name: categoryName
+            name: categoryName,
           },
         },
       },
@@ -311,7 +332,7 @@ export async function addCategoryToPost(postId: string, categoryId: string, cate
       {
         $push: {
           posts: {
-            id: new ObjectId(postId)
+            id: new ObjectId(postId),
           },
         },
       },
@@ -330,7 +351,10 @@ export async function addCategoryToPost(postId: string, categoryId: string, cate
   }
 }
 
-export async function removeCategoryFromPost(postId: string, categoryId: string) {
+export async function removeCategoryFromPost(
+  postId: string,
+  categoryId: string,
+) {
   const dbClient = db.getDBClient();
   const session = dbClient.startSession();
   try {
@@ -343,7 +367,7 @@ export async function removeCategoryFromPost(postId: string, categoryId: string)
       {
         $pull: {
           categories: {
-            id: new ObjectId(categoryId)
+            id: new ObjectId(categoryId),
           },
         },
       },
@@ -356,7 +380,7 @@ export async function removeCategoryFromPost(postId: string, categoryId: string)
       {
         $pull: {
           posts: {
-            id: new ObjectId(postId)
+            id: new ObjectId(postId),
           },
         },
       },

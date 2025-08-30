@@ -1,8 +1,18 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate';
 import { validateRequest } from '../../middlewares/validate-request';
-import { createCategorySchema, deleteCategorySchema, editCategorySchema, getCategoriesSchema } from './categories.schema';
-import { createCategoryHandler, deleteCategoryHandler, editCategoryHandler, getCategoriesHandler } from './categories.controllers';
+import {
+  createCategoryHandler,
+  deleteCategoryHandler,
+  editCategoryHandler,
+  getCategoriesHandler,
+} from './categories.controllers';
+import {
+  createCategorySchema,
+  deleteCategorySchema,
+  editCategorySchema,
+  getCategoriesSchema,
+} from './categories.schema';
 
 const router = Router();
 

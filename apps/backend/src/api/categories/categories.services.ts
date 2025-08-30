@@ -15,16 +15,18 @@ export async function createCategory(
   data: CreateCategoryBody,
 ) {
   try {
-    const res = await db.collection<Categories>(CATEGORIES_COLLECTION).insertOne({
-      _id: new ObjectId(),
-      posts: [],
-      name: data.name,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      description: data.description ? data.description : null,
-      userId: new ObjectId(userId),
-      blogId: new ObjectId(blogId),
-    });
+    const res = await db
+      .collection<Categories>(CATEGORIES_COLLECTION)
+      .insertOne({
+        _id: new ObjectId(),
+        posts: [],
+        name: data.name,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        description: data.description ? data.description : null,
+        userId: new ObjectId(userId),
+        blogId: new ObjectId(blogId),
+      });
     return {
       success: res.acknowledged,
       categoryId: res.insertedId,
@@ -90,18 +92,21 @@ export async function editCategory(categoryId: string, data: EditCategoryBody) {
     );
 
     if (data.name) {
-      await db.collection<Posts>(POSTS_COLLECTION).updateMany({
-        "categories.id": new ObjectId(categoryId)
-      }, {
-        $set: {
-          "categories.$.name": data.name
-        }
-      })
+      await db.collection<Posts>(POSTS_COLLECTION).updateMany(
+        {
+          'categories.id': new ObjectId(categoryId),
+        },
+        {
+          $set: {
+            'categories.$.name': data.name,
+          },
+        },
+      );
     }
 
     return {
-      isSuccess: true
-    }
+      isSuccess: true,
+    };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     throw new BlogbeeError(
@@ -118,23 +123,25 @@ export async function deleteCategory(categoryId: string) {
   try {
     session.startTransaction();
 
-    const categoryData = await db.collection<Categories>(CATEGORIES_COLLECTION).findOne({
-      _id: new ObjectId(categoryId),
-    });
+    const categoryData = await db
+      .collection<Categories>(CATEGORIES_COLLECTION)
+      .findOne({
+        _id: new ObjectId(categoryId),
+      });
 
     await db.collection<Posts>(POSTS_COLLECTION).updateMany(
       {
         categories: {
           $elemMatch: {
-            id: categoryData?._id
-          }
-        }
+            id: categoryData?._id,
+          },
+        },
       },
       {
         $pull: {
           categories: {
-            id: categoryData?._id
-          }
+            id: categoryData?._id,
+          },
         },
       },
     );
@@ -146,8 +153,8 @@ export async function deleteCategory(categoryId: string) {
     await session.commitTransaction();
 
     return {
-      isSuccess: true
-    }
+      isSuccess: true,
+    };
   } catch (err) {
     await session.abortTransaction();
     logger.error('SERVER_ERROR: Internal server error occured', err);
@@ -160,7 +167,10 @@ export async function deleteCategory(categoryId: string) {
   }
 }
 
-export async function isCategoryOwnedByUser(userId: string, categoryId: string) {
+export async function isCategoryOwnedByUser(
+  userId: string,
+  categoryId: string,
+) {
   try {
     const res = await db.collection<Categories>(CATEGORIES_COLLECTION).findOne({
       userId: new ObjectId(userId),
@@ -180,7 +190,7 @@ export async function isCategoryNameTaken(blogId: string, name: string) {
   try {
     const res = await db.collection<Categories>(CATEGORIES_COLLECTION).findOne({
       blogId: new ObjectId(blogId),
-      name
+      name,
     });
     return res !== null;
   } catch (err) {

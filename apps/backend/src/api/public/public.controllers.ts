@@ -3,8 +3,8 @@ import { StatusCodes } from 'http-status-codes';
 import { BlogbeeResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
 import { getBlogBySlug } from '../blogs/blogs.services';
-import { getPostBySlug, getPosts } from '../posts/posts.services';
 import { getCategories } from '../categories/categories.services';
+import { getPostBySlug, getPosts } from '../posts/posts.services';
 import type { GetPublicPostsQuery } from './public.schema';
 
 export async function getPublicBlogDetailsHandler(req: Request, res: Response) {
@@ -41,7 +41,15 @@ export async function getPublicBlogDetailsHandler(req: Request, res: Response) {
   }
 }
 
-export async function getPublicPostsListHandler(req: Request<Record<string, unknown>, Record<string, unknown>, Record<string, unknown>, GetPublicPostsQuery>, res: Response) {
+export async function getPublicPostsListHandler(
+  req: Request<
+    Record<string, unknown>,
+    Record<string, unknown>,
+    Record<string, unknown>,
+    GetPublicPostsQuery
+  >,
+  res: Response,
+) {
   try {
     const blogSlug = req.query.blog;
     const blogData = await getBlogBySlug(blogSlug);
@@ -64,7 +72,7 @@ export async function getPublicPostsListHandler(req: Request<Record<string, unkn
       query,
       limit,
       page,
-      categories: category
+      categories: category,
     });
 
     logger.info('GET_POSTS_LIST_SUCCESS: Fetching posts list for blog');

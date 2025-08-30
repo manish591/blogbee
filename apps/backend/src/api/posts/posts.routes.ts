@@ -2,13 +2,13 @@ import { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate';
 import { validateRequest } from '../../middlewares/validate-request';
 import {
+  addCategoryToPostHandler,
   createPostHandler,
   deletePostHandler,
   editPostHandler,
-  getPostsHandler,
   getPostByIdHandler,
+  getPostsHandler,
   removeCategoryFromPostHandler,
-  addCategoryToPostHandler,
 } from './posts.controllers';
 import {
   addCategoryToPostSchema,
@@ -28,12 +28,7 @@ router.post(
   validateRequest(createPostSchema),
   createPostHandler,
 );
-router.get(
-  '/',
-  authenticate,
-  validateRequest(getPostsSchema),
-  getPostsHandler,
-);
+router.get('/', authenticate, validateRequest(getPostsSchema), getPostsHandler);
 router.get(
   '/:postId',
   authenticate,

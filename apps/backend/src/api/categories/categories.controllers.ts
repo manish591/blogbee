@@ -3,10 +3,25 @@ import { StatusCodes } from 'http-status-codes';
 import { BlogbeeResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
 import { getBlogById, isBlogOwnedByUser } from '../blogs/blogs.services';
-import { createCategory, deleteCategory, editCategory, getCategories, getCategoryById, isCategoryNameTaken, isCategoryOwnedByUser } from './categories.services';
 import type { CreateCategoryBody } from './categories.schema';
+import {
+  createCategory,
+  deleteCategory,
+  editCategory,
+  getCategories,
+  getCategoryById,
+  isCategoryNameTaken,
+  isCategoryOwnedByUser,
+} from './categories.services';
 
-export async function createCategoryHandler(req: Request<Record<string, unknown>, Record<string, unknown>, CreateCategoryBody>, res: Response) {
+export async function createCategoryHandler(
+  req: Request<
+    Record<string, unknown>,
+    Record<string, unknown>,
+    CreateCategoryBody
+  >,
+  res: Response,
+) {
   try {
     const userData = res.locals.user;
 
@@ -48,7 +63,9 @@ export async function createCategoryHandler(req: Request<Record<string, unknown>
 
     if (isTaken) {
       logger.error('CONFLICT_ERROR: Category name already taken');
-      res.status(StatusCodes.CONFLICT).json(new BlogbeeResponse("Category name already exists"));
+      res
+        .status(StatusCodes.CONFLICT)
+        .json(new BlogbeeResponse('Category name already exists'));
       return;
     }
 

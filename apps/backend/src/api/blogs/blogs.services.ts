@@ -4,9 +4,9 @@ import * as db from '../../db';
 import type { Blogs, Categories, Posts } from '../../db/schema';
 import { BlogbeeError } from '../../utils/app-error';
 import { logger } from '../../utils/logger';
+import { CATEGORIES_COLLECTION } from '../categories/categories.services';
 import { POSTS_COLLECTION } from '../posts/posts.services';
 import type { CreateBlogBody, EditBlogBody } from './blogs.schema';
-import { CATEGORIES_COLLECTION } from '../categories/categories.services';
 
 export const BLOG_COLLECTION = 'blogs';
 
@@ -83,14 +83,14 @@ export async function getBlogBySlug(slug: string) {
 export async function getAllBlogsByUser(
   userId: string,
   options?: {
-    query?: string,
-    page?: number,
-    limit?: number,
-    sort?: "latest" | "oldest"
-  }
+    query?: string;
+    page?: number;
+    limit?: number;
+    sort?: 'latest' | 'oldest';
+  },
 ) {
   try {
-    const query = options?.query ?? "";
+    const query = options?.query ?? '';
     const limit = options?.limit ?? 10;
     const page = options?.page ?? 1;
     const sort = options?.sort;
@@ -111,34 +111,34 @@ export async function getAllBlogsByUser(
               $search: query,
             },
           }),
-        }
+        },
       },
       {
         $lookup: {
-          from: "posts",
-          localField: "_id",
-          foreignField: "blogId",
+          from: 'posts',
+          localField: '_id',
+          foreignField: 'blogId',
           pipeline: [
             {
-              $group: { _id: "$blogId", total: { $sum: 1 } }
-            }
+              $group: { _id: '$blogId', total: { $sum: 1 } },
+            },
           ],
-          as: "posts"
-        }
+          as: 'posts',
+        },
       },
       {
         $addFields: {
           postsCount: {
-            $ifNull: [{ $arrayElemAt: ["$posts.total", 0] }, 0]
-          }
-        }
+            $ifNull: [{ $arrayElemAt: ['$posts.total', 0] }, 0],
+          },
+        },
       },
       {
-        $limit: docsToInclude
+        $limit: docsToInclude,
       },
       {
-        $skip: docsToSkip
-      }
+        $skip: docsToSkip,
+      },
     ]);
 
     if (sort) {
@@ -159,7 +159,7 @@ export async function getAllBlogsByUser(
       limit,
       totalItems,
       totalPages,
-      items: res
+      items: res,
     };
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);

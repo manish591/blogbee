@@ -3,6 +3,12 @@ import { StatusCodes } from 'http-status-codes';
 import { BlogbeeResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
 import { uploadFileToCloudinary } from '../../utils/upload';
+import type {
+  CreateBlogBody,
+  EditBlogBody,
+  EditBlogParams,
+  GetBlogsQuery,
+} from './blogs.schema';
 import {
   createBlog,
   deleteBlog,
@@ -12,7 +18,6 @@ import {
   isBlogOwnedByUser,
   isSlugTaken,
 } from './blogs.services';
-import type { CreateBlogBody, EditBlogBody, EditBlogParams, GetBlogsQuery } from './blogs.schema';
 
 export async function createBlogHandler(
   req: Request<
@@ -59,7 +64,15 @@ export async function createBlogHandler(
   }
 }
 
-export async function getBlogsHandler(req: Request<Record<string, unknown>, Record<string, unknown>, Record<string, unknown>, GetBlogsQuery>, res: Response) {
+export async function getBlogsHandler(
+  req: Request<
+    Record<string, unknown>,
+    Record<string, unknown>,
+    Record<string, unknown>,
+    GetBlogsQuery
+  >,
+  res: Response,
+) {
   try {
     const userData = res.locals.user;
 
@@ -72,11 +85,16 @@ export async function getBlogsHandler(req: Request<Record<string, unknown>, Reco
     }
 
     const queryParams = req.query;
-    const query = queryParams.query ?? "";
+    const query = queryParams.query ?? '';
     const limit = queryParams.limit ? Number(queryParams.limit) : 10;
     const page = queryParams.page ? Number(queryParams.page) : 1;
     const sort = queryParams.sort;
-    const allUserBlogsData = await getAllBlogsByUser(userData.userId, { query, limit, page, sort });
+    const allUserBlogsData = await getAllBlogsByUser(userData.userId, {
+      query,
+      limit,
+      page,
+      sort,
+    });
     logger.info('FETCH_ALL_BLOG_SUCCESS: Blogs fetched successfully');
 
     res

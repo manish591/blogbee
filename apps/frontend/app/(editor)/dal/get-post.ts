@@ -1,6 +1,6 @@
-import { API_URL } from "@/constants";
-import { serializeCookies } from "@/lib/cookie";
-import "server-only";
+import { API_URL } from '@/constants';
+import { serializeCookies } from '@/lib/cookie';
+import 'server-only';
 
 export type PostData = {
   _id: string;
@@ -9,7 +9,7 @@ export type PostData = {
   postStatus: string;
   title: string;
   categories: {
-    id: string
+    id: string;
   }[];
   slug?: string;
   subTitle?: string;
@@ -17,20 +17,20 @@ export type PostData = {
   coverImg?: string;
   updatedAt: Date;
   createdAt: Date;
-}
+};
 
 export async function getPost(postId: string): Promise<PostData> {
   const cookieHeader = await serializeCookies();
 
   const res = await fetch(`${API_URL}/v1/posts/${postId}`, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      cookie: cookieHeader
-    }
+      cookie: cookieHeader,
+    },
   });
 
   if (!res.ok) {
-    throw new Error("GET_POST_DATA_ERROR: Failed to get post data");
+    throw new Error('GET_POST_DATA_ERROR: Failed to get post data');
   }
 
   const data = await res.json();

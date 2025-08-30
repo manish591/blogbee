@@ -9,7 +9,7 @@ export type PostData = {
   title: string;
   postStatus: string;
   categories: {
-    id: string
+    id: string;
   }[];
   subTitle?: string;
   slug?: string;

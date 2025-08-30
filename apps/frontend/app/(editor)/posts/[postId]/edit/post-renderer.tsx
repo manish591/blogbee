@@ -1,5 +1,13 @@
 'use client';
 
+import { ArrowLeft, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+import type { PostData } from '@/app/(editor)/dal/get-post';
+import { PostSettingsForm } from '@/app/(editor)/posts/[postId]/edit/edit-post-form';
+import type { BlogData } from '@/app/blogs/dal/get-all-blogs';
+import { BackButton } from '@/components/back-button';
+import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
@@ -8,16 +16,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { PostEditor } from './postEditor';
-import { PostSettingsForm } from '@/app/(editor)/posts/[postId]/edit/edit-post-form';
-import { BackButton } from '@/components/back-button';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
-import type { PostData } from '@/app/(editor)/dal/get-post';
-import Link from 'next/link';
-import { useState } from 'react';
-import type { BlogData } from '@/app/blogs/dal/get-all-blogs';
 import { PostEditIndicator } from './post-edit-indicator';
+import { PostEditor } from './postEditor';
 
 export function PostRenderer({
   postData,

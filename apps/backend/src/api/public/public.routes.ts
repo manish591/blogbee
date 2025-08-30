@@ -5,7 +5,11 @@ import {
   getPublicPostDetailsHandler,
   getPublicPostsListHandler,
 } from './public.controllers';
-import { getPublicBlogSchema, getPublicPostSchema, getPublicPostsSchema } from './public.schema';
+import {
+  getPublicBlogSchema,
+  getPublicPostSchema,
+  getPublicPostsSchema,
+} from './public.schema';
 
 const router = Router();
 

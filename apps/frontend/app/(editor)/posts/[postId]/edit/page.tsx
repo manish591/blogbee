@@ -1,8 +1,8 @@
 import { notFound, redirect } from 'next/navigation';
 import { verifySession } from '@/app/(auth)/dal/verify-session';
 import { getPost } from '@/app/(editor)/dal/get-post';
-import { PostRenderer } from './post-renderer';
 import { getBlog } from '@/app/blogs/dal/get-blog';
+import { PostRenderer } from './post-renderer';
 
 export default async function PostEditorPage({
   params,

@@ -4,14 +4,8 @@ import { z } from 'zod';
 export const createBlogSchema = z.object({
   body: z
     .object({
-      name: z
-        .string()
-        .trim().max(30),
-      about: z
-        .string()
-        .trim()
-        .max(300)
-        .optional(),
+      name: z.string().trim().max(30),
+      about: z.string().trim().max(300).optional(),
       slug: z
         .string()
         .trim()
@@ -20,9 +14,7 @@ export const createBlogSchema = z.object({
           message:
             'name should only contain lowercase characters, numbers and hyphens',
         }),
-      logo: z
-        .url()
-        .optional(),
+      logo: z.url().optional(),
     })
     .strict(),
 });
@@ -33,12 +25,16 @@ export const getBlogsSchema = z.object({
       query: z.string().optional(),
       page: z.coerce
         .number()
-        .min(1, { message: "page must be at least 1" })
-        .max(1000, { message: "page must be at most 1000" }).transform(val => String(val)).optional(),
+        .min(1, { message: 'page must be at least 1' })
+        .max(1000, { message: 'page must be at most 1000' })
+        .transform((val) => String(val))
+        .optional(),
       limit: z.coerce
         .number()
-        .min(1, { message: "limit must be at least 1" })
-        .max(20, { message: "limit must be at most 20" }).transform(val => String(val)).optional(),
+        .min(1, { message: 'limit must be at least 1' })
+        .max(20, { message: 'limit must be at most 20' })
+        .transform((val) => String(val))
+        .optional(),
       sort: z.union([z.literal('latest'), z.literal('oldest')]).optional(),
     })
     .strict(),
@@ -60,19 +56,9 @@ export const getBlogByIdSchema = z.object({
 export const editBlogSchema = z.object({
   body: z
     .object({
-      name: z
-        .string()
-        .trim()
-        .max(30)
-        .optional(),
-      about: z
-        .string()
-        .trim()
-        .max(300)
-        .optional(),
-      logo: z
-        .url()
-        .optional(),
+      name: z.string().trim().max(30).optional(),
+      about: z.string().trim().max(300).optional(),
+      logo: z.url().optional(),
     })
     .strict(),
   params: z
@@ -101,9 +87,7 @@ export const deleteBlogSchema = z.object({
 });
 
 export type CreateBlogBody = z.infer<typeof createBlogSchema>['body'];
-export type GetBlogsQuery = z.infer<
-  typeof getBlogsSchema
->['query'];
+export type GetBlogsQuery = z.infer<typeof getBlogsSchema>['query'];
 export type GetBlogByIdParams = z.infer<typeof getBlogByIdSchema>['params'];
 export type EditBlogBody = z.infer<typeof editBlogSchema>['body'];
 export type EditBlogParams = z.infer<typeof editBlogSchema>['params'];

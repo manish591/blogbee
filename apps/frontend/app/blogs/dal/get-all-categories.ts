@@ -9,7 +9,7 @@ export type CategoriesData = {
   blogId: string;
   userId: string;
   posts: {
-    id: string
+    id: string;
   }[];
   createdAt: Date;
   updatedAt: Date;

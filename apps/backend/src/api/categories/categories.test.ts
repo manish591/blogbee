@@ -2,9 +2,17 @@ import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { buildServer } from '../../app';
 import { createBlog } from '../blogs/blogs.services';
-import { addCategoryToPost, createPost, getPostById } from '../posts/posts.services';
+import {
+  addCategoryToPost,
+  createPost,
+  getPostById,
+} from '../posts/posts.services';
 import { createUser } from '../users/users.services';
-import { createCategory, getCategories, getCategoryById } from './categories.services';
+import {
+  createCategory,
+  getCategories,
+  getCategoryById,
+} from './categories.services';
 
 describe('CATEGORIES', () => {
   const loggedInUser = {
@@ -124,7 +132,8 @@ describe('CATEGORIES', () => {
       expect(otherUserAllcategories.length).toBe(0);
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
-        message: 'You do not have permissions to create the category in this blog',
+        message:
+          'You do not have permissions to create the category in this blog',
       });
     });
 
@@ -203,7 +212,8 @@ describe('CATEGORIES', () => {
 
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
-        message: 'You do not have permissions to read the content of the categories',
+        message:
+          'You do not have permissions to read the content of the categories',
       });
     });
 
@@ -234,7 +244,9 @@ describe('CATEGORIES', () => {
         description: 'Contains all the blogs related to the javascript',
         blogId,
       };
-      categoryId = (await createCategory(userId, blogId, categoryData)).categoryId.toString();
+      categoryId = (
+        await createCategory(userId, blogId, categoryData)
+      ).categoryId.toString();
     });
 
     it('should return 400 bad request if invalid request body is provided', async () => {
@@ -289,7 +301,8 @@ describe('CATEGORIES', () => {
       expect(editedCategoryData?.name).not.toBe(editCategoryContent.name);
       expect(res.status).toBe(403);
       expect(res.body).toMatchObject({
-        message: 'You do not have permissions to edit the content of the categories',
+        message:
+          'You do not have permissions to edit the content of the categories',
       });
     });
 
@@ -313,22 +326,30 @@ describe('CATEGORIES', () => {
       });
     });
 
-    it("should return 200 ok for successfully updating the category name in posts collection after updating the category name", async () => {
+    it('should return 200 ok for successfully updating the category name in posts collection after updating the category name', async () => {
       const blogData = {
-        name: "test1",
-        slug: "test-blog"
-      }
+        name: 'test1',
+        slug: 'test-blog',
+      };
       const createdBlog = await createBlog(userId, blogData);
       const blogId = createdBlog.blogId.toString();
       const createdPost = await createPost(userId, blogId);
       const createdPostId = createdPost.postId.toString();
       const categoryData = {
         blogId,
-        name: "javascript"
-      }
-      const createdCategory = await createCategory(userId, blogId, categoryData);
+        name: 'javascript',
+      };
+      const createdCategory = await createCategory(
+        userId,
+        blogId,
+        categoryData,
+      );
       const createdCategoryId = createdCategory.categoryId.toString();
-      await addCategoryToPost(createdPostId, createdCategoryId, categoryData.name);
+      await addCategoryToPost(
+        createdPostId,
+        createdCategoryId,
+        categoryData.name,
+      );
       const app = buildServer();
       const data = {
         name: 'typescript',
@@ -367,10 +388,12 @@ describe('CATEGORIES', () => {
         about: 'This is a content.',
       };
       const blogId = (await createBlog(userId, blogData)).blogId.toString();
-      categoryId = (await createCategory(userId, blogId, {
-        ...categoryData,
-        blogId
-      })).categoryId.toString();
+      categoryId = (
+        await createCategory(userId, blogId, {
+          ...categoryData,
+          blogId,
+        })
+      ).categoryId.toString();
     });
 
     it('should return 403 forbidden if user attempts to edit the content of category in the they do not own', async () => {

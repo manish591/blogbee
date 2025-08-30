@@ -72,7 +72,10 @@ export function FaqsSection() {
         <div className="py-16 text-center border-t">
           <p>
             Have more questions?{' '}
-            <Link href="#" className="underline">
+            <Link
+              href={`mailto:manishdevrani777@gmail.com`}
+              className="underline"
+            >
               Contact Us
             </Link>
           </p>

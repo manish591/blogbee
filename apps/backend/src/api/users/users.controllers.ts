@@ -4,6 +4,11 @@ import { BlogbeeResponse } from '../../utils/api-response';
 import { comparePassword } from '../../utils/auth';
 import { logger } from '../../utils/logger';
 import { uploadFileToCloudinary } from '../../utils/upload';
+import type {
+  CreateUserBody,
+  EditUserBody,
+  LoginUserBody,
+} from './users.schema';
 import {
   createAuthSession,
   createUser,
@@ -12,7 +17,6 @@ import {
   getUserByEmail,
   revokeAuthSession,
 } from './users.services';
-import type { CreateUserBody, EditUserBody, LoginUserBody } from './users.schema';
 
 export const COOKIE_OPTIONS: CookieOptions = {
   secure: true,
@@ -67,11 +71,7 @@ export async function createUserHandler(
 }
 
 export async function loginUserHandler(
-  req: Request<
-    Record<string, unknown>,
-    Record<string, unknown>,
-    LoginUserBody
-  >,
+  req: Request<Record<string, unknown>, Record<string, unknown>, LoginUserBody>,
   res: Response,
 ) {
   try {
@@ -176,11 +176,7 @@ export async function uploadProfileImageHandler(req: Request, res: Response) {
 }
 
 export async function editProfileHandler(
-  req: Request<
-    Record<string, unknown>,
-    Record<string, unknown>,
-    EditUserBody
-  >,
+  req: Request<Record<string, unknown>, Record<string, unknown>, EditUserBody>,
   res: Response,
 ) {
   try {

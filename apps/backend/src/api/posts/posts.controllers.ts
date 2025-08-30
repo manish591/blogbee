@@ -1,9 +1,17 @@
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { PostStatus } from '../../db/schema';
 import { BlogbeeResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
 import { getBlogById, isBlogOwnedByUser } from '../blogs/blogs.services';
 import { getCategoryById } from '../categories/categories.services';
+import type {
+  AddCategoryToPostParams,
+  EditPostBody,
+  EditPostParams,
+  GetPostsQuery,
+  RemoveCategoryFromPostParams,
+} from './posts.schema';
 import {
   addCategoryToPost,
   createPost,
@@ -15,8 +23,6 @@ import {
   isPostOwnedByUser,
   removeCategoryFromPost,
 } from './posts.services';
-import type { AddCategoryToPostParams, EditPostBody, EditPostParams, GetPostsQuery, RemoveCategoryFromPostParams } from './posts.schema';
-import { PostStatus } from '../../db/schema';
 
 export async function createPostHandler(req: Request, res: Response) {
   try {
@@ -72,7 +78,15 @@ export async function createPostHandler(req: Request, res: Response) {
   }
 }
 
-export async function getPostsHandler(req: Request<Record<string, unknown>, Record<string, unknown>, Record<string, unknown>, GetPostsQuery>, res: Response) {
+export async function getPostsHandler(
+  req: Request<
+    Record<string, unknown>,
+    Record<string, unknown>,
+    Record<string, unknown>,
+    GetPostsQuery
+  >,
+  res: Response,
+) {
   try {
     const userData = res.locals.user;
 
@@ -123,7 +137,7 @@ export async function getPostsHandler(req: Request<Record<string, unknown>, Reco
       page,
       categories,
       sort,
-      status
+      status,
     });
     logger.info('GET_POST_SUCCESS: Posts fetched successfully');
 
@@ -189,7 +203,10 @@ export async function getPostByIdHandler(req: Request, res: Response) {
   }
 }
 
-export async function editPostHandler(req: Request<EditPostParams, Record<string, unknown>, EditPostBody>, res: Response) {
+export async function editPostHandler(
+  req: Request<EditPostParams, Record<string, unknown>, EditPostBody>,
+  res: Response,
+) {
   try {
     const userData = res.locals.user;
 
@@ -227,9 +244,13 @@ export async function editPostHandler(req: Request<EditPostParams, Record<string
 
     const { postStatus, slug } = req.body;
 
-    if (postStatus === PostStatus.PUBLISHED && (!postData.slug && !slug)) {
-      logger.error("BAD_REQUEST: Publishing post requires a slug to be passed in the body");
-      res.status(StatusCodes.BAD_REQUEST).json(new BlogbeeResponse("Slug is required"));
+    if (postStatus === PostStatus.PUBLISHED && !postData.slug && !slug) {
+      logger.error(
+        'BAD_REQUEST: Publishing post requires a slug to be passed in the body',
+      );
+      res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(new BlogbeeResponse('Slug is required'));
       return;
     }
 
@@ -297,7 +318,10 @@ export async function deletePostHandler(req: Request, res: Response) {
   }
 }
 
-export async function addCategoryToPostHandler(req: Request<AddCategoryToPostParams>, res: Response) {
+export async function addCategoryToPostHandler(
+  req: Request<AddCategoryToPostParams>,
+  res: Response,
+) {
   try {
     const userData = res.locals.user;
 
@@ -362,13 +386,17 @@ export async function addCategoryToPostHandler(req: Request<AddCategoryToPostPar
       res
         .status(StatusCodes.FORBIDDEN)
         .json(
-          new BlogbeeResponse('The post and category must belong to the same blog'),
+          new BlogbeeResponse(
+            'The post and category must belong to the same blog',
+          ),
         );
       return;
     }
 
     await addCategoryToPost(postId, categoryId, categoryData.name);
-    logger.info('ADD_CATEGORY_TO_POST_SUCCESS: category added to post successfully');
+    logger.info(
+      'ADD_CATEGORY_TO_POST_SUCCESS: category added to post successfully',
+    );
 
     res
       .status(StatusCodes.OK)
@@ -381,7 +409,10 @@ export async function addCategoryToPostHandler(req: Request<AddCategoryToPostPar
   }
 }
 
-export async function removeCategoryFromPostHandler(req: Request<RemoveCategoryFromPostParams>, res: Response) {
+export async function removeCategoryFromPostHandler(
+  req: Request<RemoveCategoryFromPostParams>,
+  res: Response,
+) {
   try {
     const userData = res.locals.user;
 

@@ -3,9 +3,9 @@ import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { buildServer } from '../../app';
 import { createBlog } from '../blogs/blogs.services';
+import { createCategory } from '../categories/categories.services';
 import { createPost, editPost } from '../posts/posts.services';
 import { createUser } from '../users/users.services';
-import { createCategory } from '../categories/categories.services';
 
 describe('PUBLIC API', () => {
   let userId: string;
