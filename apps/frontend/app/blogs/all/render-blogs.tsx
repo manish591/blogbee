@@ -1,7 +1,6 @@
-import { FileText, Plus } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { BlogCard } from '@/app/blogs/all/blog-card';
 import { getAllBlogs } from '@/app/blogs/dal/get-all-blogs';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export type RenderBlogsProps = {
@@ -29,7 +28,7 @@ export async function RenderBlogs({
   return (
     <>
       {blogsData.items.length < 1 ? (
-        <div className="flex py-20 justify-center min-h-screen p-8">
+        <div className="bg-background border rounded-md flex py-20 justify-center p-8">
           <div className="border-0 w-full max-w-md shadow-none">
             <div className="flex flex-col items-center text-center p-8">
               <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4">
@@ -38,13 +37,8 @@ export async function RenderBlogs({
               <h2 className="text-3xl font-semibold mb-3">Blogs not found</h2>
               <p className="text-foreground/70 mb-6 leading-[1.5] max-w-[70%] mx-auto">
                 You haven't created any blog posts yet. Create your first site
-                below.
+                now.
               </p>
-              <span className="loading loading-ring loading-md"></span>
-              <Button className="gap-2">
-                <Plus className="w-4 h-4" />
-                Create your first blog
-              </Button>
             </div>
           </div>
         </div>
