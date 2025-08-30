@@ -1,7 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import type { LoginFormData } from '@/components/login-form';
+import type { LoginFormData } from '@/components/web/login-form';
 import { API_URL } from '@/constants';
 
 export async function loginUser(data: LoginFormData) {

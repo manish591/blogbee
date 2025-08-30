@@ -1,7 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import type { SignupFormData } from '@/components/signup-form';
+import type { SignupFormData } from '@/components/web/signup-form';
 import { API_URL } from '@/constants';
 
 export async function createUser(data: SignupFormData) {

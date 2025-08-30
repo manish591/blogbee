@@ -81,7 +81,7 @@ export function LoginForm() {
             <Button type="submit" className="w-full cursor-pointer">
               Login
             </Button>
-            <div className="flex">
+            <div className="hidden">
               <Button
                 variant="outline"
                 type="button"

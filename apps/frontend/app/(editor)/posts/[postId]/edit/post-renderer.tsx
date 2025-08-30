@@ -6,7 +6,7 @@ import { useState } from 'react';
 import type { PostData } from '@/app/(editor)/dal/get-post';
 import { PostSettingsForm } from '@/app/(editor)/posts/[postId]/edit/edit-post-form';
 import type { BlogData } from '@/app/blogs/dal/get-all-blogs';
-import { BackButton } from '@/components/back-button';
+import { BackButton } from '@/components/web/back-button';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,

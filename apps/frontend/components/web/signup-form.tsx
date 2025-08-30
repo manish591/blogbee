@@ -97,7 +97,7 @@ export function SignupForm() {
             <Button type="submit" className="w-full cursor-pointer">
               Signup
             </Button>
-            <div className="flex">
+            <div className="hidden">
               <Button
                 variant="outline"
                 type="button"

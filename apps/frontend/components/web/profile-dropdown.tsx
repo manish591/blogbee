@@ -1,7 +1,7 @@
 import { CircleHelp, LayoutDashboard, Settings, UserIcon } from 'lucide-react';
 import Link from 'next/link';
 import type { User } from '@/app/(auth)/dal/verify-session';
-import { ProfileAvatar } from '@/components/profile-avatar';
+import { ProfileAvatar } from '@/components/web/profile-avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,7 +41,7 @@ export function ProfileDropdown({ user }: Readonly<{ user: User }>) {
           className="text-sm text-foreground/70 px-3 cursor-pointer"
           asChild
         >
-          <Link href="#">
+          <Link href="/account/profile">
             <UserIcon />
             Profile
           </Link>
@@ -50,7 +50,7 @@ export function ProfileDropdown({ user }: Readonly<{ user: User }>) {
           className="text-sm text-foreground/70 px-3 cursor-pointer"
           asChild
         >
-          <Link href="#">
+          <Link href="/account/settings">
             <Settings />
             Settings
           </Link>
@@ -59,7 +59,7 @@ export function ProfileDropdown({ user }: Readonly<{ user: User }>) {
           className="text-sm text-foreground/70 px-3 cursor-pointer"
           asChild
         >
-          <Link href="#">
+          <Link href="mailto:manishdevrani777@gmail.com">
             <CircleHelp />
             Feedback
           </Link>

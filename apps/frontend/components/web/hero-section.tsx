@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { HeroMarquee } from '@/components/hero-marquee';
+import { HeroMarquee } from '@/components/web/hero-marquee';
 import { Button } from '@/components/ui/button';
 
 export function HeroSection() {

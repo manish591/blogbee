@@ -2,8 +2,8 @@ import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { BackButton } from '@/components/back-button';
-import { LoginForm } from '@/components/login-form';
+import { BackButton } from '@/components/web/back-button';
+import { LoginForm } from '@/components/web/login-form';
 import { verifySession } from '../dal/verify-session';
 
 export default async function LoginPage() {
