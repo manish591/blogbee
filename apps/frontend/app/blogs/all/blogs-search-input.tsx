@@ -13,7 +13,9 @@ export function BlogsSearchInput() {
   const searchParamsStr = searchParams.toString();
   const initialSearchQuery = searchParams.get('query')?.toString();
 
-  const [localSearchQuery, setLocalSearchQuery] = useState(initialSearchQuery);
+  const [localSearchQuery, setLocalSearchQuery] = useState(
+    initialSearchQuery ?? '',
+  );
   const debouncedLocalSearch = useDebounce(localSearchQuery);
 
   const setSearchParams = useCallback(
