@@ -1,7 +1,8 @@
-import { getPostData } from '@/app/(editor)/dal/get-post-data';
-import { redirect } from 'next/navigation';
-import { PostRenderer } from './post-renderer';
+import { notFound, redirect } from 'next/navigation';
 import { verifySession } from '@/app/(auth)/dal/verify-session';
+import { getPost } from '@/app/(editor)/dal/get-post';
+import { PostRenderer } from './post-renderer';
+import { getBlog } from '@/app/blogs/dal/get-blog';
 
 export default async function PostEditorPage({
   params,
@@ -13,11 +14,16 @@ export default async function PostEditorPage({
   }
 
   const postId = (await params).postId;
-  const postData = await getPostData(postId);
+  const postData = await getPost(postId);
+  const blogData = await getBlog(postData.blogId);
+
+  if (postData.postStatus === 'archived') {
+    redirect(notFound());
+  }
 
   return (
     <div className="min-h-screen">
-      <PostRenderer postData={postData} />
+      <PostRenderer postData={postData} blogData={blogData} />
     </div>
   );
 }

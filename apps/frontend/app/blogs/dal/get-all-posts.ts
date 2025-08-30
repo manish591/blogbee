@@ -8,7 +8,9 @@ export type PostData = {
   blogId: string;
   title: string;
   postStatus: string;
-  tags: string[];
+  categories: {
+    id: string
+  }[];
   subTitle?: string;
   slug?: string;
   content?: string;
@@ -22,8 +24,6 @@ export type GetAllPostsReturnValue = {
   limit: number;
   totalItems: number;
   totalPages: number;
-  hasNext: boolean;
-  hasPrevious: boolean;
   items: PostData[];
 };
 

@@ -38,19 +38,6 @@ export function PostSettingsForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="h-full">
         <div className="h-[calc(100%-48px)] overflow-auto space-y-6">
-          <div className="px-4 grid gap-3">
-            <p className="font-medium text-sm">Cover Image</p>
-            <div className="flex flex-col items-center rounded-md p-2 py-4 border-dashed border-2">
-              <div className="text-center">
-                <p className="text-base font-medium text-gray-700 mb-1">
-                  Drop your post cover image here
-                </p>
-                <p className="text-sm text-gray-500">
-                  Recommended size 500x500px
-                </p>
-              </div>
-            </div>
-          </div>
           <div className="px-4">
             <FormField
               control={form.control}

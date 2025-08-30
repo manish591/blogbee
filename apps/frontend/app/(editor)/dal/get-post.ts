@@ -6,9 +6,11 @@ export type PostData = {
   _id: string;
   userId: string;
   blogId: string;
-  postStatus: number;
+  postStatus: string;
   title: string;
-  tags: string[];
+  categories: {
+    id: string
+  }[];
   slug?: string;
   subTitle?: string;
   content?: string;
@@ -17,7 +19,7 @@ export type PostData = {
   createdAt: Date;
 }
 
-export async function getPostData(postId: string): Promise<PostData> {
+export async function getPost(postId: string): Promise<PostData> {
   const cookieHeader = await serializeCookies();
 
   const res = await fetch(`${API_URL}/v1/posts/${postId}`, {

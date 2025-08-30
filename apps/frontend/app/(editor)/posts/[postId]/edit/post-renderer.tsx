@@ -9,15 +9,22 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { PostEditor } from './postEditor';
-import { PostSettingsForm } from '@/app/(editor)/post-settings-form';
+import { PostSettingsForm } from '@/app/(editor)/posts/[postId]/edit/edit-post-form';
 import { BackButton } from '@/components/back-button';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, CloudCheck, ExternalLink } from 'lucide-react';
-import type { PostData } from '@/app/(editor)/dal/get-post-data';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
+import type { PostData } from '@/app/(editor)/dal/get-post';
+import Link from 'next/link';
+import { useState } from 'react';
+import type { BlogData } from '@/app/blogs/dal/get-all-blogs';
+import { PostEditIndicator } from './post-edit-indicator';
 
-export async function PostRenderer({
+export function PostRenderer({
   postData,
-}: Readonly<{ postData: PostData }>) {
+  blogData,
+}: Readonly<{ postData: PostData; blogData: BlogData }>) {
+  const [isSavingPost, setIsSavingPost] = useState<boolean | null>(null);
+
   return (
     <>
       <header className="bg-background">
@@ -29,34 +36,37 @@ export async function PostRenderer({
             </BackButton>
           </div>
           <div className="flex gap-4">
-            <div className="flex items-center gap-2 text-green-500 mr-4">
-              <CloudCheck /> <span>Saved</span>
-            </div>
-            {/* <div className="flex items-center gap-2 text-foreground/60 mr-4">
-            <output
-              className="animate-spin inline-block size-4 border-2 border-current border-t-transparent text-foreground/60 rounded-full dark:text-blue-500"
-              aria-label="loading"
+            <PostEditIndicator isSavingPost={isSavingPost} />
+            <Button
+              variant="outline"
+              size="sm"
+              className="cursor-pointer"
+              asChild
             >
-              <span className="sr-only">Loading...</span>
-            </output>
-            <span>Saving..</span>
-          </div> */}
-            <Button variant="outline" size="sm">
-              <ExternalLink className="w-4 h-4" />
-              Preview
+              <Link
+                href={`http://${blogData.slug}.localhost:3000/preview/${postData._id}`}
+              >
+                <ExternalLink className="w-4 h-4" />
+                Preview
+              </Link>
             </Button>
             <Sheet>
               <SheetTrigger asChild>
-                <Button size="sm" className="px-4">
-                  Publish
-                </Button>
+                {postData.postStatus === 'draft' ? (
+                  <Button size="sm" className="px-4">
+                    Publish
+                  </Button>
+                ) : (
+                  <Button size="sm" className="px-4">
+                    Update
+                  </Button>
+                )}
               </SheetTrigger>
               <SheetContent className="gap-0">
                 <SheetHeader className="h-28 py-0 flex justify-center">
-                  <SheetTitle className="text-xl">Draft Settings</SheetTitle>
+                  <SheetTitle className="text-xl">Post Settings</SheetTitle>
                   <SheetDescription>
-                    These settings will be published immediately and
-                    automatically override your current post configuration.
+                    Update the post settings here
                   </SheetDescription>
                 </SheetHeader>
                 <div className="h-[calc(100svh-112px)]">
@@ -68,7 +78,12 @@ export async function PostRenderer({
         </div>
       </header>
       <main>
-        <PostEditor />
+        <PostEditor
+          setIsSavingPost={setIsSavingPost}
+          title={postData.title}
+          content={postData.content ?? ''}
+          postId={postData._id}
+        />
       </main>
     </>
   );
