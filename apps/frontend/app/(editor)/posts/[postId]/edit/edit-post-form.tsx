@@ -13,31 +13,45 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import type { PostData } from '@/app/(editor)/dal/get-post';
+import { editPost, type EditPostData } from '@/app/(editor)/actions/edit-post';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
-  slug: z.string().optional(),
-  subTitle: z.string().optional(),
+  slug: z.string().max(30),
 });
 
 export type TPostSettingFormSchema = z.infer<typeof formSchema>;
 
-export function PostSettingsForm() {
+export function PostSettingsForm({
+  postData,
+}: Readonly<{ postData: PostData }>) {
+  const router = useRouter();
+
   const form = useForm<TPostSettingFormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      slug: '',
-      subTitle: '',
+      slug: postData.slug,
     },
   });
 
-  function onSubmit(values: TPostSettingFormSchema) {
-    console.log(values);
+  async function onSubmit(values: TPostSettingFormSchema) {
+    try {
+      const postdata: EditPostData = {
+        slug: values.slug,
+        ...(postData.postStatus === 'draft' && { postStatus: 'published' }),
+      };
+      await editPost(postData._id, postdata);
+      router.refresh();
+    } catch (err) {
+      console.log('EDIT_POST_FAILED: Failed to edit the post', err);
+    }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="h-full">
-        <div className="h-[calc(100%-48px)] overflow-auto space-y-6">
+        <div className="h-[calc(100%-64px)] overflow-auto space-y-6">
           <div className="px-4">
             <FormField
               control={form.control}
@@ -57,28 +71,13 @@ export function PostSettingsForm() {
               )}
             />
           </div>
-          <div className="px-4">
-            <FormField
-              control={form.control}
-              name="subTitle"
-              render={({ field }) => (
-                <FormItem className="grid gap-3">
-                  <FormLabel className="text-sm">Subtitle</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      className="shadow-none"
-                      placeholder="Subtitle"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
         </div>
-        <div className="h-12 border-t flex items-center justify-end px-4">
-          <Button className="h-7 text-[0.8rem]">Publish</Button>
+        <div className="border-t flex items-center justify-end px-4 h-[64px]">
+          {postData.postStatus === 'draft' ? (
+            <Button size="sm">Publish</Button>
+          ) : (
+            <Button size="sm">Update</Button>
+          )}
         </div>
       </form>
     </Form>

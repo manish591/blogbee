@@ -12,11 +12,11 @@ export function PostEditor({
 }: Readonly<{
   setIsSavingPost: React.Dispatch<React.SetStateAction<boolean | null>>;
   title: string;
-  content: string;
   postId: string;
+  content?: string;
 }>) {
   const [postTitle, setPostTitle] = useState(title);
-  const [postContent, setPostContent] = useState(content);
+  const [postContent, setPostContent] = useState(content ?? '');
   const debouncedTitle = useDebounce(postTitle);
   const debouncedContent = useDebounce(postContent);
 

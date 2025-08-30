@@ -70,7 +70,7 @@ export function PostRenderer({
                   </SheetDescription>
                 </SheetHeader>
                 <div className="h-[calc(100svh-112px)]">
-                  <PostSettingsForm />
+                  <PostSettingsForm postData={postData} />
                 </div>
               </SheetContent>
             </Sheet>
@@ -81,7 +81,7 @@ export function PostRenderer({
         <PostEditor
           setIsSavingPost={setIsSavingPost}
           title={postData.title}
-          content={postData.content ?? ''}
+          content={postData.content}
           postId={postData._id}
         />
       </main>
