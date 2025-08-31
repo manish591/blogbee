@@ -111,23 +111,16 @@ describe('PUBLIC API', () => {
       expect(res.body).toMatchObject({
         message: 'Posts list fetched successfully',
         data: {
-          blog: expect.objectContaining({
-            name: blogData.name,
-            slug: blogData.slug,
-            about: blogData.about,
-          }),
-          posts: {
-            currentPage: 1,
-            limit: 10,
-            totalItems: 1,
-            totalPages: 1,
-            items: [
-              expect.objectContaining({
-                title: 'untitled',
-                categories: [],
-              }),
-            ],
-          },
+          currentPage: 1,
+          limit: 10,
+          totalItems: 1,
+          totalPages: 1,
+          items: [
+            expect.objectContaining({
+              title: 'untitled',
+              categories: [],
+            }),
+          ],
         },
       });
     });
@@ -189,18 +182,11 @@ describe('PUBLIC API', () => {
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
         message: 'Post details fetched successfully',
-        data: {
-          post: expect.objectContaining({
-            title: 'untitled',
-            slug: postSlug,
-            categories: [],
-          }),
-          blog: expect.objectContaining({
-            name: blogData.name,
-            slug: blogData.slug,
-            about: blogData.about,
-          }),
-        },
+        data: expect.objectContaining({
+          title: 'untitled',
+          slug: postSlug,
+          categories: [],
+        })
       });
     });
   });

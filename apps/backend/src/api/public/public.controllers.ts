@@ -81,8 +81,7 @@ export async function getPublicPostsListHandler(
 
     res.status(StatusCodes.OK).json(
       new BlogbeeResponse('Posts list fetched successfully', {
-        blog: blogData,
-        posts: postsData,
+        postsData,
       }),
     );
   } catch (err) {
@@ -134,8 +133,7 @@ export async function getPublicPostDetailsHandler(req: Request, res: Response) {
 
     res.status(StatusCodes.OK).json(
       new BlogbeeResponse('Post details fetched successfully', {
-        blog: blogData,
-        post: postData,
+        postData,
       }),
     );
   } catch (err) {
