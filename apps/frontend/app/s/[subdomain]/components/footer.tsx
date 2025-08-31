@@ -1,14 +1,15 @@
 import { Rss } from 'lucide-react';
 import Link from 'next/link';
+import type { BlogData } from '@/app/blogs/dal/get-all-blogs';
 import { DOMAIN_NAME, PROTOCOL } from '@/constants';
 
-export function Footer({ subdomain }: Readonly<{ subdomain: string }>) {
+export function Footer({ blogData }: Readonly<{ blogData: BlogData }>) {
   return (
     <footer className="bg-secondary/40 border-t py-6">
       <div className="max-w-7xl mx-auto px-8">
         <div className="flex items-center justify-between">
           <Link href="/" className="text-xl font-medium capitalize">
-            {subdomain}
+            {blogData.slug}
           </Link>
           <div className="flex items-center space-x-4">
             <Link
@@ -56,7 +57,7 @@ export function Footer({ subdomain }: Readonly<{ subdomain: string }>) {
       <div className="mt-10 max-w-7xl px-8 mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-6 w-full">
           <span className="text-gray-500 text-sm">
-            © 2025 <span className="capitalize">{subdomain}</span>
+            © 2025 <span className="capitalize">{blogData.slug}</span>
           </span>
           <Link
             href="/archive"
