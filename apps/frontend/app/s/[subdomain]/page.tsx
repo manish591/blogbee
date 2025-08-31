@@ -2,29 +2,44 @@ import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { PostCard } from './components/post-card';
+import { getBlogBySlug } from './dal/get-blog-by-slug';
 
-export default function BlogHomePage() {
+export default async function BlogHomePage({
+  params,
+}: Readonly<{ params: Promise<{ subdomain: string }> }>) {
+  const subdomain = (await params).subdomain;
+  const blogDetails = await getBlogBySlug(subdomain);
+
   return (
     <div className="py-24 max-w-7xl mx-auto px-8">
       <div className="flex-1">
         <div className="mb-12">
-          <h1 className="text-5xl font-bold leading-tight">The Manish Blog</h1>
+          <h1 className="text-5xl font-bold leading-tight capitalize">
+            The {blogDetails?.blog.name} Blog
+          </h1>
         </div>
       </div>
       <div className="grid grid-cols-[minmax(0,1fr)_360px] gap-12">
         <div>
-          <PostCard isFeatured />
-          <span className="h-[1px] w-full border block my-8"></span>
-          <PostCard />
-          <span className="h-[1px] w-full border block my-8"></span>
-          <PostCard />
-          <span className="h-[1px] w-full border block my-8"></span>
-          <PostCard />
-
+          <div className="space-y-14">
+            {blogDetails?.posts && blogDetails.posts.length > 0 && (
+              <PostCard postData={blogDetails.posts[0]} isFeatured />
+            )}
+            {blogDetails?.posts.slice(1).map((post) => {
+              return <PostCard key={post._id} postData={post} />;
+            })}
+          </div>
           <div className="flex items-center justify-center mt-10">
-            <Button variant="outline" className="h-7 text-[0.8rem">
-              Load more
-              <ArrowRight />
+            <Button
+              variant="outline"
+              size="sm"
+              className="cursor-pointer"
+              asChild
+            >
+              <Link href="/archive">
+                View more
+                <ArrowRight />
+              </Link>
             </Button>
           </div>
         </div>
@@ -40,38 +55,18 @@ export default function BlogHomePage() {
                   All
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-sm text-foreground/70 hover:text-foreground"
-                >
-                  Interviews
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-sm text-foreground/70 hover:text-foreground"
-                >
-                  Interviews
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-sm text-foreground/70 hover:text-foreground"
-                >
-                  Podcast
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="#"
-                  className="text-sm text-foreground/70 hover:text-foreground"
-                >
-                  Inspiration
-                </Link>
-              </li>
+              {blogDetails?.categories.map((category) => {
+                return (
+                  <li key={category._id}>
+                    <Link
+                      href={`/categories/${category.name}`}
+                      className="text-sm text-foreground/70 hover:text-foreground capitalize"
+                    >
+                      {category.name}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </aside>

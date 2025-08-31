@@ -1,7 +1,12 @@
 import Image from 'next/image';
+import type { PostData } from '@/app/(editor)/dal/get-post';
 import { cn } from '@/lib/utils';
+import { convertDateToReadableFormat } from '@/lib/date';
 
-export function PostCard({ isFeatured }: Readonly<{ isFeatured?: boolean }>) {
+export function PostCard({
+  isFeatured,
+  postData,
+}: Readonly<{ isFeatured?: boolean; postData: PostData }>) {
   return (
     <article
       className={cn(
@@ -28,16 +33,16 @@ export function PostCard({ isFeatured }: Readonly<{ isFeatured?: boolean }>) {
               isFeatured && 'text-base',
             )}
           >
-            JUL 29, 2025
+            {convertDateToReadableFormat(new Date(postData.updatedAt))}
           </time>
         </div>
         <h2
           className={cn(
-            'text-2xl font-medium mb-4 flex items-center gap-2',
+            'text-2xl font-medium mb-4 flex items-center gap-2 capitalize',
             isFeatured && 'text-4xl',
           )}
         >
-          Work In Progress, Part 12
+          {postData.title}
         </h2>
         {isFeatured && (
           <div className="mb-4">
@@ -57,9 +62,7 @@ export function PostCard({ isFeatured }: Readonly<{ isFeatured?: boolean }>) {
               isFeatured && 'text-foreground/80',
             )}
           >
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum nulla
-            earum placeat doloremque tenetur, quam nobis. Consequuntur,
-            deserunt. Omnis, quis!
+            {postData.content}
           </p>
         </div>
       </div>

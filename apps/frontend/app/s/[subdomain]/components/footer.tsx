@@ -1,13 +1,14 @@
 import { Rss } from 'lucide-react';
 import Link from 'next/link';
+import { DOMAIN_NAME, PROTOCOL } from '@/constants';
 
-export function Footer() {
+export function Footer({ subdomain }: Readonly<{ subdomain: string }>) {
   return (
     <footer className="bg-secondary/40 border-t py-6">
       <div className="max-w-7xl mx-auto px-8">
         <div className="flex items-center justify-between">
-          <Link href="/" className="text-xl font-medium">
-            manishblog
+          <Link href="/" className="text-xl font-medium capitalize">
+            {subdomain}
           </Link>
           <div className="flex items-center space-x-4">
             <Link
@@ -54,9 +55,11 @@ export function Footer() {
       </div>
       <div className="mt-10 max-w-7xl px-8 mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-6 w-full">
-          <span className="text-gray-500 text-sm">© 2025 Dribbble</span>
+          <span className="text-gray-500 text-sm">
+            © 2025 <span className="capitalize">{subdomain}</span>
+          </span>
           <Link
-            href="/cookies"
+            href="/archive"
             className="text-foreground/70 hover:text-foreground transition-colors text-sm"
           >
             Archive
@@ -74,7 +77,7 @@ export function Footer() {
             Privacy
           </Link>
           <Link
-            href="/"
+            href={`${PROTOCOL}://${DOMAIN_NAME}`}
             className="border inline-block p-[3px] px-2 rounded-md bg-accent/70"
           >
             <p className="text-[0.8rem] text-foreground/70">

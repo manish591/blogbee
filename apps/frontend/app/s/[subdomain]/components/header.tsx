@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 
-export function Header() {
+export function Header({ subdomain }: Readonly<{ subdomain: string }>) {
   return (
     <header className="z-10 sticky top-0 w-full bg-background px-12">
       <div className="h-16 flex items-center justify-between">
@@ -24,7 +24,9 @@ export function Header() {
               className="bg-secondary hidden"
             />
             <div className="flex items-center gap-2">
-              <span className="text-xl font-semibold">manishblog</span>
+              <span className="text-xl font-semibold capitalize">
+                {subdomain}
+              </span>
             </div>
           </div>
           <nav className="hidden items-center gap-6">
