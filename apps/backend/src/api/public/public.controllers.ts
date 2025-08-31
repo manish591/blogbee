@@ -21,7 +21,9 @@ export async function getPublicBlogDetailsHandler(req: Request, res: Response) {
     }
 
     const blogId = blogData._id.toString();
-    const topBlogPosts = await getPosts(blogId);
+    const topBlogPosts = await getPosts(blogId, {
+      "sort": "latest"
+    });
     const allBlogCategories = await getCategories(blogId);
 
     logger.info('EMBED_BLOG_SUCCESS: Blog data retrieved successfully');
