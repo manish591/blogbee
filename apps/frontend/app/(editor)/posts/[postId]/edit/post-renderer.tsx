@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/sheet';
 import { PostEditIndicator } from './post-edit-indicator';
 import { PostEditor } from './postEditor';
+import { BASE_URL, DOMAIN_NAME } from '@/constants';
 
 export function PostRenderer({
   postData,
@@ -44,7 +45,11 @@ export function PostRenderer({
               asChild
             >
               <Link
-                href={`http://${blogData.slug}.localhost:3000/preview/${postData._id}`}
+                href={BASE_URL.replace(
+                  DOMAIN_NAME,
+                  `${blogData.slug}.${DOMAIN_NAME}/preview/${postData._id}`,
+                )}
+                target="_blank"
               >
                 <ExternalLink className="w-4 h-4" />
                 Preview

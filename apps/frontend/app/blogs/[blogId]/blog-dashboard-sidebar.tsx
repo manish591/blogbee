@@ -61,6 +61,7 @@ export async function BlogDashboardSidebar({
               DOMAIN_NAME,
               `${blogData.slug}.${DOMAIN_NAME}`,
             )}
+            target="_blank"
           >
             <ExternalLink className="w-4 h-4" />
             <span>Visit Blog</span>
