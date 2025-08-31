@@ -8,7 +8,7 @@ export async function getBlogBySlug(slug: string): Promise<{
   blog: BlogData,
   posts: PostData[]
   categories: CategoriesData[]
-} | null> {
+}> {
   const res = await fetch(`${API_URL}/v1/public/blogs?blog=${slug}`, {
     method: "GET"
   });

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PostCard } from './components/post-card';
 import { getBlogBySlug } from './dal/get-blog-by-slug';
 import { Layout } from './components/blog-layout';
+import { CategoriesList } from './components/categories-list';
 
 export default async function BlogHomePage({
   params,
@@ -52,28 +53,7 @@ export default async function BlogHomePage({
           <aside className="w-64 space-y-8 py-2">
             <div>
               <h3 className="text-lg font-semibold mb-4">Categories</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    href="#"
-                    className="text-sm text-foreground/70 hover:text-foreground"
-                  >
-                    All
-                  </Link>
-                </li>
-                {blogData?.categories.map((category) => {
-                  return (
-                    <li key={category._id}>
-                      <Link
-                        href={`/categories/${category.name}`}
-                        className="text-sm text-foreground/70 hover:text-foreground capitalize"
-                      >
-                        {category.name}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
+              <CategoriesList categoriesData={blogData.categories} />
             </div>
           </aside>
         </div>

@@ -80,9 +80,7 @@ export async function getPublicPostsListHandler(
     logger.info('GET_POSTS_LIST_SUCCESS: Fetching posts list for blog');
 
     res.status(StatusCodes.OK).json(
-      new BlogbeeResponse('Posts list fetched successfully', {
-        postsData,
-      }),
+      new BlogbeeResponse('Posts list fetched successfully', postsData),
     );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
@@ -132,9 +130,7 @@ export async function getPublicPostDetailsHandler(req: Request, res: Response) {
     }
 
     res.status(StatusCodes.OK).json(
-      new BlogbeeResponse('Post details fetched successfully', {
-        postData,
-      }),
+      new BlogbeeResponse('Post details fetched successfully', postData),
     );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
