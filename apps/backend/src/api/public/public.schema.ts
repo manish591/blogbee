@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import { z } from 'zod';
 
 export const getPublicBlogSchema = z.object({
@@ -43,7 +44,36 @@ export const getPublicPostSchema = z.object({
     .strict(),
 });
 
+export const getPublicPreviewPostSchema = z.object({
+  params: z
+    .object({
+      postId: z
+        .string()
+        .trim()
+        .refine((val) => ObjectId.isValid(val), {
+          message: 'Invalid mongodb objectid',
+        }),
+    })
+    .strict(),
+  query: z
+    .object({
+      blog: z.string().trim(),
+    })
+    .strict(),
+});
+
+export const getPublicCategoriesSchema = z.object({
+  query: z
+    .object({
+      blog: z.string().trim(),
+    })
+    .strict(),
+});
+
 export type GetPublicBlogQuery = z.infer<typeof getPublicBlogSchema>['query'];
 export type GetPublicPostsQuery = z.infer<typeof getPublicPostsSchema>['query'];
 export type GetPublicPostQuery = z.infer<typeof getPublicPostSchema>['query'];
 export type GetPublicPostParms = z.infer<typeof getPublicPostSchema>['params'];
+export type GetPublicCategoriesQuery = z.infer<typeof getPublicCategoriesSchema>['query'];
+export type GetPublicPreviewPostParms = z.infer<typeof getPublicPreviewPostSchema>['params'];
+export type GetPublicPreviewPostQuery = z.infer<typeof getPublicPreviewPostSchema>['query'];

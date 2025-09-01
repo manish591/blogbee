@@ -503,6 +503,35 @@ describe('POSTS', () => {
       });
     });
 
+    it("should return 409 conflict if user attempts to update post slug that already exists", async () => {
+      // create two posts
+      // updated one of the post with slug
+      // now try to update other post with same slug
+      const firstCreatedPost = await createPost(userId, blogId);
+      const firstCreatedPostId = firstCreatedPost.postId.toString();
+      const secondCreatedPost = await createPost(userId, blogId);
+      const secondCreatedPostId = secondCreatedPost.postId.toString();
+      const duplicateSlugEditData = {
+        slug: "this-is-duplicate-slug"
+      }
+      await editPost(firstCreatedPostId, duplicateSlugEditData);
+
+      const app = buildServer();
+      const res = await request(app)
+        .patch(`/v1/posts/${secondCreatedPostId}`)
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .set('Cookie', [cookie])
+        .send(duplicateSlugEditData);
+      const secondPostData = await getPostById(secondCreatedPostId);
+
+      expect(secondPostData?.slug).not.toBeDefined();
+      expect(res.status).toBe(409);
+      expect(res.body).toMatchObject({
+        message: 'Post slug is taken',
+      });
+    });
+
     it('should return 200 ok for successfully editing the post', async () => {
       const createdPost = await createPost(userId, blogId);
       const createdPostId = createdPost.postId.toString();

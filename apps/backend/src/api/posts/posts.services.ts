@@ -398,3 +398,18 @@ export async function removeCategoryFromPost(
     await session.endSession();
   }
 }
+
+export async function isPostSlugTaken(slug: string) {
+  try {
+    const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
+      slug
+    });
+    return res !== null;
+  } catch (err) {
+    logger.error('SERVER_ERROR: Internal server error occured', err);
+    throw new BlogbeeError(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      'Internal server error occured',
+    );
+  }
+}

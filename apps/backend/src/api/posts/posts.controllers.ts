@@ -21,6 +21,7 @@ import {
   getPosts,
   isPostContainsCategory,
   isPostOwnedByUser,
+  isPostSlugTaken,
   removeCategoryFromPost,
 } from './posts.services';
 
@@ -243,6 +244,20 @@ export async function editPostHandler(
     }
 
     const { postStatus, slug } = req.body;
+
+    if (slug) {
+      const isTaken = await isPostSlugTaken(slug);
+
+      if (isTaken) {
+        logger.error(
+          'CONFLICT_ERROR: Post slug is taken',
+        );
+        res
+          .status(StatusCodes.CONFLICT)
+          .json(new BlogbeeResponse('Post slug is taken'));
+        return;
+      }
+    }
 
     if (postStatus === PostStatus.PUBLISHED && !postData.slug && !slug) {
       logger.error(
