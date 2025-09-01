@@ -33,12 +33,16 @@ export default async function PostCategoriesPage({
                 return <PostCard key={post._id} postData={post} />;
               })}
             </div>
-            {postData.items.length > 0 && (
+            {postData.items.length > 0 ? (
               <div className="flex items-center justify-center mt-10">
                 <Button variant="outline" className="h-7 text-[0.8rem">
                   Load more
                   <ArrowRight />
                 </Button>
+              </div>
+            ) : (
+              <div>
+                <p className="text-xl text-foreground/70">Nothing here yet!</p>
               </div>
             )}
           </div>

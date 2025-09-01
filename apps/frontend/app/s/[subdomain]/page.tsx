@@ -12,10 +12,6 @@ export default async function BlogHomePage({
   const subdomain = (await params).subdomain;
   const blogData = await getBlogBySlug(subdomain);
 
-  if (!blogData) {
-    return null;
-  }
-
   return (
     <Layout blogData={blogData.blog}>
       <div className="py-24 max-w-7xl mx-auto px-8">

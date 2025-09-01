@@ -8,7 +8,7 @@ export function CategoriesList({
     <ul className="space-y-2">
       <li>
         <Link
-          href="#"
+          href="/"
           className="text-sm text-foreground/70 hover:text-foreground"
         >
           All

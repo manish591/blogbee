@@ -34,7 +34,7 @@ export function Header({ blogData }: Readonly<{ blogData: BlogData }>) {
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <PostSearch />
+          <PostSearch blogSlug={blogData.slug} />
           <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full">
             <Moon className="w-5 h-5" />
           </Button>

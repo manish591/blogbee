@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Bricolage_Grotesque } from 'next/font/google';
 import './globals.css';
+import Providers from './providers';
 
 const grostsque = Bricolage_Grotesque({
   variable: '--font-syne-sans',
@@ -20,7 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={grostsque.className}>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
