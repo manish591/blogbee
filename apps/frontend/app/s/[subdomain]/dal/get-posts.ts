@@ -6,6 +6,9 @@ export async function getPosts(blogSlug: string, options?: {
   category?: string
   query?: string
 }): Promise<{
+  currentPage: number,
+  totalItems: number,
+  totalPages: number,
   items: PostData[]
 }> {
   const url = new URL(`${API_URL}/v1/public/posts?blog=${blogSlug}`);
