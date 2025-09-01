@@ -1,8 +1,8 @@
 import { ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import type { PostData } from '@/app/(editor)/dal/get-post';
-import { convertDateToReadableFormat } from '@/lib/date';
 import Link from 'next/link';
+import type { PostData } from '@/app/(editor)/dal/get-post';
+import { Button } from '@/components/ui/button';
+import { convertDateToReadableFormat } from '@/lib/date';
 
 export function ArchivePostCard({
   postData,
