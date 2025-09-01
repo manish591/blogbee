@@ -1,8 +1,6 @@
-import { Moon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { BlogData } from '@/app/blogs/dal/get-all-blogs';
-import { Button } from '@/components/ui/button';
 import { PostSearch } from './post-search';
 
 export function Header({ blogData }: Readonly<{ blogData: BlogData }>) {
@@ -19,9 +17,9 @@ export function Header({ blogData }: Readonly<{ blogData: BlogData }>) {
               className="bg-secondary hidden"
             />
             <div className="flex items-center gap-2">
-              <span className="text-xl font-semibold capitalize">
+              <Link href="/" className="text-xl font-semibold capitalize">
                 {blogData.slug}
-              </span>
+              </Link>
             </div>
           </div>
           <nav className="hidden items-center gap-6">
@@ -35,9 +33,9 @@ export function Header({ blogData }: Readonly<{ blogData: BlogData }>) {
         </div>
         <div className="flex items-center gap-2">
           <PostSearch blogSlug={blogData.slug} />
-          <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full">
+          {/* <Button variant="ghost" size="icon" className="w-8 h-8 rounded-full">
             <Moon className="w-5 h-5" />
-          </Button>
+          </Button> */}
         </div>
       </div>
     </header>

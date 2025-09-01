@@ -139,7 +139,7 @@ export async function getPosts(
     const numDocsToReturn = limit;
     const totalItems = await db
       .collection<Posts>(POSTS_COLLECTION)
-      .countDocuments({ blogId: new ObjectId(blogId) });
+      .countDocuments({ blogId: new ObjectId(blogId), postStatus: PostStatus.PUBLISHED });
     const totalPages = Math.ceil(totalItems / limit);
     const currentPage = page;
 
@@ -152,6 +152,14 @@ export async function getPosts(
             $search: query,
           },
         }),
+        ...(options?.status && {
+          postStatus: options.status,
+        }),
+        ...(options?.categories && {
+          'categories.name': {
+            $in: options.categories.split(','),
+          },
+        })
       })
       .skip(docsToSkip)
       .limit(numDocsToReturn);
@@ -162,22 +170,6 @@ export async function getPosts(
       } else if (options.sort === 'oldest') {
         cursor.sort({ updatedAt: 1 });
       }
-    }
-
-    if (options?.categories) {
-      const filteredCategories = options.categories.split(',');
-
-      cursor.filter({
-        'categories.name': {
-          $in: filteredCategories,
-        },
-      });
-    }
-
-    if (options?.status) {
-      cursor.filter({
-        postStatus: options.status,
-      });
     }
 
     const res = await cursor.toArray();

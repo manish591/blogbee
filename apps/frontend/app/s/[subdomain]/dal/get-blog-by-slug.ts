@@ -1,14 +1,8 @@
 import 'server-only';
-import type { PostData } from '@/app/(editor)/dal/get-post';
 import type { BlogData } from '@/app/blogs/dal/get-all-blogs';
-import type { CategoriesData } from '@/app/blogs/dal/get-all-categories';
 import { API_URL } from '@/constants';
 
-export async function getBlogBySlug(slug: string): Promise<{
-  blog: BlogData;
-  posts: PostData[];
-  categories: CategoriesData[];
-}> {
+export async function getBlogBySlug(slug: string): Promise<BlogData> {
   const res = await fetch(`${API_URL}/v1/public/blogs?blog=${slug}`, {
     method: 'GET',
   });

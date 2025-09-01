@@ -5,6 +5,7 @@ import { CategoriesList } from '../../components/categories-list';
 import { PostCard } from '../../components/post-card';
 import { getBlogBySlug } from '../../dal/get-blog-by-slug';
 import { getPosts } from '../../dal/get-posts';
+import { getCategories } from '../../dal/get-categories';
 
 export default async function PostCategoriesPage({
   params,
@@ -12,12 +13,13 @@ export default async function PostCategoriesPage({
   const subdomain = (await params).subdomain;
   const categorySlug = (await params).slug;
   const blogData = await getBlogBySlug(subdomain);
-  const postData = await getPosts(subdomain, {
+  const postsData = await getPosts(subdomain, {
     category: categorySlug,
   });
+  const categoriesData = await getCategories(subdomain);
 
   return (
-    <Layout blogData={blogData.blog}>
+    <Layout blogData={blogData}>
       <div className="py-24 max-w-7xl mx-auto px-8">
         <div className="flex-1">
           <div className="mb-12">
@@ -29,11 +31,11 @@ export default async function PostCategoriesPage({
         <div className="grid grid-cols-[minmax(0,1fr)_360px] gap-12">
           <div>
             <div className="space-y-10">
-              {postData.items.map((post) => {
+              {postsData.items.map((post) => {
                 return <PostCard key={post._id} postData={post} />;
               })}
             </div>
-            {postData.items.length > 0 ? (
+            {postsData.items.length > 0 ? (
               <div className="flex items-center justify-center mt-10">
                 <Button variant="outline" className="h-7 text-[0.8rem">
                   Load more
@@ -49,7 +51,7 @@ export default async function PostCategoriesPage({
           <aside className="w-64 space-y-8 py-2">
             <div>
               <h3 className="text-lg font-semibold mb-4">Categories</h3>
-              <CategoriesList categoriesData={blogData.categories} />
+              <CategoriesList categoriesData={categoriesData} />
             </div>
           </aside>
         </div>

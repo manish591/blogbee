@@ -13,7 +13,7 @@ export default async function BlogArchivesPage({
   const postsData = await getPosts(subdomain);
 
   return (
-    <Layout blogData={blogData.blog}>
+    <Layout blogData={blogData}>
       <div className="py-24 max-w-7xl mx-auto px-8">
         <div className="flex-1">
           <div className="mb-12">
@@ -27,28 +27,30 @@ export default async function BlogArchivesPage({
             return <ArchivePostCard key={post._id} postData={post} />;
           })}
         </div>
-        <div className="mt-12 flex items-center justify-center">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              className="h-7 text-sm"
-              disabled={postsData.currentPage === 1}
-            >
-              <ChevronLeft className="mb-[1px]" />
-              Previous
-            </Button>
-            <p className="text-sm text-foreground/60">
-              Page {postsData.currentPage} of {postsData.totalPages}
-            </p>
-            <Button
-              variant="ghost"
-              className="h-7 text-sm"
-              disabled={postsData.currentPage === postsData.totalPages}
-            >
-              Next <ChevronRight />
-            </Button>
+        {postsData.totalPages > 1 && (
+          <div className="mt-12 flex items-center justify-center">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                className="h-7 text-sm"
+                disabled={postsData.currentPage === 1}
+              >
+                <ChevronLeft className="mb-[1px]" />
+                Previous
+              </Button>
+              <p className="text-sm text-foreground/60">
+                Page {postsData.currentPage} of {postsData.totalPages}
+              </p>
+              <Button
+                variant="ghost"
+                className="h-7 text-sm"
+                disabled={postsData.currentPage === postsData.totalPages}
+              >
+                Next <ChevronRight />
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </Layout>
   );

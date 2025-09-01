@@ -11,7 +11,7 @@ export function Footer({ blogData }: Readonly<{ blogData: BlogData }>) {
           <Link href="/" className="text-xl font-medium capitalize">
             {blogData.slug}
           </Link>
-          <div className="flex items-center space-x-4">
+          <div className="hidden items-center space-x-4">
             <Link
               href="#"
               className="text-foreground/70 hover:text-foreground transition-colors"
@@ -66,19 +66,22 @@ export function Footer({ blogData }: Readonly<{ blogData: BlogData }>) {
             Archive
           </Link>
           <Link
-            href="/terms"
+            href={`${PROTOCOL}://${DOMAIN_NAME}/terms-and-conditions`}
+            target="_blank"
             className="text-foreground/70 hover:text-foreground transition-colors text-sm"
           >
             Terms
           </Link>
           <Link
-            href="/privacy"
+            href={`${PROTOCOL}://${DOMAIN_NAME}/privacy-policy`}
+            target="_blank"
             className="text-foreground/70 hover:text-foreground transition-colors text-sm"
           >
             Privacy
           </Link>
           <Link
             href={`${PROTOCOL}://${DOMAIN_NAME}`}
+            target="_blank"
             className="border inline-block p-[3px] px-2 rounded-md bg-accent/70"
           >
             <p className="text-[0.8rem] text-foreground/70">
