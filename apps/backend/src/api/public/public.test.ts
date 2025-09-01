@@ -2,11 +2,11 @@ import { beforeEach } from 'node:test';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { buildServer } from '../../app';
+import { PostStatus } from '../../db/schema';
 import { createBlog } from '../blogs/blogs.services';
 import { createCategory } from '../categories/categories.services';
 import { createPost, deletePost, editPost } from '../posts/posts.services';
 import { createUser } from '../users/users.services';
-import { PostStatus } from '../../db/schema';
 
 describe('PUBLIC API', () => {
   let userId: string;
@@ -61,7 +61,7 @@ describe('PUBLIC API', () => {
           name: blogData.name,
           slug: blogData.slug,
           about: blogData.about,
-        })
+        }),
       });
     });
   });
@@ -91,8 +91,8 @@ describe('PUBLIC API', () => {
       const createdPost = await createPost(userId, createdBlogId);
       const createdPostId = createdPost.postId.toString();
       editPost(createdPostId, {
-        slug: "new-slug",
-        postStatus: PostStatus.PUBLISHED
+        slug: 'new-slug',
+        postStatus: PostStatus.PUBLISHED,
       });
 
       const app = buildServer();
@@ -132,7 +132,7 @@ describe('PUBLIC API', () => {
       const archivedPost = await createPost(userId, createdBlogId);
       const archivedPostId = await archivedPost.postId.toString();
       await editPost(publishedPostId, {
-        postStatus: PostStatus.PUBLISHED
+        postStatus: PostStatus.PUBLISHED,
       });
       await deletePost(archivedPostId);
 
@@ -182,7 +182,7 @@ describe('PUBLIC API', () => {
       });
     });
 
-    it("should return 404 not found if user passed blog slug of unpublished post", async () => {
+    it('should return 404 not found if user passed blog slug of unpublished post', async () => {
       const blogData = {
         name: 'update blog title',
         slug: 'update-blog-title',
@@ -193,8 +193,8 @@ describe('PUBLIC API', () => {
       const createdPost = await createPost(userId, createdBlogId);
       const createdPostId = createdPost.postId.toString();
       const editPostData = {
-        slug: "draft-slug"
-      }
+        slug: 'draft-slug',
+      };
       await editPost(createdPostId, editPostData);
 
       const app = buildServer();
@@ -204,7 +204,7 @@ describe('PUBLIC API', () => {
 
       expect(res.status).toBe(404);
       expect(res.body).toMatchObject({
-        message: "Post not found"
+        message: 'Post not found',
       });
     });
 
@@ -221,7 +221,7 @@ describe('PUBLIC API', () => {
       const postSlug = 'new-slug';
       editPost(createdPostId, {
         slug: postSlug,
-        postStatus: PostStatus.PUBLISHED
+        postStatus: PostStatus.PUBLISHED,
       });
 
       const app = buildServer();
@@ -229,7 +229,7 @@ describe('PUBLIC API', () => {
         `/v1/public/posts/${postSlug}?blog=${blogData.slug}`,
       );
 
-      console.log("the data", res.body);
+      console.log('the data', res.body);
 
       expect(res.status).toBe(200);
       expect(res.body).toMatchObject({
@@ -238,7 +238,7 @@ describe('PUBLIC API', () => {
           title: 'untitled',
           slug: postSlug,
           categories: [],
-        })
+        }),
       });
     });
   });
@@ -278,7 +278,7 @@ describe('PUBLIC API', () => {
       });
     });
 
-    it("should return 404 not found if user passed blog slug of archived post", async () => {
+    it('should return 404 not found if user passed blog slug of archived post', async () => {
       const blogData = {
         name: 'update blog title',
         slug: 'update-blog-title',
@@ -297,7 +297,7 @@ describe('PUBLIC API', () => {
 
       expect(res.status).toBe(404);
       expect(res.body).toMatchObject({
-        message: "Post not found"
+        message: 'Post not found',
       });
     });
 
@@ -323,7 +323,7 @@ describe('PUBLIC API', () => {
         data: expect.objectContaining({
           title: 'untitled',
           categories: [],
-        })
+        }),
       });
     });
   });

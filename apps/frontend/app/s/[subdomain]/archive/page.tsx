@@ -1,9 +1,9 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ArchivePostCard } from './archive-post-card';
 import { Layout } from '../components/blog-layout';
 import { getBlogBySlug } from '../dal/get-blog-by-slug';
 import { getPosts } from '../dal/get-posts';
+import { ArchivePostCard } from './archive-post-card';
 
 export default async function BlogArchivesPage({
   params,

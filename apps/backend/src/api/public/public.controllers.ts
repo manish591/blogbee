@@ -1,19 +1,29 @@
 import type { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { PostStatus } from '../../db/schema';
 import { BlogbeeResponse } from '../../utils/api-response';
 import { logger } from '../../utils/logger';
 import { getBlogBySlug } from '../blogs/blogs.services';
 import { getCategories } from '../categories/categories.services';
 import { getPostById, getPostBySlug, getPosts } from '../posts/posts.services';
-import type { GetPublicBlogQuery, GetPublicPostParms, GetPublicPostQuery, GetPublicPostsQuery, GetPublicPreviewPostParms, GetPublicPreviewPostQuery } from './public.schema';
-import { PostStatus } from '../../db/schema';
+import type {
+  GetPublicBlogQuery,
+  GetPublicPostParms,
+  GetPublicPostQuery,
+  GetPublicPostsQuery,
+  GetPublicPreviewPostParms,
+  GetPublicPreviewPostQuery,
+} from './public.schema';
 
-export async function getPublicBlogDetailsHandler(req: Request<
-  Record<string, unknown>,
-  Record<string, unknown>,
-  Record<string, unknown>,
-  GetPublicBlogQuery
->, res: Response) {
+export async function getPublicBlogDetailsHandler(
+  req: Request<
+    Record<string, unknown>,
+    Record<string, unknown>,
+    Record<string, unknown>,
+    GetPublicBlogQuery
+  >,
+  res: Response,
+) {
   try {
     const blogSlug = req.query.blog;
     const blogData = await getBlogBySlug(blogSlug);
@@ -26,10 +36,12 @@ export async function getPublicBlogDetailsHandler(req: Request<
       return;
     }
 
-    logger.info('GET_PUBLIC_BLOG_DATA_SUCCESS: Blog data retrieved successfully');
-    res.status(StatusCodes.OK).json(
-      new BlogbeeResponse('Blog data retrieved successfully', blogData),
+    logger.info(
+      'GET_PUBLIC_BLOG_DATA_SUCCESS: Blog data retrieved successfully',
     );
+    res
+      .status(StatusCodes.OK)
+      .json(new BlogbeeResponse('Blog data retrieved successfully', blogData));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
@@ -70,14 +82,14 @@ export async function getPublicPostsListHandler(
       limit,
       page,
       categories: category,
-      status: PostStatus.PUBLISHED
+      status: PostStatus.PUBLISHED,
     });
 
     logger.info('SUCCESS: Posts list fetched successfully');
 
-    res.status(StatusCodes.OK).json(
-      new BlogbeeResponse('Posts list fetched successfully', postsData),
-    );
+    res
+      .status(StatusCodes.OK)
+      .json(new BlogbeeResponse('Posts list fetched successfully', postsData));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
@@ -86,12 +98,15 @@ export async function getPublicPostsListHandler(
   }
 }
 
-export async function getPublicPostDetailsHandler(req: Request<
-  GetPublicPostParms,
-  Record<string, unknown>,
-  Record<string, unknown>,
-  GetPublicPostQuery
->, res: Response) {
+export async function getPublicPostDetailsHandler(
+  req: Request<
+    GetPublicPostParms,
+    Record<string, unknown>,
+    Record<string, unknown>,
+    GetPublicPostQuery
+  >,
+  res: Response,
+) {
   try {
     const blogSlug = req.query.blog;
     const blogData = await getBlogBySlug(blogSlug);
@@ -108,7 +123,11 @@ export async function getPublicPostDetailsHandler(req: Request<
     const postSlug = req.params.postSlug;
     const postData = await getPostBySlug(postSlug);
 
-    if (!postData || postData.postStatus === PostStatus.DRAFT || postData.postStatus === PostStatus.ARCHIVED) {
+    if (
+      !postData ||
+      postData.postStatus === PostStatus.DRAFT ||
+      postData.postStatus === PostStatus.ARCHIVED
+    ) {
       logger.error('NOT_FOUND_ERROR: Post not found');
       res
         .status(StatusCodes.NOT_FOUND)
@@ -130,9 +149,9 @@ export async function getPublicPostDetailsHandler(req: Request<
       return;
     }
 
-    res.status(StatusCodes.OK).json(
-      new BlogbeeResponse('Post details fetched successfully', postData),
-    );
+    res
+      .status(StatusCodes.OK)
+      .json(new BlogbeeResponse('Post details fetched successfully', postData));
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
@@ -141,12 +160,15 @@ export async function getPublicPostDetailsHandler(req: Request<
   }
 }
 
-export async function getPublicPreviewPostHandler(req: Request<
-  GetPublicPreviewPostParms,
-  Record<string, unknown>,
-  Record<string, unknown>,
-  GetPublicPreviewPostQuery
->, res: Response) {
+export async function getPublicPreviewPostHandler(
+  req: Request<
+    GetPublicPreviewPostParms,
+    Record<string, unknown>,
+    Record<string, unknown>,
+    GetPublicPreviewPostQuery
+  >,
+  res: Response,
+) {
   try {
     const blogSlug = req.query.blog;
     const blogData = await getBlogBySlug(blogSlug);
@@ -185,9 +207,14 @@ export async function getPublicPreviewPostHandler(req: Request<
       return;
     }
 
-    res.status(StatusCodes.OK).json(
-      new BlogbeeResponse('Post preview details fetched successfully', postData),
-    );
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new BlogbeeResponse(
+          'Post preview details fetched successfully',
+          postData,
+        ),
+      );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res
@@ -212,9 +239,11 @@ export async function getPublicCategoriesHandler(req: Request, res: Response) {
     const blogId = blogData._id.toString();
     const allCategories = await getCategories(blogId);
 
-    res.status(StatusCodes.OK).json(
-      new BlogbeeResponse('Categories fetched successfully', allCategories),
-    );
+    res
+      .status(StatusCodes.OK)
+      .json(
+        new BlogbeeResponse('Categories fetched successfully', allCategories),
+      );
   } catch (err) {
     logger.error('SERVER_ERROR: Internal server error occured', err);
     res

@@ -1,10 +1,10 @@
 import { ArrowRight } from 'lucide-react';
-import { getBlogBySlug } from '../../dal/get-blog-by-slug';
-import { getPosts } from '../../dal/get-posts';
+import { Button } from '@/components/ui/button';
 import { Layout } from '../../components/blog-layout';
 import { CategoriesList } from '../../components/categories-list';
 import { PostCard } from '../../components/post-card';
-import { Button } from '@/components/ui/button';
+import { getBlogBySlug } from '../../dal/get-blog-by-slug';
+import { getPosts } from '../../dal/get-posts';
 
 export default async function PostCategoriesPage({
   params,

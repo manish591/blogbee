@@ -1,10 +1,10 @@
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { PostCard } from './components/post-card';
-import { getBlogBySlug } from './dal/get-blog-by-slug';
 import { Layout } from './components/blog-layout';
 import { CategoriesList } from './components/categories-list';
+import { PostCard } from './components/post-card';
+import { getBlogBySlug } from './dal/get-blog-by-slug';
 
 export default async function BlogHomePage({
   params,

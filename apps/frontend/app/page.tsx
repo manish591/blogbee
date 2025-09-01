@@ -1,5 +1,6 @@
 import { ArrowRight, FileText, Home } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import { FaqsSection } from '@/components/web/faqs-section';
 import { FeaturesSection } from '@/components/web/features-section';
 import { Footer } from '@/components/web/footer';
@@ -7,7 +8,6 @@ import { Header } from '@/components/web/header';
 import { HeroSection } from '@/components/web/hero-section';
 import { HowItWorksSection } from '@/components/web/how-it-works-section';
 import { Logo } from '@/components/web/logo';
-import { Button } from '@/components/ui/button';
 
 export default async function Page() {
   return (

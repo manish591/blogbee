@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import type { PostData } from '@/app/(editor)/dal/get-post';
-import { cn } from '@/lib/utils';
 import { convertDateToReadableFormat } from '@/lib/date';
+import { cn } from '@/lib/utils';
 
 export function PostCard({
   isFeatured,

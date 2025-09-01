@@ -503,7 +503,7 @@ describe('POSTS', () => {
       });
     });
 
-    it("should return 409 conflict if user attempts to update post slug that already exists", async () => {
+    it('should return 409 conflict if user attempts to update post slug that already exists', async () => {
       // create two posts
       // updated one of the post with slug
       // now try to update other post with same slug
@@ -512,8 +512,8 @@ describe('POSTS', () => {
       const secondCreatedPost = await createPost(userId, blogId);
       const secondCreatedPostId = secondCreatedPost.postId.toString();
       const duplicateSlugEditData = {
-        slug: "this-is-duplicate-slug"
-      }
+        slug: 'this-is-duplicate-slug',
+      };
       await editPost(firstCreatedPostId, duplicateSlugEditData);
 
       const app = buildServer();

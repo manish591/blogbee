@@ -402,7 +402,7 @@ export async function removeCategoryFromPost(
 export async function isPostSlugTaken(slug: string) {
   try {
     const res = await db.collection<Posts>(POSTS_COLLECTION).findOne({
-      slug
+      slug,
     });
     return res !== null;
   } catch (err) {

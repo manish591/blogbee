@@ -1,7 +1,6 @@
 import { CircleHelp, LayoutDashboard, Settings, UserIcon } from 'lucide-react';
 import Link from 'next/link';
 import type { User } from '@/app/(auth)/dal/verify-session';
-import { ProfileAvatar } from '@/components/web/profile-avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ProfileAvatar } from '@/components/web/profile-avatar';
 import { LogoutButton } from './signout-button';
 
 export function ProfileDropdown({ user }: Readonly<{ user: User }>) {

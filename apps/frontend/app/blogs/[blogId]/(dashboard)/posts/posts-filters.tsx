@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { Check, Filter } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -10,7 +11,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 export type PostSortFilterValues = 'latest' | 'oldest';
 export type PostStatusFilterValues = 'draft' | 'published' | 'archived';

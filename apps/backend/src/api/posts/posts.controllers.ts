@@ -249,9 +249,7 @@ export async function editPostHandler(
       const isTaken = await isPostSlugTaken(slug);
 
       if (isTaken) {
-        logger.error(
-          'CONFLICT_ERROR: Post slug is taken',
-        );
+        logger.error('CONFLICT_ERROR: Post slug is taken');
         res
           .status(StatusCodes.CONFLICT)
           .json(new BlogbeeResponse('Post slug is taken'));

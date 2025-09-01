@@ -4,9 +4,9 @@ import type { BlogData } from '@/app/blogs/dal/get-all-blogs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { BASE_URL, DOMAIN_NAME } from '@/constants';
 import { convertDateToReadableFormat } from '@/lib/date';
 import { cn } from '@/lib/utils';
-import { BASE_URL, DOMAIN_NAME } from '@/constants';
 
 export function BlogCard({
   data,

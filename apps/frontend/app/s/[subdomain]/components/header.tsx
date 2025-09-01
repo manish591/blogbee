@@ -1,9 +1,9 @@
 import { Moon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { BlogData } from '@/app/blogs/dal/get-all-blogs';
 import { Button } from '@/components/ui/button';
 import { PostSearch } from './post-search';
-import type { BlogData } from '@/app/blogs/dal/get-all-blogs';
 
 export function Header({ blogData }: Readonly<{ blogData: BlogData }>) {
   return (

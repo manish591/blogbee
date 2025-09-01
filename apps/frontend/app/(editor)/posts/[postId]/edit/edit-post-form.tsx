@@ -1,8 +1,11 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { type EditPostData, editPost } from '@/app/(editor)/actions/edit-post';
+import type { PostData } from '@/app/(editor)/dal/get-post';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -13,9 +16,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import type { PostData } from '@/app/(editor)/dal/get-post';
-import { editPost, type EditPostData } from '@/app/(editor)/actions/edit-post';
-import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   slug: z.string().max(30),

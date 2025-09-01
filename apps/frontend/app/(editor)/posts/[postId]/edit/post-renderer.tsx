@@ -6,7 +6,6 @@ import { useState } from 'react';
 import type { PostData } from '@/app/(editor)/dal/get-post';
 import { PostSettingsForm } from '@/app/(editor)/posts/[postId]/edit/edit-post-form';
 import type { BlogData } from '@/app/blogs/dal/get-all-blogs';
-import { BackButton } from '@/components/web/back-button';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -16,9 +15,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { BackButton } from '@/components/web/back-button';
+import { BASE_URL, DOMAIN_NAME } from '@/constants';
 import { PostEditIndicator } from './post-edit-indicator';
 import { PostEditor } from './postEditor';
-import { BASE_URL, DOMAIN_NAME } from '@/constants';
 
 export function PostRenderer({
   postData,

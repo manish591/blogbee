@@ -74,6 +74,12 @@ export type GetPublicBlogQuery = z.infer<typeof getPublicBlogSchema>['query'];
 export type GetPublicPostsQuery = z.infer<typeof getPublicPostsSchema>['query'];
 export type GetPublicPostQuery = z.infer<typeof getPublicPostSchema>['query'];
 export type GetPublicPostParms = z.infer<typeof getPublicPostSchema>['params'];
-export type GetPublicCategoriesQuery = z.infer<typeof getPublicCategoriesSchema>['query'];
-export type GetPublicPreviewPostParms = z.infer<typeof getPublicPreviewPostSchema>['params'];
-export type GetPublicPreviewPostQuery = z.infer<typeof getPublicPreviewPostSchema>['query'];
+export type GetPublicCategoriesQuery = z.infer<
+  typeof getPublicCategoriesSchema
+>['query'];
+export type GetPublicPreviewPostParms = z.infer<
+  typeof getPublicPreviewPostSchema
+>['params'];
+export type GetPublicPreviewPostQuery = z.infer<
+  typeof getPublicPreviewPostSchema
+>['query'];

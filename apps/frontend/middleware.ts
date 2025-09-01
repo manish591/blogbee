@@ -50,7 +50,9 @@ export default async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/', request.url));
     }
 
-    return NextResponse.rewrite(new URL(`/s/${subdomain}${pathname}`, request.url));
+    return NextResponse.rewrite(
+      new URL(`/s/${subdomain}${pathname}`, request.url),
+    );
   }
 
   // On the root domain, allow normal access
@@ -65,6 +67,6 @@ export const config = {
      * 2. /_next (Next.js internals)
      * 3. all root files inside /public (e.g. /favicon.ico)
      */
-    '/((?!api|_next|[\\w-]+\\.\\w+).*)'
-  ]
+    '/((?!api|_next|[\\w-]+\\.\\w+).*)',
+  ],
 };

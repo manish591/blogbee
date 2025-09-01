@@ -32,7 +32,15 @@ router.get(
   validateRequest(getPublicPostSchema),
   getPublicPostDetailsHandler,
 );
-router.get('/preview/:postId', validateRequest(getPublicPreviewPostSchema), getPublicPreviewPostHandler);
-router.get('/categories', validateRequest(getPublicCategoriesSchema), getPublicCategoriesHandler);
+router.get(
+  '/preview/:postId',
+  validateRequest(getPublicPreviewPostSchema),
+  getPublicPreviewPostHandler,
+);
+router.get(
+  '/categories',
+  validateRequest(getPublicCategoriesSchema),
+  getPublicCategoriesHandler,
+);
 
 export { router as publiRoutes };

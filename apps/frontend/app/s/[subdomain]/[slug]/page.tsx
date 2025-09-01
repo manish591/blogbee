@@ -1,9 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { convertDateToReadableFormat } from '@/lib/date';
+import { Layout } from '../components/blog-layout';
 import { getBlogBySlug } from '../dal/get-blog-by-slug';
 import { getPostBySlug } from '../dal/get-post-by-slug';
-import { Layout } from '../components/blog-layout';
-import { convertDateToReadableFormat } from '@/lib/date';
 
 export default async function PostPage({
   params,
