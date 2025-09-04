@@ -1,15 +1,14 @@
 services:
-  writely-db:
+  blogbee-db:
       image: mongo
       ports:
         - 27017:27017
       volumes:
         - mongodb-data:/data/db
-  writely-backend:
+  blogbee-backend:
     build:
       context: ./apps/backend
       dockerfile: Dockerfile
-      target: development
     ports:
       - 8000:8000
     volumes:
@@ -18,12 +17,13 @@ services:
     env_file:
       - ./apps/backend/.env
     environment:
-      - DATABASE_URL=mongodb://writely-db:27017/
-  writely-frontend:
+      - DATABASE_URL=mongodb://blogbee-db:27017/
+    depends_on:
+      - blogbee-db
+  blogbee-frontend:
     build:
       context: ./apps/frontend
       dockerfile: Dockerfile
-      target: development
     ports:
       - 3000:3000
     volumes:
@@ -32,7 +32,7 @@ services:
     env_file:
       - ./apps/frontend/.env
     depends_on: 
-      - backend
+      - blogbee-backend
 
 volumes:
   mongodb-data:

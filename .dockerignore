@@ -1,5 +1,29 @@
-**/*.env
+# dependencies
+node_modules
 **/node_modules
-.git/
-out/
-dist/
+npm-debug.log
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# env files
+.env
+.env.* 
+**/*.env
+
+# build outputs
+.next
+out
+dist
+build
+.turbo
+.cache
+
+# git + editor stuff
+.git
+.gitignore
+.DS_Store
+*.swp
+.idea
+.vscode
+coverage

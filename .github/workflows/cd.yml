@@ -1,0 +1,28 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+jobs: 
+  build-image-and-deply:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      
+      - name: Install pnpm
+        run: npm install pnpm -g
+      
+      - name: Install Dependencies
+        run: pnpm i
+
+      - name: Build Code
+        run: pnpm run build
+      
