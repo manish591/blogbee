@@ -45,11 +45,6 @@ export default async function middleware(request: NextRequest) {
   const subdomain = extractSubdomain(request);
 
   if (subdomain) {
-    // Block access to admin page from subdomains
-    if (pathname.startsWith('/login')) {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
-
     return NextResponse.rewrite(
       new URL(`/s/${subdomain}${pathname}`, request.url),
     );
