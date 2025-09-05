@@ -6,7 +6,7 @@ services:
       volumes:
         - mongodb-data:/data/db
   blogbee-backend:
-    image: ghcr.io/manish591/blogbee/backend:latest
+    image: ghcr.io/manish591/blogbee-backend
     ports:
       - 8000:8000
     environment:
@@ -14,7 +14,7 @@ services:
     depends_on:
       - blogbee-db
   blogbee-frontend:
-    image: ghcr.io/manish591/blogbee/frontend:latest
+    image: ghcr.io/manish591/blogbee-frontend
     ports:
       - 3000:3000
     depends_on: 

@@ -46,7 +46,9 @@ jobs:
           context: .
           file: ./apps/frontend/Dockerfile
           push: true
-          tags: ghcr.io/manish591/blogbee-frontend:${{ needs.commit-hash.outputs.commit-hash }}
+          tags: |
+            ghcr.io/manish591/blogbee-frontend:${{ needs.commit-hash.outputs.commit-hash }}
+            ghcr.io/manish591/blogbee-frontend:latest
 
       - name: Build and Push Backend Docker Image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
@@ -54,5 +56,8 @@ jobs:
           context: .
           file: ./apps/backend/Dockerfile
           push: true
-          tags: ghcr.io/manish591/blogbee-backend:${{ needs.commit-hash.outputs.commit-hash }}
+          tags: |
+            ghcr.io/manish591/blogbee-backend:${{ needs.commit-hash.outputs.commit-hash }}
+            ghcr.io/manish591/blogbee-backend:latest
+
       
