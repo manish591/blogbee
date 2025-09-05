@@ -1,24 +1,46 @@
 services:
+  reverse-proxy:
+    image: traefik:v3.5
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
   blogbee-db:
       image: mongo
-      ports:
-        - 27017:27017
       volumes:
         - mongodb-data:/data/db
+      healthcheck:
+        test: ["CMD-SHELL", "mongosh --eval 'db.adminCommand(\"ping\")' || exit 1"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
   blogbee-backend:
     image: ghcr.io/manish591/blogbee-backend
-    ports:
-      - 8000:8000
+    labels:
+      - "traefik.http.routers.blogbee-backend.rule=HOST(`api.blogbee.site`)"
     environment:
+      - LOG_LEVEL=info
+      - NODE_ENV=production
       - DB_URL=mongodb://blogbee-db:27017/
     depends_on:
-      - blogbee-db
+      blogbee-db:
+        condition: service_healthy
   blogbee-frontend:
     image: ghcr.io/manish591/blogbee-frontend
-    ports:
-      - 3000:3000
+    labels:
+      - "traefik.http.routers.blogbee-frontend.rule=HOST(`blogbee.site`)"
     depends_on: 
       - blogbee-backend
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_BASE_URL=https://blogbee.site
+      - NEXT_PUBLIC_API_URL=https://api.blogbee.site
+      - NEXT_PUBLIC_DOMAIN_NAME=blogbee.site
 
 volumes:
   mongodb-data:
