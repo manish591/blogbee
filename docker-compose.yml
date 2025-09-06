@@ -29,8 +29,7 @@ services:
       - NODE_ENV=production
       - DB_URL=mongodb://blogbee-db:27017/
     depends_on:
-      blogbee-db:
-        condition: service_healthy
+      - blogbee-db
   blogbee-frontend:
     image: ghcr.io/manish591/blogbee-frontend
     depends_on: 
