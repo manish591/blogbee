@@ -12,7 +12,6 @@ services:
     depends_on:
       - blogbee-frontend
       - blogbee-backend
-    restart: unless-stopped
   blogbee-db:
       image: mongo
       volumes:
@@ -30,10 +29,16 @@ services:
       - DB_URL=mongodb://blogbee-db:27017/
     depends_on:
       - blogbee-db
+    deploy:
+      update_config:
+        order: start-first
   blogbee-frontend:
     image: ghcr.io/manish591/blogbee-frontend
     depends_on: 
       - blogbee-backend
+    deploy:
+      update_config:
+        order: start-first
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_BASE_URL=https://blogbee.site
