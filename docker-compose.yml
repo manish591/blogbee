@@ -1,26 +1,14 @@
 services:
-  reverse-proxy:
-    image: nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - /etc/ssl/cert.pem:/etc/ssl/cert.pem:ro
-      - /etc/ssl/key.pem:/etc/ssl/key.pem:ro
-      - /etc/ssl/cloudflare.crt:/etc/ssl/cloudflare.crt:ro
-    depends_on:
-      - blogbee-frontend
-      - blogbee-backend
   blogbee-db:
-      image: mongo
-      volumes:
-        - mongodb-data:/data/db
-      healthcheck:
-        test: ["CMD-SHELL", "mongosh --eval 'db.adminCommand(\"ping\")' || exit 1"]
-        interval: 10s
-        timeout: 5s
-        retries: 5
+    image: mongo
+    volumes:
+      - mongodb-data:/data/db
+    healthcheck:
+      test:
+        ["CMD-SHELL", 'mongosh --eval ''db.adminCommand("ping")'' || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 5
   blogbee-backend:
     image: ghcr.io/manish591/blogbee-backend
     environment:
@@ -34,7 +22,7 @@ services:
         order: start-first
   blogbee-frontend:
     image: ghcr.io/manish591/blogbee-frontend
-    depends_on: 
+    depends_on:
       - blogbee-backend
     deploy:
       update_config:
