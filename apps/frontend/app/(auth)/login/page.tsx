@@ -14,15 +14,15 @@ export default async function LoginPage() {
   }
 
   return (
-    <div className="h-screen grid grid-cols-2">
+    <div className="h-screen grid grid-cols-1 sm:grid-cols-2">
       <div className="w-full h-full flex justify-center items-center">
-        <BackButton className="border absolute top-[30px] left-[30px] px-4 shadow-none cursor-pointer">
+        <BackButton className="border absolute top-[30px] left-4 sm:left-[30px] px-4 shadow-none cursor-pointer">
           <span>
             <ArrowLeft className="w-4 h-4" />
           </span>{' '}
           Back
         </BackButton>
-        <div className="w-full">
+        <div className="w-full px-4 sm:px-0">
           <div className="max-w-sm mx-auto">
             <section className="mb-6">
               <h1 className="text-2xl font-medium">Welcome to Blogbee</h1>
@@ -43,7 +43,7 @@ export default async function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="w-full h-full p-2">
+      <div className="w-full h-full p-2 hidden sm:block">
         <div className="relative w-full h-full rounded-md bg-black/90">
           <Image
             src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1755607989/krisjanis-kazaks-bRB_9zllVN4-unsplash_fov1wv.jpg"

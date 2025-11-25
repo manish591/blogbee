@@ -12,6 +12,7 @@ export function BackButton({
 
   return (
     <Button
+      size="sm"
       variant="outline"
       className={cn('cursor-pointer', className)}
       onClick={() => {

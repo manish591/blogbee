@@ -14,9 +14,9 @@ export default async function SignupPage() {
   }
 
   return (
-    <div className="h-screen grid grid-cols-2">
-      <div className="w-full h-full flex justify-center items-center">
-        <BackButton className="border absolute top-[30px] left-[30px] px-4 shadow-none cursor-pointer">
+    <div className="h-screen grid grid-cols-1 sm:grid-cols-2">
+      <div className="w-full h-full flex justify-center items-center px-4 sm:px-0">
+        <BackButton className="border absolute top-[30px] left-4 sm:left-[30px] px-4 shadow-none cursor-pointer">
           <span>
             <ArrowLeft className="w-4 h-4" />
           </span>{' '}
@@ -43,7 +43,7 @@ export default async function SignupPage() {
           </div>
         </div>
       </div>
-      <div className="w-full h-full p-2">
+      <div className="w-full h-full p-2 hidden sm:block">
         <div className="relative w-full h-full rounded-md bg-black/90">
           <Image
             src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1755607989/krisjanis-kazaks-bRB_9zllVN4-unsplash_fov1wv.jpg"
