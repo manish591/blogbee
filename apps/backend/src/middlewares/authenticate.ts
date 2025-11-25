@@ -13,6 +13,8 @@ export async function authenticate(
     const cookie = req.cookies;
     const sessionId: string | undefined = cookie.sessionId;
 
+    console.log("the cookies", cookie, " sessionid", sessionId);
+
     if (!sessionId) {
       logger.error(
         'UNAUTHORIZED_ERROR: Authorization cookies not found in the request',
