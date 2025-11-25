@@ -26,9 +26,11 @@ export const verifySession = cache(
         Cookie: cookieHeader,
       },
     });
+
     const data = await res.json();
 
     if (!res.ok) {
+      console.log("the response", res);
       console.log('AUTHORIZATION_FAILED_ERROR: Failed to verify user');
       return null;
     }
