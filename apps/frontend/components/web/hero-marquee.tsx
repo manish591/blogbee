@@ -102,7 +102,7 @@ export function HeroMarquee() {
                   size="sm"
                   className="flex-1 bg-transparent"
                 >
-                  <ExternalLink className="mr-2 h-3 w-3" />
+                  <ExternalLink className="hidden sm:inline-block mr-2 h-3 w-3" />
                   Go to blog
                 </Button>
                 <Button
@@ -110,8 +110,8 @@ export function HeroMarquee() {
                   size="sm"
                   className="flex-1 bg-transparent"
                 >
-                  <BarChart3 className="mr-2 h-3 w-3" />
-                  Blog dashboard
+                  <BarChart3 className="hidden sm:inline-block mr-2 h-3 w-3" />
+                  Blog Dashboard
                 </Button>
               </div>
             </CardContent>

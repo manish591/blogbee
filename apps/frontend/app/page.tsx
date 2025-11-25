@@ -12,12 +12,12 @@ import { Logo } from '@/components/web/logo';
 export default async function Page() {
   return (
     <div className="min-h-screen">
-      <Header>
-        <div className="max-w-[1080px] mx-auto flex items-center">
+      <Header className="px-4 h-14 sm:h-16 flex items-center">
+        <div className="max-w-[1100px] w-full mx-auto flex items-center">
           <Logo />
-          <nav className="h-16 flex items-center justify-between ml-auto">
+          <nav className="flex items-center justify-between ml-auto">
             <div className="flex gap-8 items-center font-medium">
-              <div className="flex gap-6 items-center">
+              <div className="hidden sm:flex gap-6 items-center">
                 <Link
                   href="/"
                   className="text-foreground/80 hover:text-foreground transition-colors"

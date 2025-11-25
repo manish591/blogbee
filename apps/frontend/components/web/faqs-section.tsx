@@ -47,26 +47,28 @@ export function FaqsSection() {
   return (
     <section className="border-b bg-accent/30">
       <div>
-        <div className="border-b">
-          <div className="max-w-[1080px] mx-auto border-r border-l py-20">
-            <h2 className="text-5xl font-bold text-center">
+        <div className="border-b px-4">
+          <div className="max-w-[1100px] mx-auto border-r border-l py-20">
+            <h2 className="text-3xl sm:text-5xl font-bold text-center">
               Frequently asked questions
             </h2>
           </div>
         </div>
-        <div className="max-w-[1080px] mx-auto border-r border-l">
-          <div>
-            {faqs.map((faq, index) => (
-              <div
-                key={`${faq.question}-${index}`}
-                className="py-8 border-b last:border-0 px-20"
-              >
-                <h3 className="text-lg font-semibold mb-3">{faq.question}</h3>
-                <p className="text-foreground/70 leading-relaxed max-w-[90%]">
-                  {faq.answer}
-                </p>
-              </div>
-            ))}
+        <div className="px-4">
+          <div className="max-w-[1100px] mx-auto border-r border-l">
+            <div>
+              {faqs.map((faq, index) => (
+                <div
+                  key={`${faq.question}-${index}`}
+                  className="py-8 border-b last:border-0 px-6 sm:px-20"
+                >
+                  <h3 className="text-lg font-semibold mb-3">{faq.question}</h3>
+                  <p className="text-foreground/70 leading-relaxed max-w-[90%]">
+                    {faq.answer}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <div className="py-16 text-center border-t">

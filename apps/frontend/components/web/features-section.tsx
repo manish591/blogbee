@@ -5,31 +5,31 @@ import { APP_NAME } from '@/constants';
 export function FeaturesSection() {
   return (
     <div id="features">
-      <section className="py-36 border-b px-6 bg-accent/20">
-        <div className="max-w-[1080px] mx-auto">
-          <div className="relative grid lg:grid-cols-2 gap-20 items-center">
+      <section className="py-24 sm:py-36 border-b px-4 bg-accent/20">
+        <div className="max-w-[1100px] mx-auto">
+          <div className="relative grid lg:grid-cols-2 gap-10 sm:gap-20 items-center">
             <div className="lg:order-1">
-              <div className="absolute left-[-8%] top-[-10%]">
+              <div className="static sm:absolute left-[-8%] top-[-10%]">
                 <Image
                   src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1755642724/Screenshot_2025-08-20_040019_f5dvff.png"
                   height={1080}
                   width={800}
                   alt="blog-dashboard"
-                  className="rounded-md object-cover -rotate-4 border h-[350px] w-[600px] bg-background object-left"
+                  className="rounded-md object-cover rotate-0 sm:-rotate-4 border h-[250px] sm:h-[350px] w-[600px] bg-background object-left"
                 />
               </div>
             </div>
-            <div className="space-y-8 lg:order-2">
+            <div className="space-y-6 sm:space-y-8 lg:order-2">
               <div className="flex items-baseline gap-4">
-                <div className="text-5xl text-primary">01</div>
+                <div className="text-4xl sm:text-5xl text-primary">01</div>
                 <div className="h-[1.5px] flex-1 max-w-[60%] bg-primary rounded-full"></div>
               </div>
-              <div className="space-y-6">
-                <h2 className="text-5xl font-semibold text-slate-900 leading-tight">
+              <div className="space-y-8">
+                <h2 className="text-3xl sm:text-5xl font-semibold text-slate-900 leading-tight">
                   Multiple Blogs, <br />
                   <span>One Dashboard</span>
                 </h2>
-                <p className="text-xl text-foreground/70 max-w-[80%] leading-relaxed pt-6">
+                <p className="text-lg sm:text-xl text-foreground/70 max-w-[80%] leading-relaxed">
                   No more jumping between platforms — manage everything in one
                   clean interface.
                 </p>
@@ -39,69 +39,71 @@ export function FeaturesSection() {
         </div>
       </section>
       <section className="bg-background border-b">
-        <div className="border-b">
+        <div className="border-b px-4">
           <div className="max-w-[1080px] mx-auto py-24 flex items-center gap-12">
             <div className="flex flex-col gap-8 w-max">
               <div className="h-[1.5px] bg-primary w-full"></div>
-              <div className="text-5xl text-primary">02</div>
+              <div className="text-4xl sm:text-5xl text-primary">02</div>
             </div>
             <div>
-              <h3 className="text-5xl font-semibold">
+              <h3 className="text-3xl sm:text-5xl font-semibold">
                 Hosted on
                 <br /> Our Domain
               </h3>
             </div>
           </div>
         </div>
-        <div className="max-w-[1080px] mx-auto grid grid-cols-[45%_1fr]">
-          <div className="space-y-4 border-l">
-            <div className="space-y-3 border-b px-8 py-6">
-              <div className="flex items-center gap-3">
-                <Gift className="w-6 h-6" />
-                <div className="flex-1">
-                  <span className="font-medium">Free Subdomain</span>
-                  <div className="text-sm font-mono text-primary">
-                    yourblog.{APP_NAME}.site
+        <div className="px-4">
+          <div className="max-w-[1100px] mx-auto grid sm:grid-cols-[45%_1fr] grid-cols-1">
+            <div className="space-y-4 border-l">
+              <div className="space-y-3 border-b px-8 py-6">
+                <div className="flex items-center gap-3">
+                  <Gift className="w-6 h-6" />
+                  <div className="flex-1">
+                    <span className="font-medium">Free Subdomain</span>
+                    <div className="text-sm font-mono text-primary">
+                      yourblog.{APP_NAME}.site
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="px-8 pb-8">
+                <div className="flex items-center gap-3 text-foreground/80">
+                  <span className="text-sm">Coming Soon</span>
+                </div>
+                <div className="space-y-3 mt-4">
+                  <div className="flex items-center gap-3 p-3 rounded-md border text-foreground/60">
+                    <Globe className="w-5 h-5" />
+                    <span className="text-foreground/80">
+                      Custom Domain Setup
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-md border text-foreground/60">
+                    <Settings className="w-5 h-5" />
+                    <span className="text-foreground/80">
+                      Subdirectory Hosting
+                    </span>
+                    <span className="text-xs text-foreground/50 ml-auto">
+                      yourdomain.com/blog
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="px-8 pb-8">
-              <div className="flex items-center gap-3 text-foreground/80">
-                <span className="text-sm">Coming Soon</span>
-              </div>
-              <div className="space-y-3 mt-4">
-                <div className="flex items-center gap-3 p-3 rounded-md border text-foreground/60">
-                  <Globe className="w-5 h-5" />
-                  <span className="text-foreground/80">
-                    Custom Domain Setup
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 p-3 rounded-md border text-foreground/60">
-                  <Settings className="w-5 h-5" />
-                  <span className="text-foreground/80">
-                    Subdirectory Hosting
-                  </span>
-                  <span className="text-xs text-foreground/50 ml-auto">
-                    yourdomain.com/blog
-                  </span>
-                </div>
-              </div>
+            <div className="hidden sm:block max-h-80 border-l">
+              <Image
+                src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1755965750/Screenshot_2025-08-23_214449_wxatr3.png"
+                width={1080}
+                height={320}
+                alt="domain"
+                className="border-r blur-[2px] object-cover object-left w-full h-full"
+              />
             </div>
-          </div>
-          <div className="max-h-80 border-l">
-            <Image
-              src="https://res.cloudinary.com/dcugqfvvg/image/upload/v1755965750/Screenshot_2025-08-23_214449_wxatr3.png"
-              width={1080}
-              height={320}
-              alt="domain"
-              className="border-r blur-[2px] object-cover object-left w-full h-full"
-            />
           </div>
         </div>
       </section>
-      <section className="border-b">
-        <div className="max-w-[1080px] mx-auto">
+      <section className="border-b px-4">
+        <div className="max-w-[1100px] mx-auto">
           <div className="w-full relative">
             <div
               className="absolute inset-0 z-0"
@@ -117,23 +119,23 @@ export function FeaturesSection() {
                   'radial-gradient(ellipse 70% 60% at 50% 0%, #000 60%, transparent 100%)',
               }}
             />
-            <div className="z-6 relative flex justify-center items-center border-l py-44 border-r">
-              <div className="flex items-start justify-start gap-12">
+            <div className="z-6 relative flex justify-center items-center border-l py-20 sm:py-44 border-r px-6">
+              <div className="flex flex-col sm:flex-row items-start justify-start gap-12">
                 <div className="flex flex-col gap-8 w-max mt-[16px]">
                   <div className="h-[1.5px] bg-primary w-[90%] mx-auto"></div>
-                  <div className="text-5xl text-primary">03</div>
+                  <div className="text-4xl sm:text-5xl text-primary">03</div>
                 </div>
                 <div>
-                  <h3 className="text-5xl font-semibold leading-[1.2]">
+                  <h3 className="text-3xl sm:text-5xl font-semibold leading-[1.2]">
                     Clean. Modern.
                   </h3>
-                  <h3 className="text-5xl font-semibold leading-[1.2]">
+                  <h3 className="text-3xl sm:text-5xl font-semibold leading-[1.2]">
                     Lightning-Fast
                   </h3>
-                  <p className="text-xl text-foreground/70 mt-8">
+                  <p className="text-lg sm:text-xl text-foreground/70 mt-8">
                     A platform that gets out of your way so you can
                   </p>
-                  <p className="text-xl text-foreground/70">
+                  <p className="text-lg sm:text-xl text-foreground/70">
                     focus on your words, not the setup.
                   </p>
                 </div>
@@ -142,20 +144,20 @@ export function FeaturesSection() {
           </div>
         </div>
       </section>
-      <section className="dark bg-background py-24">
-        <div className="max-w-[1080px] mx-auto flex items-center gap-12">
+      <section className="dark bg-background py-24 px-4">
+        <div className="max-w-[1100px] mx-auto flex items-center gap-12">
           <div className="flex flex-col gap-8 w-max">
             <div className="h-[1.5px] bg-primary w-full"></div>
-            <div className="text-5xl text-primary">04</div>
+            <div className="text-4xl sm:text-5xl text-primary">04</div>
           </div>
           <div>
-            <h3 className="text-5xl font-semibold text-foreground">
+            <h3 className="text-3xl sm:text-5xl font-semibold text-foreground">
               SEO, Done
               <br /> For You
             </h3>
           </div>
         </div>
-        <div className="max-w-[1080px] mx-auto mt-24">
+        <div className="max-w-[1100px] mx-auto mt-24">
           <div className="grid grid-cols-1 md:grid-cols-3">
             <div
               className="p-9 py-20 border"
