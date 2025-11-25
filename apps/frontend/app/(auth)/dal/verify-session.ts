@@ -30,7 +30,7 @@ export const verifySession = cache(
     const data = await res.json();
 
     if (!res.ok) {
-      console.log("the response", res);
+      console.log("the response", res, cookieHeader);
       console.log('AUTHORIZATION_FAILED_ERROR: Failed to verify user');
       return null;
     }
